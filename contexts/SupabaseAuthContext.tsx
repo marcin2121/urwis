@@ -1,100 +1,91 @@
 'use client'
-
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { migrateLocalStorageToSupabase } from '@/lib/migrations/migrateLocalStorage'
-import type { User as SupabaseUser, Session } from '@supabase/supabase-js'
+import type { User, Session } from '@supabase/supabase-js'
 
-interface UserProfile {
+// ✅ DODAJ typ UserRole
+export type UserRole = 'user' | 'admin' | 'moderator';
+
+interface Profile {
   id: string
   username: string
   email: string
-  avatar_url: string | null
   level: number
   total_exp: number
-  created_at: string
-  updated_at: string
+  avatar_url: string | null
+  role: UserRole  // ✅ DODANE
 }
 
-interface SupabaseAuthContextType {
-  user: SupabaseUser | null
-  profile: UserProfile | null
+interface AuthContextType {
+  user: User | null
   session: Session | null
-  isLoading: boolean
-  signUp: (email: string, password: string, username: string) => Promise<{ error?: string }>
-  signIn: (email: string, password: string) => Promise<{ error?: string }>
+  profile: Profile | null
+  isAuthenticated: boolean
+  isAdmin: boolean  // ✅ DODANE
+  isModerator: boolean  // ✅ DODANE
+  loading: boolean
   signOut: () => Promise<void>
-  updateProfile: (updates: Partial<UserProfile>) => Promise<{ error?: string }>
-  refreshProfile: () => Promise<void>
 }
 
-const SupabaseAuthContext = createContext<SupabaseAuthContextType | undefined>(undefined)
+const SupabaseAuthContext = createContext<AuthContextType | undefined>(undefined)
 
-export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<SupabaseUser | null>(null)
-  const [profile, setProfile] = useState<UserProfile | null>(null)
+export function SupabaseAuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [migrationDone, setMigrationDone] = useState(false)
-  const supabase = createClient()
+  const [profile, setProfile] = useState<Profile | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  // Initialize auth session
+  const supabaseRef = useRef(createClient())
+  const supabase = supabaseRef.current
+
   useEffect(() => {
-    let isMounted = true
     const initAuth = async () => {
       try {
-        const {
-          data: { session: currentSession },
-        } = await supabase.auth.getSession()
-        
-        if (!isMounted) return
-        
-        setSession(currentSession)
-        setUser(currentSession?.user ?? null)
+        const { data: { session }, error } = await supabase.auth.getSession()
 
-        if (currentSession?.user) {
-          await fetchProfile(currentSession.user.id)
+        if (error) {
+          console.error('Session error:', error)
+          setLoading(false)
+          return
+        }
 
-          // Migrate localStorage data on first login
-          if (!migrationDone && localStorage.getItem('urwis_points')) {
-            const result = await migrateLocalStorageToSupabase(currentSession.user.id)
-            if (result.success) {
-              if (isMounted) setMigrationDone(true)
-            }
-          }
+        console.log('Initial session:', session?.user?.email || 'No session')
+        setSession(session)
+        setUser(session?.user ?? null)
+
+        if (session?.user) {
+          await fetchProfile(session.user.id)
+        } else {
+          setLoading(false)
         }
-      } catch (error) {
-        console.error('Error initializing auth:', error)
-      } finally {
-        if (isMounted) {
-          setIsLoading(false)
-        }
+      } catch (err) {
+        console.error('Init auth error:', err)
+        setLoading(false)
       }
     }
 
     initAuth()
 
-    // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, newSession) => {
-      if (!isMounted) return
-      
-      setSession(newSession)
-      setUser(newSession?.user ?? null)
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth event:', event, session?.user?.email || 'No user')
 
-      if (newSession?.user) {
-        await fetchProfile(newSession.user.id)
+      setSession(session)
+      setUser(session?.user ?? null)
+
+      if (session?.user) {
+        await fetchProfile(session.user.id)
       } else {
         setProfile(null)
+        setLoading(false)
       }
     })
 
     return () => {
-      isMounted = false
       subscription.unsubscribe()
     }
-  }, [])
+  }, [supabase])
 
   const fetchProfile = async (userId: string) => {
     try {
@@ -105,104 +96,51 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
         .single()
 
       if (error) {
-        if (error.code === 'PGRST116') {
-          // Profile doesn't exist yet - that's OK for new users
-          setProfile(null)
-        } else {
-          throw error
-        }
-      } else {
-        setProfile(data)
-      }
-    } catch (error) {
-      console.error('Error fetching profile:', error)
-      setProfile(null)
-    }
-  }
-
-  const refreshProfile = async () => {
-    if (!user) return
-    await fetchProfile(user.id)
-  }
-
-  const signUp = async (email: string, password: string, username: string) => {
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            username,
-          },
-          emailRedirectTo: `${window.location.origin}/auth/sign-up-success`,
-        },
-      })
-
-      if (error) throw error
-
-      return { error: undefined }
-    } catch (error: any) {
-      return { error: error.message }
-    }
-  }
-
-  const signIn = async (email: string, password: string) => {
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-      if (error) {
+        console.error('Profile error:', error)
         throw error
       }
-      return { error: undefined }
-    } catch (error: any) {
-      return { error: error.message }
+
+      console.log('Profile loaded:', data?.username, 'Role:', data?.role)
+      setProfile(data)
+    } catch (error) {
+      console.error('Fetch profile error:', error)
+    } finally {
+      setLoading(false)
     }
   }
 
   const signOut = async () => {
     try {
-      await supabase.auth.signOut()
-      setUser(null)
-      setProfile(null)
-      setSession(null)
-    } catch (error) {
-      console.error('Error signing out:', error)
-    }
-  }
-
-  const updateProfile = async (updates: Partial<UserProfile>) => {
-    if (!user) return { error: 'No user logged in' }
-
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update(updates)
-        .eq('id', user.id)
+      console.log('Signing out...')
+      const { error } = await supabase.auth.signOut()
 
       if (error) throw error
 
-      setProfile((prev) => (prev ? { ...prev, ...updates } : null))
-      return { error: undefined }
-    } catch (error: any) {
-      return { error: error.message }
+      setUser(null)
+      setSession(null)
+      setProfile(null)
+
+      window.location.href = '/'
+    } catch (error) {
+      console.error('Sign out error:', error)
     }
   }
+
+  // ✅ Helper functions
+  const isAdmin = profile?.role === 'admin'
+  const isModerator = profile?.role === 'moderator' || profile?.role === 'admin'
 
   return (
     <SupabaseAuthContext.Provider
       value={{
         user,
-        profile,
         session,
-        isLoading,
-        signUp,
-        signIn,
+        profile,
+        isAuthenticated: !!session,
+        isAdmin,  // ✅ DODANE
+        isModerator,  // ✅ DODANE
+        loading,
         signOut,
-        updateProfile,
-        refreshProfile,
       }}
     >
       {children}
@@ -210,60 +148,10 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
   )
 }
 
-// Compatibility hook dla starych komponentów
-export function useSupabaseAuth() {
+export const useSupabaseAuth = () => {
   const context = useContext(SupabaseAuthContext)
   if (context === undefined) {
     throw new Error('useSupabaseAuth must be used within SupabaseAuthProvider')
   }
-
-  // Oblicz exp do następnego poziomu
-  const calculateExpToNextLevel = (level: number, currentExp: number) => {
-    const nextLevelRequirement = Math.pow(level + 1, 2) * 100
-    return nextLevelRequirement - currentExp
-  }
-
-  return {
-    // ← GŁÓWNE (nowe API):
-    user: context.user,
-    profile: context.profile,
-    session: context.session,
-    isLoading: context.isLoading,
-    signUp: context.signUp,
-    signIn: context.signIn,
-    signOut: context.signOut,
-    updateProfile: context.updateProfile,
-    refreshProfile: context.refreshProfile,
-
-    // ← COMPATIBILITY (stare API):
-    isAuthenticated: !!context.user,
-
-    // ← MAPPED user object
-    userLegacy: context.profile ? {
-      id: context.profile.id,
-      email: context.profile.email,
-      username: context.profile.username,
-      level: context.profile.level,
-      exp: context.profile.total_exp,
-      expToNextLevel: calculateExpToNextLevel(context.profile.level, context.profile.total_exp),
-      avatar: context.profile.avatar_url || '🧸',
-      createdAt: context.profile.created_at,
-    } : null,
-
-    // ← LEGACY functions
-    login: async (email: string, password: string) => {
-      const result = await context.signIn(email, password)
-      return { error: result.error }
-    },
-    register: async (email: string, username: string, password: string) => {
-      const result = await context.signUp(email, password, username)
-      return { error: result.error }
-    },
-    logout: context.signOut,
-    updateAvatar: async (avatar: string) => {
-      await context.updateProfile({ avatar_url: avatar })
-    },
-  }
+  return context
 }
-
-export { SupabaseAuthContext }
