@@ -296,6 +296,7 @@ function ProfileTab({ user, updateAvatar }: any) {
   );
 }
 
+
 // 2. Loyalty Tab
 function LoyaltyTab({ points, level, badges }: any) {
   const badgesList = [
