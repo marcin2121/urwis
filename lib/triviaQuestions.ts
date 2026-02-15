@@ -246,17 +246,9 @@ export const TRIVIA_QUESTIONS: TriviaQuestion[] = [
     exp: 25,
     category: "🎨 Kultura"
   },
-  {
-    question: "Autor 'Pana Tadeusza'?",
-    options: ["Sienkiewicz", "Mickiewicz", "Reymont", "Orzeszkowa"],
-    correct: 1,
-    exp: 20,
-    category: "🎨 Kultura"
-  },
-
   // SPORT (150+)
   {
-    question: "Ile graczy w drużynie piłkarskiej (w polu)?",
+    question: "Ilu jest graczy w drużynie piłkarskiej (w polu)?",
     options: ["9", "10", "11", "12"],
     correct: 2,
     exp: 15,
@@ -265,7 +257,7 @@ export const TRIVIA_QUESTIONS: TriviaQuestion[] = [
 
   // Z GITHUB GIST (200+ przetłumaczonych)
   {
-    question: "Migający czerwony światło oznacza?",
+    question: "Co oznacza czerwone światło?",
     options: ["Zatrzymaj się", "Przyspiesz", "Jedź ostrożnie", "Trąb"],
     correct: 0,
     exp: 10,
@@ -288,13 +280,6 @@ export const TRIVIA_QUESTIONS: TriviaQuestion[] = [
 
   // MATEMATYKA (100+)
   {
-    question: "Pierwiastek z 64?",
-    options: ["6", "8", "10", "12"],
-    correct: 1,
-    exp: 20,
-    category: "🔢 Matematyka"
-  },
-  {
     question: "3/4 jako ułamek dziesiętny?",
     options: ["0.25", "0.50", "0.75", "0.90"],
     correct: 2,
@@ -315,7 +300,7 @@ export const TRIVIA_QUESTIONS: TriviaQuestion[] = [
   {
     question: "Skóra niedźwiedzia polarnego jest...?",
     options: ["Biała", "Czarna", "Brązowa", "Przezroczysta"],
-    correct: 3,
+    correct: 1,
     exp: 25,
     category: "🐻 Zwierzęta"
   },
