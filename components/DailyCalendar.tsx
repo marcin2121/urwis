@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
-import { useLoyalty } from '@/contexts/LoyaltyContext';
+import { useLoyalty } from '@/contexts/SupabaseLoyaltyContext';
 
 export default function DailyCalendar() {
   const { user, isAuthenticated, addExp } = useAuth();
@@ -92,19 +92,19 @@ export default function DailyCalendar() {
 
     let streak = 0;
     const today = new Date();
-    
+
     for (let i = 0; i < 365; i++) {
       const checkDate = new Date(today);
       checkDate.setDate(today.getDate() - i);
       const dateStr = `${checkDate.getFullYear()}-${String(checkDate.getMonth() + 1).padStart(2, '0')}-${String(checkDate.getDate()).padStart(2, '0')}`;
-      
+
       if (claimedDays.has(dateStr)) {
         streak++;
       } else if (i > 0) {
         break;
       }
     }
-    
+
     return streak;
   };
 
@@ -134,9 +134,9 @@ export default function DailyCalendar() {
     for (let day = 1; day <= daysInMonth; day++) {
       const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       const isClaimed = claimedDays.has(dateStr);
-      const isToday = day === new Date().getDate() && 
-                      currentMonth === new Date().getMonth() && 
-                      currentYear === new Date().getFullYear();
+      const isToday = day === new Date().getDate() &&
+        currentMonth === new Date().getMonth() &&
+        currentYear === new Date().getFullYear();
       const isPast = new Date(currentYear, currentMonth, day) < new Date(new Date().setHours(0, 0, 0, 0));
       const isFuture = new Date(currentYear, currentMonth, day) > new Date();
 
@@ -147,15 +147,14 @@ export default function DailyCalendar() {
           whileTap={isToday && !isClaimed ? { scale: 0.95 } : {}}
           onClick={() => isToday && !isClaimed && claimDailyReward(day)}
           disabled={!isToday || isClaimed}
-          className={`aspect-square rounded-xl flex flex-col items-center justify-center font-bold text-sm relative transition-all ${
-            isClaimed 
-              ? 'bg-linear-to-br from-green-400 to-emerald-500 text-white shadow-lg' 
-              : isToday 
-              ? 'bg-linear-to-br from-yellow-400 to-orange-500 text-white shadow-xl animate-pulse cursor-pointer'
-              : isPast
-              ? 'bg-gray-100 text-gray-400'
-              : 'bg-gray-50 text-gray-300'
-          }`}
+          className={`aspect-square rounded-xl flex flex-col items-center justify-center font-bold text-sm relative transition-all ${isClaimed
+              ? 'bg-linear-to-br from-green-400 to-emerald-500 text-white shadow-lg'
+              : isToday
+                ? 'bg-linear-to-br from-yellow-400 to-orange-500 text-white shadow-xl animate-pulse cursor-pointer'
+                : isPast
+                  ? 'bg-gray-100 text-gray-400'
+                  : 'bg-gray-50 text-gray-300'
+            }`}
         >
           <span className="text-lg">{day}</span>
           {isClaimed && <span className="text-2xl absolute">✓</span>}

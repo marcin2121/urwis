@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
-import { useLoyalty } from '@/contexts/LoyaltyContext';
+import { useLoyalty } from '@/contexts/SupabaseLoyaltyContext';
 
 interface Challenge {
   type: string;
@@ -215,7 +215,7 @@ export default function DailyChallenge() {
     if (!user) return;
 
     const today = new Date().toDateString();
-    
+
     // Sprawdź czy dzisiaj już wykonał wyzwanie
     const completed = localStorage.getItem(`urwis_challenge_completed_${user.id}_${today}`);
     setChallengeCompleted(!!completed);
@@ -240,14 +240,14 @@ export default function DailyChallenge() {
     let success = false;
 
     // Sprawdź odpowiedź
-    if (dailyChallenge.type === 'quiz' || 
-        dailyChallenge.type === 'trivia' || 
-        dailyChallenge.type === 'math' || 
-        dailyChallenge.type === 'riddle' ||
-        dailyChallenge.type === 'emoji' ||
-        dailyChallenge.type === 'truefalse' ||
-        dailyChallenge.type === 'memory' ||
-        dailyChallenge.type === 'seasonal') {
+    if (dailyChallenge.type === 'quiz' ||
+      dailyChallenge.type === 'trivia' ||
+      dailyChallenge.type === 'math' ||
+      dailyChallenge.type === 'riddle' ||
+      dailyChallenge.type === 'emoji' ||
+      dailyChallenge.type === 'truefalse' ||
+      dailyChallenge.type === 'memory' ||
+      dailyChallenge.type === 'seasonal') {
       success = answer === dailyChallenge.correct;
     } else if (dailyChallenge.type === 'find') {
       // Sprawdź czy znalazł Urwisa
@@ -263,7 +263,7 @@ export default function DailyChallenge() {
       // Dodaj nagrody
       addPoints(dailyChallenge.reward, 'Dzienne wyzwanie');
       addExp(dailyChallenge.expReward, `Dzienne wyzwanie: ${dailyChallenge.task || dailyChallenge.question}`);
-      
+
       // Zapisz ukończenie
       const today = new Date().toDateString();
       localStorage.setItem(`urwis_challenge_completed_${user.id}_${today}`, 'true');
@@ -272,7 +272,7 @@ export default function DailyChallenge() {
 
 
       // ✨ DODAJ - Trigger mission check dla weekly challenge
-    window.dispatchEvent(new CustomEvent('missionProgress', {
+      window.dispatchEvent(new CustomEvent('missionProgress', {
         detail: { type: 'challenges_completed', value: 1 }
       }));
 
@@ -320,33 +320,33 @@ export default function DailyChallenge() {
           // Do wykonania
           <div className="flex-1 flex flex-col">
             {/* Quiz/Trivia/Math/Riddles/Emoji/TrueFalse/Memory/Seasonal */}
-            {(dailyChallenge.type === 'quiz' || 
-              dailyChallenge.type === 'trivia' || 
+            {(dailyChallenge.type === 'quiz' ||
+              dailyChallenge.type === 'trivia' ||
               dailyChallenge.type === 'math' ||
               dailyChallenge.type === 'riddle' ||
               dailyChallenge.type === 'emoji' ||
               dailyChallenge.type === 'truefalse' ||
               dailyChallenge.type === 'memory' ||
               dailyChallenge.type === 'seasonal') && (
-              <div className="flex-1 flex flex-col">
-                <p className="text-lg font-semibold mb-4 text-center">
-                  {dailyChallenge.question}
-                </p>
-                <div className="space-y-3 flex-1">
-                  {dailyChallenge.options?.map((option: string, i: number) => (
-                    <motion.button
-                      key={i}
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.97 }}
-                      onClick={() => completeDailyChallenge(i)}
-                      className="w-full p-4 bg-gray-100 hover:bg-linear-to-r hover:from-yellow-100 hover:to-orange-100 rounded-xl font-semibold transition-all text-left"
-                    >
-                      {option}
-                    </motion.button>
-                  ))}
+                <div className="flex-1 flex flex-col">
+                  <p className="text-lg font-semibold mb-4 text-center">
+                    {dailyChallenge.question}
+                  </p>
+                  <div className="space-y-3 flex-1">
+                    {dailyChallenge.options?.map((option: string, i: number) => (
+                      <motion.button
+                        key={i}
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => completeDailyChallenge(i)}
+                        className="w-full p-4 bg-gray-100 hover:bg-linear-to-r hover:from-yellow-100 hover:to-orange-100 rounded-xl font-semibold transition-all text-left"
+                      >
+                        {option}
+                      </motion.button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
             {/* Find Urwis */}
             {dailyChallenge.type === 'find' && (
@@ -354,11 +354,11 @@ export default function DailyChallenge() {
                 <p className="text-lg font-semibold mb-6">
                   {dailyChallenge.task}
                 </p>
-                
+
                 {(() => {
                   const today = new Date().toDateString();
                   const found = localStorage.getItem(`urwis_hidden_found_${user?.id}_${today}`);
-                  
+
                   return found ? (
                     <motion.button
                       whileHover={{ scale: 1.05 }}
@@ -373,7 +373,7 @@ export default function DailyChallenge() {
                       <p className="text-sm text-gray-700 mb-2">
                         💡 Wskazówka: Szukaj świecącego Urwisa na różnych stronach!
                       </p>
-                      <a 
+                      <a
                         href="/"
                         className="text-blue-600 font-bold hover:underline"
                       >
@@ -433,9 +433,9 @@ export default function DailyChallenge() {
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-3xl p-8 max-w-md text-center shadow-2xl"
             >
-              <motion.div 
+              <motion.div
                 className="text-7xl mb-4"
-                animate={{ 
+                animate={{
                   scale: [1, 1.2, 1],
                   rotate: [0, 10, -10, 0]
                 }}
@@ -449,7 +449,7 @@ export default function DailyChallenge() {
               <p className="text-lg text-gray-700 mb-6">
                 {modalMessage.description}
               </p>
-              
+
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -480,9 +480,9 @@ export default function DailyChallenge() {
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-3xl p-8 max-w-md text-center shadow-2xl"
             >
-              <motion.div 
+              <motion.div
                 className="text-7xl mb-4"
-                animate={{ 
+                animate={{
                   rotate: [0, -10, 10, -10, 0]
                 }}
                 transition={{ duration: 0.5 }}
@@ -495,7 +495,7 @@ export default function DailyChallenge() {
               <p className="text-lg text-gray-700 mb-6">
                 {modalMessage.description}
               </p>
-              
+
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
