@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
-import AuthModal from '../AuthModal';
+import AuthModal from '@/components/AuthModal';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);

@@ -29,17 +29,23 @@ export default function Page() {
     setError(null)
 
     try {
-      // ✅ POPRAWIONE - bez options!
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
 
-      if (error) throw error
-      router.push('/protected')
+      if (error) {
+        setError(error.message)
+        setIsLoading(false)
+        return
+      }
+      
+      // Wait for auth state to update before redirecting
+      await new Promise(resolve => setTimeout(resolve, 500))
+      router.push('/profil')
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'An error occurred')
-    } finally {
+      const message = error instanceof Error ? error.message : 'An error occurred'
+      setError(message)
       setIsLoading(false)
     }
   }

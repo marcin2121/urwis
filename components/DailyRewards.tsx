@@ -27,6 +27,7 @@ export default function DailyRewards() {
   const [hiddenItemFound, setHiddenItemFound] = useState(false);
   const [challengeCompleted, setChallengeCompleted] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
 
   // ✨ NOWE: Stany dla pop-upów
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -112,6 +113,14 @@ export default function DailyRewards() {
     },
 
   ];
+
+  // Initialize window size on mount
+  useEffect(() => {
+    setWindowSize({
+      width: window.innerWidth,
+      height: window.innerHeight,
+    });
+  }, []);
 
   useEffect(() => {
     if (!isAuthenticated || !user) {
@@ -282,14 +291,14 @@ export default function DailyRewards() {
     <section className="py-24 bg-linear-to-b from-yellow-50 to-orange-50 relative overflow-hidden">
       {/* Animated background */}
       <div className="absolute inset-0 opacity-10 pointer-events-none">
-        {[...Array(20)].map((_, i) => (
+        {windowSize.width > 0 && [...Array(20)].map((_, i) => (
           <motion.div
             key={i}
             className="absolute text-4xl"
-            initial={{ y: -100, x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000) }}
+            initial={{ y: -100, x: Math.random() * windowSize.width }}
             animate={{
-              y: (typeof window !== 'undefined' ? window.innerHeight : 1000) + 100,
-              x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
+              y: windowSize.height + 100,
+              x: Math.random() * windowSize.width,
             }}
             transition={{
               duration: Math.random() * 10 + 10,

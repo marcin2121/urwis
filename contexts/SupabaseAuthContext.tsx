@@ -1,90 +1,95 @@
 'use client'
-
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { migrateLocalStorageToSupabase } from '@/lib/migrations/migrateLocalStorage'
-import type { User as SupabaseUser, Session } from '@supabase/supabase-js'
+import type { User, Session } from '@supabase/supabase-js'
+import type { Profile } from '@/types/database'
 
-interface UserProfile {
-  id: string
-  username: string
-  email: string
-  avatar_url: string | null
-  level: number
-  total_exp: number
-  created_at: string
-  updated_at: string
-}
-
-interface SupabaseAuthContextType {
-  user: SupabaseUser | null
-  profile: UserProfile | null
+interface AuthContextType {
+  user: User | null
   session: Session | null
-  isLoading: boolean
-  signUp: (email: string, password: string, username: string) => Promise<{ error?: string }>
-  signIn: (email: string, password: string) => Promise<{ error?: string }>
+  profile: Profile | null
+  isAuthenticated: boolean
+  isAdmin: boolean
+  isModerator: boolean
+  loading: boolean
+  login: (email: string, password: string) => Promise<boolean>
+  register: (email: string, username: string, password: string) => Promise<boolean>
+  updateProfile: (updates: Partial<Profile>) => Promise<boolean>  // ✅ DODANE
   signOut: () => Promise<void>
-  updateProfile: (updates: Partial<UserProfile>) => Promise<{ error?: string }>
-  refreshProfile: () => Promise<void>
 }
 
-const SupabaseAuthContext = createContext<SupabaseAuthContextType | undefined>(undefined)
+const SupabaseAuthContext = createContext<AuthContextType | undefined>(undefined)
 
-export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<SupabaseUser | null>(null)
-  const [profile, setProfile] = useState<UserProfile | null>(null)
+const supabase = createClient()
+
+export function SupabaseAuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [migrationDone, setMigrationDone] = useState(false)
-  const supabase = createClient()
+  const [profile, setProfile] = useState<Profile | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [initialized, setInitialized] = useState(false)
 
-  // Initialize auth session
   useEffect(() => {
+    if (initialized) return
+
+    let mounted = true
+
     const initAuth = async () => {
       try {
-        const {
-          data: { session: currentSession },
-        } = await supabase.auth.getSession()
-        setSession(currentSession)
-        setUser(currentSession?.user ?? null)
+        const { data: { session }, error } = await supabase.auth.getSession()
 
-        if (currentSession?.user) {
-          await fetchProfile(currentSession.user.id)
+        if (!mounted) return
 
-          // Migrate localStorage data on first login
-          if (!migrationDone && localStorage.getItem('urwis_points')) {
-            const result = await migrateLocalStorageToSupabase(currentSession.user.id)
-            if (result.success) {
-              console.log('[Urwis] Migrated data:', result.migratedData)
-              setMigrationDone(true)
-            }
-          }
+        if (error) {
+          console.error('❌ Session error:', error)
+          setLoading(false)
+          return
         }
-      } catch (error) {
-        console.error('Error initializing auth:', error)
+
+        console.log('✅ Initial session:', session?.user?.email || 'No session')
+        setSession(session)
+        setUser(session?.user ?? null)
+
+        if (session?.user) {
+          await fetchProfile(session.user.id)
+        } else {
+          setLoading(false)
+        }
+      } catch (err) {
+        console.error('❌ Init auth error:', err)
+        if (mounted) setLoading(false)
       } finally {
-        setIsLoading(false)
+        if (mounted) setInitialized(true)
       }
     }
 
     initAuth()
 
-    // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, newSession) => {
-      setSession(newSession)
-      setUser(newSession?.user ?? null)
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!mounted) return
 
-      if (newSession?.user) {
-        await fetchProfile(newSession.user.id)
-      } else {
+      console.log('🔔 Auth event:', event, session?.user?.email || 'No user')
+
+      if (event === 'INITIAL_SESSION') return
+
+      setSession(session)
+      setUser(session?.user ?? null)
+
+      if (session?.user && event === 'SIGNED_IN') {
+        await fetchProfile(session.user.id)
+      } else if (event === 'SIGNED_OUT') {
         setProfile(null)
+        setLoading(false)
       }
     })
 
-    return () => subscription.unsubscribe()
-  }, [])
+    return () => {
+      mounted = false
+      subscription.unsubscribe()
+    }
+  }, [initialized])
 
   const fetchProfile = async (userId: string) => {
     try {
@@ -94,94 +99,164 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
         .eq('id', userId)
         .single()
 
-      if (error) throw error
+      if (error) {
+        console.error('❌ Profile error:', error)
+        throw error
+      }
+
+      console.log('✅ Profile loaded:', data?.username, 'Role:', data?.role)
       setProfile(data)
     } catch (error) {
-      console.error('Error fetching profile:', error)
+      console.error('❌ Fetch profile error:', error)
+    } finally {
+      setLoading(false)
     }
   }
 
-  const refreshProfile = async () => {
-    if (!user) return
-    await fetchProfile(user.id)
+  // ✅ LOGIN FUNCTION
+  const login = async (email: string, password: string): Promise<boolean> => {
+    try {
+      console.log('🔐 Logging in:', email)
+      setLoading(true)
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password: password,
+      })
+
+      if (error) {
+        console.error('❌ Login error:', error)
+        alert(error.message)
+        return false
+      }
+
+      console.log('✅ Logged in:', data.user?.email)
+      return true
+    } catch (err: any) {
+      console.error('❌ Login exception:', err)
+      alert(err.message || 'Błąd logowania')
+      return false
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const signUp = async (email: string, password: string, username: string) => {
+  // ✅ REGISTER FUNCTION
+  const register = async (email: string, username: string, password: string): Promise<boolean> => {
     try {
+      console.log('📝 Registering:', email, username)
+      setLoading(true)
+
       const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
+        email: email.trim(),
+        password: password,
         options: {
           data: {
-            username,
+            username: username.trim(),
           },
-          emailRedirectTo: `${window.location.origin}/auth/sign-up-success`,
         },
       })
 
-      if (error) throw error
+      if (error) {
+        console.error('❌ Register error:', error)
+        alert(error.message)
+        return false
+      }
 
-      return { error: undefined }
-    } catch (error: any) {
-      return { error: error.message }
+      console.log('✅ Registered:', data.user?.email)
+
+      if (data.user && !data.session) {
+        alert('✅ Konto utworzone! Sprawdź email aby potwierdzić.')
+        return true
+      }
+
+      alert('✅ Konto utworzone! Możesz się teraz zalogować.')
+      return true
+    } catch (err: any) {
+      console.error('❌ Register exception:', err)
+      alert(err.message || 'Błąd rejestracji')
+      return false
+    } finally {
+      setLoading(false)
     }
   }
 
-  const signIn = async (email: string, password: string) => {
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
+  // ✅ UPDATE PROFILE FUNCTION
+  const updateProfile = async (updates: Partial<Profile>): Promise<boolean> => {
+    if (!user) {
+      console.error('❌ No user to update')
+      return false
+    }
 
-      if (error) throw error
-      return { error: undefined }
-    } catch (error: any) {
-      return { error: error.message }
+    try {
+      console.log('🔄 Updating profile:', updates)
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', user.id)
+        .select()
+        .single()
+
+      if (error) {
+        console.error('❌ Update profile error:', error)
+        alert('Błąd aktualizacji profilu: ' + error.message)
+        return false
+      }
+
+      console.log('✅ Profile updated:', data)
+      setProfile(data)
+      return true
+    } catch (err: any) {
+      console.error('❌ Update profile exception:', err)
+      alert(err.message || 'Błąd aktualizacji profilu')
+      return false
     }
   }
 
   const signOut = async () => {
     try {
-      await supabase.auth.signOut()
+      console.log('🚪 Signing out...')
+
       setUser(null)
-      setProfile(null)
       setSession(null)
-    } catch (error) {
-      console.error('Error signing out:', error)
-    }
-  }
+      setProfile(null)
 
-  const updateProfile = async (updates: Partial<UserProfile>) => {
-    if (!user) return { error: 'No user logged in' }
-
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update(updates)
-        .eq('id', user.id)
+      const { error } = await supabase.auth.signOut()
 
       if (error) throw error
 
-      setProfile((prev) => (prev ? { ...prev, ...updates } : null))
-      return { error: undefined }
-    } catch (error: any) {
-      return { error: error.message }
+      window.location.href = '/'
+    } catch (error) {
+      console.error('❌ Sign out error:', error)
     }
+  }
+
+  const isAdmin = profile?.role === 'admin'
+  const isModerator = profile?.role === 'moderator' || profile?.role === 'admin'
+
+  if (loading && !initialized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-2xl font-bold">Ładowanie... 🦸‍♂️</div>
+      </div>
+    )
   }
 
   return (
     <SupabaseAuthContext.Provider
       value={{
         user,
-        profile,
         session,
-        isLoading,
-        signUp,
-        signIn,
+        profile,
+        isAuthenticated: !!session,
+        isAdmin,
+        isModerator,
+        loading,
+        login,
+        register,
+        updateProfile,  // ✅ DODANE
         signOut,
-        updateProfile,
-        refreshProfile,
       }}
     >
       {children}
@@ -189,60 +264,10 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
   )
 }
 
-// Compatibility hook dla starych komponentów
-export function useSupabaseAuth() {
+export const useSupabaseAuth = () => {
   const context = useContext(SupabaseAuthContext)
   if (context === undefined) {
     throw new Error('useSupabaseAuth must be used within SupabaseAuthProvider')
   }
-
-  // Oblicz exp do następnego poziomu
-  const calculateExpToNextLevel = (level: number, currentExp: number) => {
-    const nextLevelRequirement = Math.pow(level + 1, 2) * 100
-    return nextLevelRequirement - currentExp
-  }
-
-  return {
-    // ← GŁÓWNE (nowe API):
-    user: context.user,
-    profile: context.profile,
-    session: context.session,
-    isLoading: context.isLoading,
-    signUp: context.signUp,
-    signIn: context.signIn,
-    signOut: context.signOut,
-    updateProfile: context.updateProfile,
-    refreshProfile: context.refreshProfile,
-
-    // ← COMPATIBILITY (stare API):
-    isAuthenticated: !!context.user,
-
-    // ← MAPPED user object
-    userLegacy: context.profile ? {
-      id: context.profile.id,
-      email: context.profile.email,
-      username: context.profile.username,
-      level: context.profile.level,
-      exp: context.profile.total_exp,
-      expToNextLevel: calculateExpToNextLevel(context.profile.level, context.profile.total_exp),
-      avatar: context.profile.avatar_url || '🧸',
-      createdAt: context.profile.created_at,
-    } : null,
-
-    // ← LEGACY functions
-    login: async (email: string, password: string) => {
-      const result = await context.signIn(email, password)
-      return { error: result.error }
-    },
-    register: async (email: string, username: string, password: string) => {
-      const result = await context.signUp(email, password, username)
-      return { error: result.error }
-    },
-    logout: context.signOut,
-    updateAvatar: async (avatar: string) => {
-      await context.updateProfile({ avatar_url: avatar })
-    },
-  }
+  return context
 }
-
-export { SupabaseAuthContext }

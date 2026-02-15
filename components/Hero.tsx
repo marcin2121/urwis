@@ -3,15 +3,15 @@ import { useRef, useEffect, useState } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import Modal from 'react-modal';
 
-// Dodaj to na początku komponentu, aby uniknąć ostrzeżeń accessibility
-if (typeof window !== 'undefined') {
-  Modal.setAppElement('body');
-}
-
 export default function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isMapOpen, setIsMapOpen] = useState(false);
+
+  // Set modal root element for accessibility
+  useEffect(() => {
+    Modal.setAppElement('body');
+  }, []);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,

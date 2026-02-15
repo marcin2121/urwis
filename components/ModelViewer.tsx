@@ -1,4 +1,4 @@
-import { FC, Suspense, useRef, useLayoutEffect, useEffect, useMemo } from 'react';
+import { FC, Suspense, useRef, useLayoutEffect, useEffect, useMemo, useState } from 'react';
 import { Canvas, useFrame, useLoader, useThree, invalidate } from '@react-three/fiber';
 import { OrbitControls, useGLTF, useFBX, useProgress, Html, Environment, ContactShadows } from '@react-three/drei';
 import * as THREE from 'three';
@@ -32,7 +32,7 @@ export interface ViewerProps {
   onModelLoaded?: () => void;
 }
 
-const isTouch = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+// Check if device supports touch input - evaluated at runtime only inside hooks
 const deg2rad = (d: number) => (d * Math.PI) / 180;
 const DECIDE = 8; // px before we decide horizontal vs vertical
 const ROTATE_SPEED = 0.005;
@@ -402,6 +402,13 @@ const ModelViewer: FC<ViewerProps> = ({
   autoRotateSpeed = 0.35,
   onModelLoaded
 }) => {
+  const [isTouch, setIsTouch] = useState(false);
+
+  // Detect touch support on mount
+  useEffect(() => {
+    setIsTouch('ontouchstart' in window || navigator.maxTouchPoints > 0);
+  }, []);
+
   useEffect(() => void useGLTF.preload(url), [url]);
   const pivot = useRef(new THREE.Vector3()).current;
   const contactRef = useRef<THREE.Mesh>(null);
