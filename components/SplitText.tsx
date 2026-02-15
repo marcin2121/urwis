@@ -69,7 +69,7 @@ const SplitText: React.FC<SplitTextProps> = ({
       if (el._rbsplitInstance) {
         try {
           el._rbsplitInstance.revert();
-        } catch (_) {}
+        } catch (_) { }
         el._rbsplitInstance = undefined;
       }
 
@@ -134,7 +134,7 @@ const SplitText: React.FC<SplitTextProps> = ({
         });
         try {
           splitInstance.revert();
-        } catch (_) {}
+        } catch (_) { }
         el._rbsplitInstance = undefined;
       };
     },
@@ -155,23 +155,26 @@ const SplitText: React.FC<SplitTextProps> = ({
     }
   );
 
-  const renderTag = () => {
+  const renderTag = (): React.ReactElement => {
     const style: React.CSSProperties = {
       textAlign,
       wordWrap: 'break-word',
       willChange: 'transform, opacity'
     };
     const classes = `split-parent overflow-hidden inline-block whitespace-normal ${className}`;
-    const Tag = (tag || 'p') as React.ElementType;
 
-    return (
-      <Tag ref={ref} style={style} className={classes}>
-        {text}
-      </Tag>
+    return React.createElement(
+      tag || 'p',
+      {
+        ref: ref as React.Ref<any>,
+        style,
+        className: classes
+      },
+      text
     );
   };
 
-  return renderTag();
+  return renderTag(); // ← DODANE!
 };
 
 export default SplitText;

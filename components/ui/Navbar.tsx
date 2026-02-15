@@ -5,12 +5,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import AuthModal from '../AuthModal';
-import { Edu_SA_Beginner } from "next/font/google";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const { user: profile, session, signOut } = useSupabaseAuth();
+  const { profile, session, signOut } = useSupabaseAuth();
   const isAuthenticated = !!session;
 
   const navItems = [
@@ -19,9 +18,7 @@ export default function Navbar() {
     { name: "Misje", icon: "🎯", href: "/misje" },
     { name: "Nagrody", icon: "🏆", href: "/nagrody" },
     { name: "Gry", icon: "🎮", href: "/gry" },
- // NOWE
   ];
-  
 
   return (
     <>
@@ -32,7 +29,7 @@ export default function Navbar() {
         transition={{ duration: 0.5 }}
         className="fixed top-8 left-1/2 -translate-x-1/2 w-[96%] max-w-6xl z-50"
       >
-        <div 
+        <div
           className="relative rounded-full border border-gray-200 shadow-[0_8px_40px_rgba(0,0,0,0.12)] px-8 py-5 overflow-hidden"
           style={{
             backdropFilter: 'blur(40px) saturate(180%)',
@@ -41,7 +38,7 @@ export default function Navbar() {
           }}
         >
           <nav className="relative flex justify-between items-center">
-            
+
             {/* Logo */}
             <Link href="/" className="flex items-center gap-3 group z-10">
               <motion.div
@@ -49,8 +46,8 @@ export default function Navbar() {
                 transition={{ duration: 0.6, type: "spring" }}
                 className="relative w-10 h-10"
               >
-                <Image 
-                  src="/logo.png" 
+                <Image
+                  src="/logo.png"
                   alt="Sklep Urwis"
                   width={50}
                   height={50}
@@ -59,7 +56,6 @@ export default function Navbar() {
                   className="object-contain drop-shadow-lg"
                 />
               </motion.div>
-
             </Link>
 
             {/* Desktop Menu */}
@@ -71,7 +67,7 @@ export default function Navbar() {
                   className="relative text-base font-bold text-gray-900 hover:text-[#BF2024] transition-colors group"
                 >
                   {item.name}
-                  <span 
+                  <span
                     className="absolute -bottom-1 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 rounded-full"
                     style={{
                       background: 'linear-gradient(90deg, #BF2024 0%, #0055ff 100%)',
@@ -87,20 +83,20 @@ export default function Navbar() {
                 <>
                   {/* User Profile Button */}
                   <Link href="/profil">
-  <motion.div
-    whileHover={{ scale: 1.05 }}
-    className="flex items-center gap-3 px-4 py-2 rounded-full border-2 border-gray-200 hover:border-blue-300 transition-all cursor-pointer"
-    style={{
-      background: 'linear-gradient(135deg, rgba(191, 32, 36, 0.05), rgba(0, 85, 255, 0.05))',
-    }}
-  >
-    <span className="text-2xl">{profile.avatar_url || '🧸'}</span>
-    <div className="text-left">
-      <div className="text-sm font-bold text-gray-900">{profile.username}</div>
-      <div className="text-xs text-gray-600">Poziom {profile.level}</div>
-    </div>
-  </motion.div>
-</Link>
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      className="flex items-center gap-3 px-4 py-2 rounded-full border-2 border-gray-200 hover:border-blue-300 transition-all cursor-pointer"
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(191, 32, 36, 0.05), rgba(0, 85, 255, 0.05))',
+                      }}
+                    >
+                      <span className="text-2xl">{profile.avatar_url || '🦸‍♂️'}</span>
+                      <div className="text-left">
+                        <div className="text-sm font-bold text-gray-900">{profile.username}</div>
+                        <div className="text-xs text-gray-600">Poziom {profile.level}</div>
+                      </div>
+                    </motion.div>
+                  </Link>
 
                   {/* Logout Button */}
                   <motion.button
@@ -191,7 +187,7 @@ export default function Navbar() {
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
               className="fixed top-28 left-1/2 -translate-x-1/2 w-[92%] max-w-lg z-40 md:hidden"
             >
-              <div 
+              <div
                 className="rounded-3xl border border-gray-200 shadow-2xl p-6 overflow-hidden"
                 style={{
                   backdropFilter: 'blur(40px) saturate(180%)',
@@ -210,31 +206,34 @@ export default function Navbar() {
                         background: 'linear-gradient(135deg, rgba(191, 32, 36, 0.1), rgba(0, 85, 255, 0.1))',
                       }}
                     >
-                      <span className="text-3xl">{profile.avatar_url || '🧸'}</span>
+                      <span className="text-3xl">{profile.avatar_url || '🦸‍♂️'}</span>
                       <div>
                         <div className="font-bold text-gray-900">{profile.username}</div>
-                        <div className="text-sm text-gray-600">Poziom {profile.level} • {profile.total_exp} EXP</div>
+                        <div className="text-sm text-gray-600">
+                          Poziom {profile.level} • {profile.total_exp ?? 0} EXP
+                        </div>
                       </div>
                     </motion.div>
                   )}
 
-              {navItems.map((item, idx) => (
-  <Link
-    key={idx}
-    href={item.href}
-    className="relative px-3 py-2 text-sm font-bold text-gray-900 hover:text-[#BF2024] transition-colors group whitespace-nowrap flex items-center gap-1"
-  >
-    <span>{item.icon}</span>
-    <span>{item.name}</span>
-    <span 
-      className="absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 rounded-full"
-      style={{
-        background: 'linear-gradient(90deg, #BF2024 0%, #0055ff 100%)',
-      }}
-    />
-  </Link>
-))}
-                  
+                  {navItems.map((item, idx) => (
+                    <Link
+                      key={idx}
+                      href={item.href}
+                      onClick={() => setIsOpen(false)}
+                      className="relative px-3 py-2 text-sm font-bold text-gray-900 hover:text-[#BF2024] transition-colors group whitespace-nowrap flex items-center gap-1"
+                    >
+                      <span>{item.icon}</span>
+                      <span>{item.name}</span>
+                      <span
+                        className="absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 rounded-full"
+                        style={{
+                          background: 'linear-gradient(90deg, #BF2024 0%, #0055ff 100%)',
+                        }}
+                      />
+                    </Link>
+                  ))}
+
                   {/* Mobile Login/Logout */}
                   {isAuthenticated ? (
                     <motion.button
@@ -307,9 +306,9 @@ export default function Navbar() {
       </AnimatePresence>
 
       {/* Auth Modal */}
-      <AuthModal 
-        isOpen={showAuthModal} 
-        onClose={() => setShowAuthModal(false)} 
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
       />
     </>
   );
