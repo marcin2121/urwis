@@ -5,7 +5,8 @@ import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useSupabaseLoyalty } from '@/contexts/SupabaseLoyaltyContext';
 
 export default function DailyCalendar() {
-  const { user, isAuthenticated, addExp } = useSupabaseAuth();
+  const { user, addExp } = useSupabaseAuth();
+  await addExp(expAmount, 'Codzienna nagroda');
   const { addPoints } = useSupabaseLoyalty();
   const [isOpen, setIsOpen] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
