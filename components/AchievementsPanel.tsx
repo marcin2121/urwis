@@ -298,7 +298,7 @@ export default function AchievementsPanel() {
   };
 
   const getAchievementProgress = (achievement: Achievement): number => {
-    if (!user) return 0;
+    if (!user || !profile) return 0;
 
     const { type } = achievement.requirement;
 
