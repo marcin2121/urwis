@@ -16,7 +16,7 @@ export default function LoyaltyDashboard() {
     { name: 'Diamentowy', min: 2000, max: 9999, color: 'from-purple-400 to-pink-600', icon: '👑' },
   ];
 
-  const currentLevel = levels.find(l => l.name === level) || levels[0];
+  const currentLevel = levels.find(l => points >= l.min && points <= l.max) || levels[0];
   const nextLevel = levels[levels.indexOf(currentLevel) + 1];
   const progress = nextLevel
     ? ((points - currentLevel.min) / (nextLevel.min - currentLevel.min)) * 100
