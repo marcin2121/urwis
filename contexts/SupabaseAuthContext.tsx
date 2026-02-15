@@ -20,7 +20,7 @@ interface AuthContextType {
 
 const SupabaseAuthContext = createContext<AuthContextType | undefined>(undefined)
 
-const supabase = createClient() // ✅ TO DZIAŁA
+const supabase = createClient()
 
 export function SupabaseAuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
@@ -29,13 +29,12 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
   const [loading, setLoading] = useState(true)
   const [initialized, setInitialized] = useState(false)
 
-  // ✅ POPRAWIONA fetchProfile - używa 'supabase' zamiast nieistniejącego 'supabaseClient'
   const fetchProfile = async (userId: string) => {
     console.log('🔍 Fetching profile for:', userId)
     console.log('🧪 Supabase client:', !!supabase)
 
     try {
-      const { data, error } = await supabase  // ✅ ZMIENIONE z supabaseClient na supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
@@ -45,7 +44,6 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
 
       if (error) {
         console.error('❌ Profile error:', error.message)
-        // ✅ Dummy profile zamiast crash
         setProfile({
           id: userId,
           username: 'Urwis',
@@ -55,7 +53,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
           role: 'user',
           avatar_url: null,
         } as any)
-        return
+        return  // ✅ DODANE
       }
 
       if (data) {
@@ -103,7 +101,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       } finally {
         if (mounted) {
           setInitialized(true)
-          setLoading(false)  // ✅ ZAWSZE wyjdź z loading
+          setLoading(false)
         }
       }
     }
@@ -137,21 +135,120 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     }
   }, [initialized])
 
-  // ... reszta funkcji login/register/updateProfile/signOut BEZ ZMIAN ...
+  // ✅ POPRAWIONE FUNKCJE Z RETURN
   const login = async (email: string, password: string): Promise<boolean> => {
-    // ... bez zmian
+    try {
+      console.log('🔐 Logging in:', email)
+      setLoading(true)
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password: password,
+      })
+
+      if (error) {
+        console.error('❌ Login error:', error)
+        alert(error.message)
+        return false  // ✅ RETURN
+      }
+
+      console.log('✅ Logged in:', data.user?.email)
+      return true  // ✅ RETURN
+    } catch (err: any) {
+      console.error('❌ Login exception:', err)
+      alert(err.message || 'Błąd logowania')
+      return false  // ✅ RETURN
+    } finally {
+      setLoading(false)
+    }
   }
 
   const register = async (email: string, username: string, password: string): Promise<boolean> => {
-    // ... bez zmian
+    try {
+      console.log('📝 Registering:', email, username)
+      setLoading(true)
+
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password: password,
+        options: {
+          data: {
+            username: username.trim(),
+          },
+        },
+      })
+
+      if (error) {
+        console.error('❌ Register error:', error)
+        alert(error.message)
+        return false  // ✅ RETURN
+      }
+
+      console.log('✅ Registered:', data.user?.email)
+
+      if (data.user && !data.session) {
+        alert('✅ Konto utworzone! Sprawdź email aby potwierdzić.')
+        return true  // ✅ RETURN
+      }
+
+      alert('✅ Konto utworzone! Możesz się teraz zalogować.')
+      return true  // ✅ RETURN
+    } catch (err: any) {
+      console.error('❌ Register exception:', err)
+      alert(err.message || 'Błąd rejestracji')
+      return false  // ✅ RETURN
+    } finally {
+      setLoading(false)
+    }
   }
 
   const updateProfile = async (updates: Partial<Profile>): Promise<boolean> => {
-    // ... bez zmian
+    if (!user) {
+      console.error('❌ No user to update')
+      return false  // ✅ RETURN
+    }
+
+    try {
+      console.log('🔄 Updating profile:', updates)
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', user.id)
+        .select()
+        .single()
+
+      if (error) {
+        console.error('❌ Update profile error:', error)
+        alert('Błąd aktualizacji profilu: ' + error.message)
+        return false  // ✅ RETURN
+      }
+
+      console.log('✅ Profile updated:', data)
+      setProfile(data)
+      return true  // ✅ RETURN
+    } catch (err: any) {
+      console.error('❌ Update profile exception:', err)
+      alert(err.message || 'Błąd aktualizacji profilu')
+      return false  // ✅ RETURN
+    }
   }
 
   const signOut = async () => {
-    // ... bez zmian
+    try {
+      console.log('🚪 Signing out...')
+      setUser(null)
+      setSession(null)
+      setProfile(null)
+
+      const { error } = await supabase.auth.signOut()
+
+      if (error) throw error
+
+      window.location.href = '/'
+    } catch (error) {
+      console.error('❌ Sign out error:', error)
+    }
   }
 
   const isAdmin = profile?.role === 'admin'
@@ -164,7 +261,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
           Ładowanie Urwisa... 🦸‍♂️⚡
         </div>
         <div className="text-sm text-gray-500 mt-2">
-          Sprawdź Console (F12) jeśli wisi &gt;3s
+          Sprawdź Console (F12) jeśli wisi >3s
         </div>
       </div>
     )
