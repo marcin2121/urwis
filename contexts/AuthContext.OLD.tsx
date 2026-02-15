@@ -200,10 +200,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useSupabaseAuth() {
+export function useOldAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useSupabaseAuth must be used within AuthProvider');
+    throw new Error('useOldAuth must be used within AuthProvider');
   }
   return context;
 }

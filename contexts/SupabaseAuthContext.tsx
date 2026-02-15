@@ -10,6 +10,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   loading: boolean;
   signOut: () => Promise<void>;
+  updateProfile: (updates: Record<string, any>) => Promise<void>;
 }
 
 const SupabaseAuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -72,6 +73,21 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     }
   };
 
+  const updateProfile = async (updates: Record<string, any>) => {
+    if (!user) return;
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', user.id);
+
+      if (error) throw error;
+      setProfile((prev: any) => prev ? { ...prev, ...updates } : prev);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+    }
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
@@ -88,6 +104,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
         isAuthenticated: !!session,
         loading,
         signOut,
+        updateProfile,
       }}
     >
       {children}
