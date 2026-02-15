@@ -304,7 +304,132 @@ export const TRIVIA_QUESTIONS: TriviaQuestion[] = [
     exp: 25,
     category: "🐻 Zwierzęta"
   },
-
+  {
+    "question": "Jaki kolor ma banan?",
+    "options": ["Czerwony", "Pomarańczowy", "Żółty", "Niebieski"],
+    "correct": 2,
+    "exp": 10,
+    "category": "🌈 Kolory"
+  },
+  {
+    "question": "Ile nóg ma pająk?",
+    "options": ["4", "6", "8", "10"],
+    "correct": 2,
+    "exp": 10,
+    "category": "🐛 Zwierzęta"
+  },
+  {
+    "question": "Kogo spotkał Czerwony Kapturek w lesie?",
+    "options": ["Niedźwiedzia", "Wilka", "Babcię", "Myśliwego"],
+    "correct": 1,
+    "exp": 15,
+    "category": "📖 Bajki"
+  },
+  {
+    "question": "Jaki kształt ma piłka?",
+    "options": ["Kwadrat", "Trójkąt", "Kula", "Prostokąt"],
+    "correct": 2,
+    "exp": 10,
+    "category": "🔢 Kształty"
+  },
+  {
+    "question": "Ile miesięcy ma rok?",
+    "options": ["10", "12", "15", "9"],
+    "correct": 1,
+    "exp": 10,
+    "category": "📅 Czas"
+  },
+  {
+    "question": "Co je krowa?",
+    "options": ["Mięso", "Trawę", "Ryby", "Owoce"],
+    "correct": 1,
+    "exp": 10,
+    "category": "🐄 Zwierzęta"
+  },
+  {
+    "question": "Co zgubił Kopciuszek na balu?",
+    "options": ["Rękawiczkę", "Pantofelek", "Sukienkę", "Kolczyk"],
+    "correct": 1,
+    "exp": 15,
+    "category": "📖 Bajki"
+  },
+  {
+    "question": "Jaki kolor ma niebo w słoneczny dzień?",
+    "options": ["Zielony", "Czerwony", "Niebieski", "Żółty"],
+    "correct": 2,
+    "exp": 10,
+    "category": "🌈 Kolory"
+  },
+  {
+    "question": "Ile palców ma ręka?",
+    "options": ["4", "5", "6", "3"],
+    "correct": 1,
+    "exp": 10,
+    "category": "👋 Ciało"
+  },
+  {
+    "question": "Gdzie mieszka ryba?",
+    "options": ["W lesie", "W wodzie", "Na drzewie", "W górach"],
+    "correct": 1,
+    "exp": 10,
+    "category": "🐟 Zwierzęta"
+  },
+  {
+    "question": "Jaki jest największy ocean?",
+    "options": ["Atlantycki", "Indyjski", "Spokojny", "Arktyczny"],
+    "correct": 2,
+    "exp": 15,
+    "category": "🌊 Geografia"
+  },
+  {
+    "question": "Ile dni ma tydzień?",
+    "options": ["5", "7", "10", "4"],
+    "correct": 1,
+    "exp": 10,
+    "category": "📅 Czas"
+  },
+  {
+    "question": "Kto maluje obrazki?",
+    "options": ["Piosenkarz", "Malarski", "Muzyk", "Tancerz"],
+    "correct": 1,
+    "exp": 15,
+    "category": "🎨 Zawody"
+  },
+  {
+    "question": "Jaki owoc jest czerwony?",
+    "options": ["Banan", "Jabłko", "Pomarańcza", "Kiwi"],
+    "correct": 1,
+    "exp": 10,
+    "category": "🍎 Owoce"
+  },
+  {
+    "question": "Ile kółek ma rower?",
+    "options": ["1", "2", "3", "4"],
+    "correct": 1,
+    "exp": 10,
+    "category": "🚲 Pojazdy"
+  },
+  {
+    "question": "Co nosi ptak na skrzydłach?",
+    "options": ["Futro", "Pióra", "Łuski", "Włosy"],
+    "correct": 1,
+    "exp": 10,
+    "category": "🐦 Zwierzęta"
+  },
+  {
+    "question": "Jaki dzień jest po poniedziałku?",
+    "options": ["Niedziela", "Wtorek", "Środa", "Piątek"],
+    "correct": 1,
+    "exp": 10,
+    "category": "📅 Czas"
+  },
+  {
+    "question": "Kto buduje gniazdo z traw?",
+    "options": ["Lis", "Ptak", "Ryba", "Żaba"],
+    "correct": 1,
+    "exp": 15,
+    "category": "🐦 Zwierzęta"
+  }
   // // 800+ więcej z GIST (parsowane)...
   // TODO: Automatycznie sparsuj pełne listy z GIST po przetłumaczeniu
 ]
