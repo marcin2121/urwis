@@ -304,7 +304,7 @@ export default function AchievementsPanel() {
 
     switch (type) {
       case 'level':
-        return user.level;
+        return profile.level;
 
       case 'total_points':
         return parseInt(localStorage.getItem(`urwis_total_points_${user.id}`) || '0');
