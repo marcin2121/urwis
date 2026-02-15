@@ -21,7 +21,7 @@ interface Achievement {
 }
 
 export default function AchievementsPanel() {
-  const { user, profile, addExp } = useSupabaseAuth(); // ← DODAJ profile
+  const { user, profile, addExp } = useSupabaseAuth();
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [unlockedAchievements, setUnlockedAchievements] = useState<Set<string>>(new Set());
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
