@@ -116,7 +116,7 @@ export const TRIVIA_QUESTIONS: TriviaQuestion[] = [
   },
   {
     "question": "Za co Paul Hunn dzierży rekord 118.1 decybeli?",
-    "options": ["Najgłośniejszy krzyk", "Najgłośniejsze beknięcie", "Najgłośniejszy śmiech", "Najgłośniejszy klaskanie"],
+    "options": ["Najgłośniejszy krzyk", "Najgłośniejsze beknięcie", "Najgłośniejszy śmiech", "Najgłośniejsze klaskanie"],
     "correct": 1,
     "exp": 30,
     "category": "🏆 Rekordy"
