@@ -1,6 +1,6 @@
 'use client'
 import { createContext, useContext, useState, useEffect } from 'react';
-import { useAuth } from './AuthContext';
+import { useSupabaseAuth } from './SupabaseAuthContext';
 import MissionNotification from '@/components/MissionNotification';
 
 interface NotificationContextType {
@@ -11,7 +11,7 @@ interface NotificationContextType {
 const NotificationContext = createContext<NotificationContextType | null>(null);
 
 export const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
-  const { user } = useAuth();
+  const { profile } = useSupabaseAuth();
   const [notifications, setNotifications] = useState<any[]>([]);
 
   const addNotification = (mission: any) => {
@@ -34,7 +34,7 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
 
   // Sprawdzaj progress misji
   const checkMissionProgress = (trackingKey: string, value: number) => {
-    if (!user) return;
+    if (!profile) return;
 
     console.log('🔔 Check Mission Progress:', trackingKey, '=', value); // DEBUG
 
@@ -120,14 +120,14 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
     relevantMissions.forEach(mission => {
       // Sprawdź czy nie jest już ukończona
       const today = new Date().toDateString();
-      const completedKey = `urwis_mission_${mission.id}_${user.id}_${today}`;
+      const completedKey = `urwis_mission_${mission.id}_${profile.id}_${today}`;
       if (localStorage.getItem(completedKey)) {
         console.log('✅ Already completed:', mission.id); // DEBUG
         return;
       }
 
       // Sprawdź czy nie pokazaliśmy już powiadomienia
-      const notifKey = `urwis_mission_notif_${mission.id}_${user.id}_${today}`;
+      const notifKey = `urwis_mission_notif_${mission.id}_${profile.id}_${today}`;
       if (localStorage.getItem(notifKey)) {
         console.log('🔕 Notification already shown:', mission.id); // DEBUG
         return;
@@ -146,7 +146,7 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
 
   // ✨ DODAJ TEN useEffect - nasłuchuj custom events
   useEffect(() => {
-    if (!user) return;
+    if (!profile) return;
 
     const handleMissionProgress = (event: any) => {
       const { type, value } = event.detail;
@@ -159,7 +159,7 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
     return () => {
       window.removeEventListener('missionProgress', handleMissionProgress as EventListener);
     };
-  }, [user]); // ← WAŻNE: dependency array
+  }, [profile]); // ← WAŻNE: dependency array
 
   return (
     <NotificationContext.Provider value={{ addNotification, checkMissionProgress }}>
