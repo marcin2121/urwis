@@ -11,7 +11,7 @@ interface LoyaltyContextType {
   totalExp: number
   badges: any[]
   userBadges: any[]
-  pointsHistory: any[];
+  pointsHistory: any[]  // ✅ Jest w interfejsie
   addPoints: (amount: number, reason: string) => Promise<void>
   addExp: (amount: number) => Promise<void>
   earnBadge: (badgeId: string) => Promise<void>
@@ -31,6 +31,7 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
   const [level, setLevel] = useState(1)
   const [badges, setBadges] = useState<any[]>([])
   const [userBadges, setUserBadges] = useState<any[]>([])
+  const [pointsHistory, setPointsHistory] = useState<any[]>([])  // ← DODAJ STATE
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -44,6 +45,8 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
     const fetchProfile = async () => {
       try {
         setLoading(true)
+
+        // Fetch profile
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('*')
@@ -53,9 +56,24 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
         if (profileError) throw profileError
 
         setProfile(profileData)
-        setPoints(profileData.total_exp || 0)
-        setTotalExp(profileData.total_exp || 0)
-        setLevel(profileData.level || 1)
+        setPoints(profileData?.total_exp || 0)
+        setTotalExp(profileData?.total_exp || 0)
+        setLevel(profileData?.level || 1)
+
+        // ← DODAJ: Fetch points history
+        const { data: historyData, error: historyError } = await supabase
+          .from('loyalty_points')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(50)
+
+        if (historyError) {
+          console.error('Error fetching history:', historyError)
+        } else {
+          setPointsHistory(historyData || [])
+        }
+
       } catch (err: any) {
         setError(err.message)
       } finally {
@@ -82,8 +100,33 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
         },
         (payload) => {
           setProfile(payload.new)
-          setLevel(payload.new.level)
-          setTotalExp(payload.new.total_exp)
+          setLevel(payload.new?.level || 1)
+          setTotalExp(payload.new?.total_exp || 0)
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [user?.id])
+
+  // ← DODAJ: Subscribe to real-time points history updates
+  useEffect(() => {
+    if (!user?.id) return
+
+    const channel = supabase
+      .channel(`loyalty-points-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'loyalty_points',
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          setPointsHistory(prev => [payload.new, ...prev])
         }
       )
       .subscribe()
@@ -99,13 +142,22 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
 
       try {
         // Add to loyalty_points table
-        const { error: insertError } = await supabase.from('loyalty_points').insert({
-          user_id: user.id,
-          amount,
-          reason,
-        })
+        const { data: insertData, error: insertError } = await supabase
+          .from('loyalty_points')
+          .insert({
+            user_id: user.id,
+            amount,
+            reason,
+          })
+          .select()
+          .single()
 
         if (insertError) throw insertError
+
+        // ← DODAJ: Update local history immediately
+        if (insertData) {
+          setPointsHistory(prev => [insertData, ...prev])
+        }
 
         // Update profile total_exp
         const newTotal = (profile?.total_exp || 0) + amount
@@ -122,7 +174,7 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
         setError(err.message)
       }
     },
-    [user?.id, profile]
+    [user?.id, profile, supabase]
   )
 
   const addExp = useCallback(
@@ -143,7 +195,7 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
         setError(err.message)
       }
     },
-    [user?.id, profile]
+    [user?.id, profile, supabase]
   )
 
   const earnBadge = useCallback(
@@ -161,7 +213,7 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
         setError(err.message)
       }
     },
-    [user?.id]
+    [user?.id, supabase]
   )
 
   return (
@@ -173,6 +225,7 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
         totalExp,
         badges,
         userBadges,
+        pointsHistory,  // ← DODAJ DO VALUE
         addPoints,
         addExp,
         earnBadge,
