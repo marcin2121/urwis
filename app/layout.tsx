@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/ui/Navbar";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { SupabaseAuthProvider } from "@/contexts/SupabaseAuthContext";
 import { LoyaltyProvider } from "@/contexts/LoyaltyContext";
 import { NotificationProvider } from "@/contexts/NotificationContext"; 
 import HiddenUrwis from "@/components/HiddenUrwis";
@@ -23,7 +23,7 @@ export default function RootLayout({
   return (
     <html lang="pl" suppressHydrationWarning>
       <body suppressHydrationWarning className="relative">
-        <AuthProvider>
+        <SupabaseAuthProvider>
           <LoyaltyProvider>
             <NotificationProvider>
               <MissionTracker /> {/* ← MUSI BYĆ TUTAJ! */}
@@ -32,7 +32,7 @@ export default function RootLayout({
               <HiddenUrwis />
             </NotificationProvider>
           </LoyaltyProvider>
-        </AuthProvider>
+        </SupabaseAuthProvider>
       </body>
     </html>
   );
