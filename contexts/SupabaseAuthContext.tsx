@@ -40,30 +40,41 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
 
   // Initialize auth session
   useEffect(() => {
+    console.log('[v0] Auth context initializing...')
+    let isMounted = true
     const initAuth = async () => {
       try {
+        console.log('[v0] Getting session...')
         const {
           data: { session: currentSession },
         } = await supabase.auth.getSession()
+        
+        if (!isMounted) return
+        
+        console.log('[v0] Session retrieved:', !!currentSession?.user)
         setSession(currentSession)
         setUser(currentSession?.user ?? null)
 
         if (currentSession?.user) {
+          console.log('[v0] Fetching profile for user:', currentSession.user.id)
           await fetchProfile(currentSession.user.id)
 
           // Migrate localStorage data on first login
           if (!migrationDone && localStorage.getItem('urwis_points')) {
             const result = await migrateLocalStorageToSupabase(currentSession.user.id)
             if (result.success) {
-              console.log('[Urwis] Migrated data:', result.migratedData)
-              setMigrationDone(true)
+              console.log('[v0] Migrated data:', result.migratedData)
+              if (isMounted) setMigrationDone(true)
             }
           }
         }
       } catch (error) {
-        console.error('Error initializing auth:', error)
+        console.error('[v0] Error initializing auth:', error)
       } finally {
-        setIsLoading(false)
+        if (isMounted) {
+          console.log('[v0] Auth initialization complete')
+          setIsLoading(false)
+        }
       }
     }
 
@@ -73,6 +84,9 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+      console.log('[v0] Auth state changed:', event)
+      if (!isMounted) return
+      
       setSession(newSession)
       setUser(newSession?.user ?? null)
 
@@ -83,10 +97,14 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
       }
     })
 
-    return () => subscription.unsubscribe()
+    return () => {
+      isMounted = false
+      subscription.unsubscribe()
+    }
   }, [])
 
   const fetchProfile = async (userId: string) => {
+    console.log('[v0] fetchProfile starting for:', userId)
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -97,16 +115,18 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
       if (error) {
         if (error.code === 'PGRST116') {
           // Profile doesn't exist yet - that's OK for new users
-          console.log('[Auth] Profile not found for user:', userId)
+          console.log('[v0] Profile not found for user:', userId)
           setProfile(null)
         } else {
+          console.error('[v0] Unexpected error fetching profile:', error.code, error.message)
           throw error
         }
       } else {
+        console.log('[v0] Profile fetched successfully for:', userId)
         setProfile(data)
       }
     } catch (error) {
-      console.error('Error fetching profile:', error)
+      console.error('[v0] Error fetching profile:', error)
       setProfile(null)
     }
   }
@@ -138,15 +158,21 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
   }
 
   const signIn = async (email: string, password: string) => {
+    console.log('[v0] signIn attempting for:', email)
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
 
-      if (error) throw error
+      if (error) {
+        console.error('[v0] signIn failed:', error.message)
+        throw error
+      }
+      console.log('[v0] signIn successful')
       return { error: undefined }
     } catch (error: any) {
+      console.error('[v0] signIn error:', error.message)
       return { error: error.message }
     }
   }
