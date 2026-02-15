@@ -16,7 +16,7 @@ export default function Home() {
         <div style={{ position: 'fixed', inset: 0, zIndex: 0 }}>
           <Particles
             particleCount={1000}
-            particleColors={["#bf2024","#0055ff"]}
+            particleColors={["#bf2024", "#0055ff"]}
             alphaParticles
             particleBaseSize={100}
             speed={0.1}
@@ -29,16 +29,16 @@ export default function Home() {
         <div style={{ position: 'fixed', inset: 0, zIndex: 11, pointerEvents: 'none' }}>
           <RibbonsBg colors={["#bf2024", "#0055ff"]} />
         </div>
-        
+
         {/* Hero Section */}
         <HeroSection />
-        
+
         {/* Sekcja Poznaj Urwisa */}
         <PoznajUrwisa />
-        
+
         {/* Sekcja O nas */}
         <AboutSection />
-        
+
         {/* Quick Links - Sekcja z linkami do podstron */}
         <QuickLinksSection />
 

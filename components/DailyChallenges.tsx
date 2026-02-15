@@ -16,28 +16,28 @@ export default function DailyChallenges() {
     <div className="min-h-screen bg-linear-to-b from-yellow-50 to-orange-50 relative overflow-hidden">
       {/* Animated background */}
       <div className="absolute inset-0 opacity-10 pointer-events-none">
-  {typeof window !== 'undefined' && [...Array(20)].map((_, i) => ( // ← DODAJ CHECK
-    <motion.div
-      key={i}
-      className="absolute text-4xl"
-      initial={{ 
-        y: -100, 
-        x: Math.random() * window.innerWidth 
-      }}
-      animate={{
-        y: window.innerHeight + 100,
-        x: Math.random() * window.innerWidth,
-      }}
-      transition={{
-        duration: Math.random() * 10 + 10,
-        repeat: Infinity,
-        delay: Math.random() * 5,
-      }}
-    >
-      {['🎁', '⭐', '🎮', '🏆', '🎯'][Math.floor(Math.random() * 5)]}
-    </motion.div>
-  ))}
-</div>
+        {typeof window !== 'undefined' && [...Array(20)].map((_, i) => ( // ← DODAJ CHECK
+          <motion.div
+            key={i}
+            className="absolute text-4xl"
+            initial={{
+              y: -100,
+              x: Math.random() * window.innerWidth
+            }}
+            animate={{
+              y: window.innerHeight + 100,
+              x: Math.random() * window.innerWidth,
+            }}
+            transition={{
+              duration: Math.random() * 10 + 10,
+              repeat: Infinity,
+              delay: Math.random() * 5,
+            }}
+          >
+            {['🎁', '⭐', '🎮', '🏆', '🎯'][Math.floor(Math.random() * 5)]}
+          </motion.div>
+        ))}
+      </div>
 
       <div className="container mx-auto px-6 pt-32 pb-12 relative z-10">
         {/* Header */}
@@ -50,13 +50,13 @@ export default function DailyChallenges() {
             <span className="text-2xl">🌟</span>
             <span className="font-bold text-orange-600">Codzienne Wyzwania</span>
           </div>
-          
+
           <h1 className="text-5xl md:text-6xl font-black mb-4">
             <span className="bg-linear-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
               Twoje Misje
             </span>
           </h1>
-          
+
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Wykonuj codzienne zadania, zdobywaj EXP i odblokowuj nagrody! 🎉
           </p>
@@ -99,7 +99,7 @@ export default function DailyChallenges() {
                     <h3 className="text-2xl font-black mb-2">Kalendarz Nagród</h3>
                     <p className="text-gray-600">Odbieraj codziennie i buduj serię!</p>
                   </div>
-                  
+
                   <DailyCalendar />
                 </div>
               </motion.div>
@@ -148,20 +148,20 @@ export default function DailyChallenges() {
             Nowe wyzwania, nagrody i niespodzianki!
           </p>
           <div className="flex gap-4 justify-center text-3xl">
-            <motion.div 
-              animate={{ rotate: [0, 10, 0] }} 
+            <motion.div
+              animate={{ rotate: [0, 10, 0] }}
               transition={{ repeat: Infinity, duration: 2 }}
             >
               🎁
             </motion.div>
-            <motion.div 
-              animate={{ rotate: [0, -10, 0] }} 
+            <motion.div
+              animate={{ rotate: [0, -10, 0] }}
               transition={{ repeat: Infinity, duration: 2, delay: 0.2 }}
             >
               ⭐
             </motion.div>
-            <motion.div 
-              animate={{ rotate: [0, 10, 0] }} 
+            <motion.div
+              animate={{ rotate: [0, 10, 0] }}
               transition={{ repeat: Infinity, duration: 2, delay: 0.4 }}
             >
               🎮

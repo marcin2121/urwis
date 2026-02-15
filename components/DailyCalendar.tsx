@@ -5,7 +5,7 @@ import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useSupabaseLoyalty } from '@/contexts/SupabaseLoyaltyContext';
 
 export default function DailyCalendar() {
-  const { user, isAuthenticated, addExp } = useSupabaseAuth();
+  const { user, addExp } = useSupabaseAuth();
   const { addPoints } = useSupabaseLoyalty();
   const [isOpen, setIsOpen] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
@@ -36,7 +36,7 @@ export default function DailyCalendar() {
     return new Date(year, month, 1).getDay();
   };
 
-  const claimDailyReward = (day: number) => {
+  const claimDailyReward = async (day: number) => {
     if (!user) return;
 
     const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
@@ -69,22 +69,31 @@ export default function DailyCalendar() {
     // Sprawdź milestone rewards
     const milestoneRewards = checkMilestones(claimedDays.size + 1);
 
-    // Zapisz
-    localStorage.setItem(`urwis_daily_claimed_${user.id}_${dateStr}`, 'true');
-    addPoints(totalPoints, 'Codzienna nagroda');
-    addExp(expAmount, 'Codzienna nagroda');
+    try {
+      // Zapisz
+      localStorage.setItem(`urwis_daily_claimed_${user.id}_${dateStr}`, 'true');
 
-    // Pokaż modal z nagrodą
-    setRewardData({
-      points: totalPoints,
-      exp: expAmount,
-      streak,
-      milestones: milestoneRewards
-    });
-    setShowRewardModal(true);
+      // Dodaj punkty i exp
+      await addPoints(totalPoints, 'Codzienna nagroda');
+      await addExp(expAmount, 'Codzienna nagroda');
 
-    // Odśwież claimed days
-    setClaimedDays(new Set([...claimedDays, dateStr]));
+      // Pokaż modal z nagrodą
+      setRewardData({
+        points: totalPoints,
+        exp: expAmount,
+        streak,
+        milestones: milestoneRewards
+      });
+      setShowRewardModal(true);
+
+      // Odśwież claimed days
+      setClaimedDays(new Set([...claimedDays, dateStr]));
+
+    } catch (error) {
+      console.error('❌ Błąd podczas odbierania nagrody:', error);
+      alert('Wystąpił błąd podczas odbierania nagrody. Spróbuj ponownie.');
+      localStorage.removeItem(`urwis_daily_claimed_${user.id}_${dateStr}`);
+    }
   };
 
   const calculateStreak = () => {
@@ -148,12 +157,12 @@ export default function DailyCalendar() {
           onClick={() => isToday && !isClaimed && claimDailyReward(day)}
           disabled={!isToday || isClaimed}
           className={`aspect-square rounded-xl flex flex-col items-center justify-center font-bold text-sm relative transition-all ${isClaimed
-            ? 'bg-linear-to-br from-green-400 to-emerald-500 text-white shadow-lg'
-            : isToday
-              ? 'bg-linear-to-br from-yellow-400 to-orange-500 text-white shadow-xl animate-pulse cursor-pointer'
-              : isPast
-                ? 'bg-gray-100 text-gray-400'
-                : 'bg-gray-50 text-gray-300'
+              ? 'bg-gradient-to-br from-green-400 to-emerald-500 text-white shadow-lg'
+              : isToday
+                ? 'bg-gradient-to-br from-yellow-400 to-orange-500 text-white shadow-xl animate-pulse cursor-pointer'
+                : isPast
+                  ? 'bg-gray-100 text-gray-400'
+                  : 'bg-gray-50 text-gray-300'
             }`}
         >
           <span className="text-lg">{day}</span>
@@ -173,7 +182,7 @@ export default function DailyCalendar() {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(true)}
-        className="w-full py-4 bg-linear-to-r from-yellow-500 to-orange-500 text-white rounded-2xl font-bold text-lg shadow-xl"
+        className="w-full py-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-2xl font-bold text-lg shadow-xl"
       >
         📅 Kalendarz Nagród
       </motion.button>
@@ -199,7 +208,7 @@ export default function DailyCalendar() {
                 {/* Header */}
                 <div className="flex justify-between items-center mb-6">
                   <div>
-                    <h2 className="text-3xl font-black bg-linear-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
+                    <h2 className="text-3xl font-black bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
                       Kalendarz Nagród
                     </h2>
                     <p className="text-gray-600 text-sm mt-1">
@@ -263,17 +272,17 @@ export default function DailyCalendar() {
 
                 {/* Statystyki */}
                 <div className="mt-6 grid grid-cols-3 gap-4">
-                  <div className="p-4 bg-linear-to-br from-green-50 to-emerald-50 rounded-xl text-center border-2 border-green-200">
+                  <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl text-center border-2 border-green-200">
                     <div className="text-3xl mb-1">✅</div>
                     <div className="text-2xl font-black text-green-600">{claimedDays.size}</div>
                     <div className="text-xs text-gray-600">Odebrane</div>
                   </div>
-                  <div className="p-4 bg-linear-to-br from-orange-50 to-red-50 rounded-xl text-center border-2 border-orange-200">
+                  <div className="p-4 bg-gradient-to-br from-orange-50 to-red-50 rounded-xl text-center border-2 border-orange-200">
                     <div className="text-3xl mb-1">🔥</div>
                     <div className="text-2xl font-black text-orange-600">{calculateStreak()}</div>
                     <div className="text-xs text-gray-600">Seria</div>
                   </div>
-                  <div className="p-4 bg-linear-to-br from-purple-50 to-pink-50 rounded-xl text-center border-2 border-purple-200">
+                  <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl text-center border-2 border-purple-200">
                     <div className="text-3xl mb-1">🎁</div>
                     <div className="text-2xl font-black text-purple-600">
                       {getDaysInMonth(currentMonth, currentYear) - claimedDays.size}
@@ -283,7 +292,7 @@ export default function DailyCalendar() {
                 </div>
 
                 {/* Milestones */}
-                <div className="mt-6 p-4 bg-linear-to-r from-yellow-50 to-orange-50 rounded-xl border-2 border-yellow-200">
+                <div className="mt-6 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl border-2 border-yellow-200">
                   <h4 className="font-bold text-gray-900 mb-3">🏆 Nagrody Milestone:</h4>
                   <div className="space-y-2 text-sm">
                     <div className={claimedDays.size >= 7 ? 'text-green-600 font-bold' : 'text-gray-600'}>
@@ -314,7 +323,7 @@ export default function DailyCalendar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setShowRewardModal(false)}
-            className="fixed inset-0 bg-black/50 z-60 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
           >
             <motion.div
               initial={{ scale: 0.8, y: 50 }}
@@ -351,7 +360,7 @@ export default function DailyCalendar() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setShowRewardModal(false)}
-                className="px-8 py-3 bg-linear-to-r from-yellow-500 to-orange-500 text-white rounded-full font-bold"
+                className="px-8 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-full font-bold"
               >
                 Super! 🎊
               </motion.button>

@@ -22,15 +22,15 @@ export default function SpinTheWheel({ onComplete }: SpinTheWheelProps) {
 
   const spinWheel = () => {
     if (isSpinning) return;
-    
+
     setIsSpinning(true);
     const randomIndex = Math.floor(Math.random() * prizes.length);
     const prizeAngle = (360 / prizes.length) * randomIndex;
     const spins = 360 * 5; // 5 full rotations
     const finalRotation = rotation + spins + prizeAngle;
-    
+
     setRotation(finalRotation);
-    
+
     setTimeout(() => {
       setResult(prizes[randomIndex].label);
       setIsSpinning(false);
@@ -46,7 +46,7 @@ export default function SpinTheWheel({ onComplete }: SpinTheWheelProps) {
           transition={{ duration: 4, ease: "easeOut" }}
           className="w-80 h-80 rounded-full relative"
           style={{
-            background: `conic-gradient(${prizes.map((p, i) => 
+            background: `conic-gradient(${prizes.map((p, i) =>
               `${p.color} ${(i / prizes.length) * 360}deg ${((i + 1) / prizes.length) * 360}deg`
             ).join(', ')})`
           }}
@@ -62,7 +62,7 @@ export default function SpinTheWheel({ onComplete }: SpinTheWheelProps) {
               {prize.label}
             </div>
           ))}
-          
+
           {/* Center button */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-white rounded-full shadow-xl flex items-center justify-center">
             <span className="text-3xl">🎡</span>
@@ -82,7 +82,7 @@ export default function SpinTheWheel({ onComplete }: SpinTheWheelProps) {
           whileTap={{ scale: 0.95 }}
           onClick={spinWheel}
           disabled={isSpinning}
-          className="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full font-black text-xl shadow-xl disabled:opacity-50"
+          className="px-8 py-4 bg-linear-to-r from-purple-500 to-pink-500 text-white rounded-full font-black text-xl shadow-xl disabled:opacity-50"
         >
           {isSpinning ? '🎰 Kręci się...' : '🎡 Zakręć kołem!'}
         </motion.button>
@@ -93,7 +93,7 @@ export default function SpinTheWheel({ onComplete }: SpinTheWheelProps) {
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="text-center p-8 bg-gradient-to-r from-blue-100 to-purple-100 rounded-2xl"
+          className="text-center p-8 bg-linear-to-r from-blue-100 to-purple-100 rounded-2xl"
         >
           <div className="text-6xl mb-4">🎊</div>
           <h3 className="text-3xl font-black mb-2">Wygrałeś!</h3>
@@ -108,7 +108,7 @@ export default function SpinTheWheel({ onComplete }: SpinTheWheelProps) {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={onComplete}
-            className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-bold"
+            className="px-6 py-3 bg-linear-to-r from-purple-500 to-pink-500 text-white rounded-lg font-bold"
           >
             Użyj kuponu w sklepie
           </motion.button>

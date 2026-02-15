@@ -26,7 +26,7 @@ export default function DailyRewards() {
   const [hiddenItemFound, setHiddenItemFound] = useState(false);
   const [challengeCompleted, setChallengeCompleted] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  
+
   // ✨ NOWE: Stany dla pop-upów
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
@@ -188,39 +188,39 @@ export default function DailyRewards() {
     ];
 
     if (streak === 7) {
-      rewards.push({ 
-        type: 'coupon', 
-        code: 'WEEK10', 
-        icon: '🎁', 
-        name: '10% zniżki' 
+      rewards.push({
+        type: 'coupon',
+        code: 'WEEK10',
+        icon: '🎁',
+        name: '10% zniżki'
       } as Reward);
     }
     if (streak === 30) {
-      rewards.push({ 
-        type: 'coupon', 
-        code: 'MONTH20', 
-        icon: '👑', 
-        name: '20% zniżki' 
+      rewards.push({
+        type: 'coupon',
+        code: 'MONTH20',
+        icon: '👑',
+        name: '20% zniżki'
       } as Reward);
     }
     if (streak === 100) {
-      rewards.push({ 
-        type: 'coupon', 
-        code: 'LEGEND50', 
-        icon: '💎', 
-        name: '50% zniżki' 
+      rewards.push({
+        type: 'coupon',
+        code: 'LEGEND50',
+        icon: '💎',
+        name: '50% zniżki'
       } as Reward);
     }
 
     setTodayReward({ points: totalPoints, exp: expAmount, rewards, streak });
-    
+
     addPoints(totalPoints, `Codzienna wizyta - dzień ${streak}`);
     addExp(expAmount, `Codzienna nagroda - seria ${streak} dni`);
-    
+
     const today = new Date().toDateString();
     localStorage.setItem(`urwis_last_visit_${user.id}`, today);
     localStorage.setItem(
-      `urwis_claimed_${user.id}_${today}`, 
+      `urwis_claimed_${user.id}_${today}`,
       JSON.stringify({ points: totalPoints, exp: expAmount, rewards, streak })
     );
     setShowReward(true);
@@ -247,11 +247,11 @@ export default function DailyRewards() {
     if (success) {
       addPoints(dailyChallenge.reward, 'Dzienne wyzwanie');
       addExp(dailyChallenge.expReward, `Dzienne wyzwanie: ${dailyChallenge.task || dailyChallenge.question}`);
-      
+
       const today = new Date().toDateString();
       localStorage.setItem(`urwis_challenge_completed_${user.id}_${today}`, 'true');
       setChallengeCompleted(true);
-      
+
       // ✨ Ładny pop-up zamiast alert
       setModalMessage({
         title: 'Gratulacje!',
@@ -312,13 +312,13 @@ export default function DailyRewards() {
             <span className="text-2xl">🌟</span>
             <span className="font-bold text-orange-600">Codzienna Przygoda</span>
           </div>
-          
+
           <h2 className="text-5xl font-black mb-4">
             <span className="bg-linear-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
               Wróć Jutro!
             </span>
           </h2>
-          
+
           <p className="text-xl text-gray-600">
             Każdego dnia czeka na Ciebie nowa niespodzianka! 🎉
           </p>
@@ -377,11 +377,10 @@ export default function DailyRewards() {
                   {[...Array(7)].map((_, i) => (
                     <div
                       key={i}
-                      className={`w-10 h-10 rounded-full flex items-center justify-center text-xl ${
-                        i < streak % 7
-                          ? 'bg-linear-to-br from-yellow-400 to-orange-500 text-white'
-                          : 'bg-gray-200 text-gray-400'
-                      }`}
+                      className={`w-10 h-10 rounded-full flex items-center justify-center text-xl ${i < streak % 7
+                        ? 'bg-linear-to-br from-yellow-400 to-orange-500 text-white'
+                        : 'bg-gray-200 text-gray-400'
+                        }`}
                     >
                       {i < streak % 7 ? '✓' : i + 1}
                     </div>
@@ -413,7 +412,7 @@ export default function DailyRewards() {
             )}
 
             <div className="mt-4 text-center text-sm text-gray-600">
-              💡 Wróć jutro po więcej punktów i EXP!<br/>
+              💡 Wróć jutro po więcej punktów i EXP!<br />
               Im dłuższa seria, tym większe nagrody!
             </div>
           </motion.div>
@@ -583,7 +582,7 @@ export default function DailyRewards() {
               <p className="text-lg mb-6">
                 i <span className="font-black text-purple-600">{todayReward.exp}</span> EXP! ✨
               </p>
-              
+
               {todayReward.rewards.map((reward: any, i: number) => (
                 <div key={i} className="mb-4 p-4 bg-yellow-50 rounded-xl">
                   <div className="text-3xl mb-2">{reward.icon}</div>
@@ -626,9 +625,9 @@ export default function DailyRewards() {
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-3xl p-8 max-w-md text-center shadow-2xl"
             >
-              <motion.div 
+              <motion.div
                 className="text-7xl mb-4"
-                animate={{ 
+                animate={{
                   scale: [1, 1.2, 1],
                   rotate: [0, 10, -10, 0]
                 }}
@@ -642,7 +641,7 @@ export default function DailyRewards() {
               <p className="text-lg text-gray-700 mb-6">
                 {modalMessage.description}
               </p>
-              
+
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -673,9 +672,9 @@ export default function DailyRewards() {
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-3xl p-8 max-w-md text-center shadow-2xl"
             >
-              <motion.div 
+              <motion.div
                 className="text-7xl mb-4"
-                animate={{ 
+                animate={{
                   rotate: [0, -10, 10, -10, 0]
                 }}
                 transition={{ duration: 0.5 }}
@@ -688,7 +687,7 @@ export default function DailyRewards() {
               <p className="text-lg text-gray-700 mb-6">
                 {modalMessage.description}
               </p>
-              
+
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -703,9 +702,9 @@ export default function DailyRewards() {
       </AnimatePresence>
 
       {/* Auth Modal */}
-      <AuthModal 
-        isOpen={showAuthModal} 
-        onClose={() => setShowAuthModal(false)} 
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
       />
     </section>
   );

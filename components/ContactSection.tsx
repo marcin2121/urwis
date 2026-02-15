@@ -65,7 +65,7 @@ export default function ContactSection() {
           <motion.div
             key={i}
             className="absolute text-6xl"
-            initial={{ 
+            initial={{
               x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
               y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000)
             }}
@@ -91,17 +91,17 @@ export default function ContactSection() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-linear-to-r from-blue-100 to-purple-100 mb-4">
             <span className="text-2xl">💬</span>
             <span className="font-bold text-purple-600">Skontaktuj się z nami</span>
           </div>
-          
+
           <h1 className="text-5xl md:text-6xl font-black mb-4">
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Kontakt
             </span>
           </h1>
-          
+
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Masz pytanie? Chętnie pomożemy! Skontaktuj się z nami telefonicznie, mailowo lub odwiedź nas osobiście.
           </p>
@@ -135,7 +135,7 @@ export default function ContactSection() {
                   particleCount={12}
                   glowColor={info.glowColor}
                   disableAnimations={false}
-                  className="h-full min-h-[180px] rounded-3xl bg-gradient-to-br from-gray-50 to-white border-2 border-gray-200 hover:border-purple-300 hover:shadow-2xl transition-all duration-300"
+                  className="h-full min-h-[180px] rounded-3xl bg-linear-to-br from-gray-50 to-white border-2 border-gray-200 hover:border-purple-300 hover:shadow-2xl transition-all duration-300"
                 >
                   <div className="flex flex-col items-center justify-center text-center p-8 h-full">
                     <div className="text-6xl mb-4">
@@ -191,7 +191,7 @@ export default function ContactSection() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => window.location.reload()}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl font-bold"
+                  className="px-6 py-3 bg-linear-to-r from-blue-500 to-purple-500 text-white rounded-xl font-bold"
                 >
                   Wyślij kolejną wiadomość
                 </motion.button>
@@ -211,8 +211,8 @@ export default function ContactSection() {
                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-colors"
                     placeholder="Jan Kowalski"
                   />
-                  <ValidationError 
-                    prefix="Imię" 
+                  <ValidationError
+                    prefix="Imię"
                     field="name"
                     errors={state.errors}
                     className="text-red-500 text-sm mt-1"
@@ -232,8 +232,8 @@ export default function ContactSection() {
                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-colors"
                     placeholder="jan@example.com"
                   />
-                  <ValidationError 
-                    prefix="Email" 
+                  <ValidationError
+                    prefix="Email"
                     field="email"
                     errors={state.errors}
                     className="text-red-500 text-sm mt-1"
@@ -252,8 +252,8 @@ export default function ContactSection() {
                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-colors"
                     placeholder="+48 123 456 789"
                   />
-                  <ValidationError 
-                    prefix="Telefon" 
+                  <ValidationError
+                    prefix="Telefon"
                     field="phone"
                     errors={state.errors}
                     className="text-red-500 text-sm mt-1"
@@ -278,8 +278,8 @@ export default function ContactSection() {
                     <option value="wspolpraca">Współpraca</option>
                     <option value="inne">Inne</option>
                   </select>
-                  <ValidationError 
-                    prefix="Temat" 
+                  <ValidationError
+                    prefix="Temat"
                     field="subject"
                     errors={state.errors}
                     className="text-red-500 text-sm mt-1"
@@ -299,8 +299,8 @@ export default function ContactSection() {
                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-colors resize-none"
                     placeholder="Napisz swoją wiadomość..."
                   />
-                  <ValidationError 
-                    prefix="Wiadomość" 
+                  <ValidationError
+                    prefix="Wiadomość"
                     field="message"
                     errors={state.errors}
                     className="text-red-500 text-sm mt-1"
@@ -313,11 +313,10 @@ export default function ContactSection() {
                   disabled={state.submitting}
                   whileHover={{ scale: state.submitting ? 1 : 1.02 }}
                   whileTap={{ scale: state.submitting ? 1 : 0.98 }}
-                  className={`w-full py-4 rounded-xl font-bold text-white shadow-xl transition-all ${
-                    state.submitting
-                      ? 'bg-gray-400 cursor-not-allowed'
-                      : 'bg-gradient-to-r from-blue-500 to-purple-500 hover:shadow-2xl'
-                  }`}
+                  className={`w-full py-4 rounded-xl font-bold text-white shadow-xl transition-all ${state.submitting
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-linear-to-r from-blue-500 to-purple-500 hover:shadow-2xl'
+                    }`}
                 >
                   {state.submitting ? '⏳ Wysyłanie...' : '📤 Wyślij wiadomość'}
                 </motion.button>
@@ -339,7 +338,7 @@ export default function ContactSection() {
                   Znajdź nas
                 </h2>
               </div>
-              
+
               <p className="text-gray-600 mb-6">
                 Zapraszamy do naszego sklepu w Białobrzegach. Znajdujemy się przy ulicy Reymonta 38A.
               </p>
@@ -368,7 +367,7 @@ export default function ContactSection() {
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-bold text-sm shadow-lg"
+                className="flex items-center justify-center gap-2 px-4 py-3 bg-linear-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-bold text-sm shadow-lg"
               >
                 <span>🧭</span>
                 <span>Nawiguj</span>
@@ -378,7 +377,7 @@ export default function ContactSection() {
                 href="tel:+48604208183"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-bold text-sm shadow-lg"
+                className="flex items-center justify-center gap-2 px-4 py-3 bg-linear-to-r from-green-500 to-emerald-500 text-white rounded-xl font-bold text-sm shadow-lg"
               >
                 <span>📞</span>
                 <span>Zadzwoń</span>

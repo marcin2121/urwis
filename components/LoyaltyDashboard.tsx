@@ -63,13 +63,13 @@ export default function LoyaltyDashboard() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-100 to-pink-100 mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-linear-to-r from-purple-100 to-pink-100 mb-4">
             <span className="text-2xl">👑</span>
             <span className="font-bold text-purple-600">Program Lojalnościowy</span>
           </div>
 
           <h2 className="text-5xl font-black mb-4">
-            <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
               Klub Urwisa
             </span>
           </h2>
@@ -94,13 +94,13 @@ export default function LoyaltyDashboard() {
                   <h3 className="text-3xl font-black text-gray-800">Twoje Punkty</h3>
                   <p className="text-gray-600">Poziom: {level}</p>
                 </div>
-                <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${currentLevel.color} flex items-center justify-center text-4xl`}>
+                <div className={`w-20 h-20 rounded-full bg-linear-to-br ${currentLevel.color} flex items-center justify-center text-4xl`}>
                   {currentLevel.icon}
                 </div>
               </div>
 
               <div className="text-6xl font-black text-center mb-6">
-                <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                <span className="bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                   {points}
                 </span>
               </div>
@@ -114,7 +114,7 @@ export default function LoyaltyDashboard() {
                   </div>
                   <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
                     <motion.div
-                      className={`h-full bg-gradient-to-r ${currentLevel.color}`}
+                      className={`h-full bg-linear-to-r ${currentLevel.color}`}
                       initial={{ width: 0 }}
                       animate={{ width: `${progress}%` }}
                       transition={{ duration: 1 }}
@@ -144,7 +144,7 @@ export default function LoyaltyDashboard() {
                       key={badge.id}
                       whileHover={isUnlocked ? { scale: 1.05 } : {}}
                       className={`p-4 rounded-2xl text-center ${isUnlocked
-                        ? 'bg-gradient-to-br from-yellow-100 to-orange-100 border-2 border-yellow-400'
+                        ? 'bg-linear-to-br from-yellow-100 to-orange-100 border-2 border-yellow-400'
                         : 'bg-gray-100 opacity-50'
                         }`}
                     >
@@ -166,7 +166,7 @@ export default function LoyaltyDashboard() {
               initial={{ opacity: 0, x: -50 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="bg-gradient-to-r from-blue-100 to-purple-100 rounded-3xl p-8"
+              className="bg-linear-to-r from-blue-100 to-purple-100 rounded-3xl p-8"
             >
               <h3 className="text-xl font-black mb-4">🎮 Demo - Zdobądź punkty:</h3>
               <div className="grid grid-cols-2 gap-3">

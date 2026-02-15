@@ -75,7 +75,7 @@ export default function ClickerGame({ onComplete }: ClickerGameProps) {
 
     const width = gameAreaRef.current.offsetWidth;
     const randomItem = gameItems[Math.floor(Math.random() * gameItems.length)];
-    
+
     const newItem: FallingItem = {
       id: itemIdRef.current++,
       x: Math.random() * (width - 60),
@@ -162,7 +162,7 @@ export default function ClickerGame({ onComplete }: ClickerGameProps) {
       </div>
 
       {/* Game area */}
-      <div 
+      <div
         ref={gameAreaRef}
         className="relative w-full h-[600px] bg-gradient-to-b from-blue-50 to-purple-50 rounded-2xl overflow-hidden border-4 border-gray-200"
       >
@@ -189,7 +189,7 @@ export default function ClickerGame({ onComplete }: ClickerGameProps) {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={startGame}
-                className="px-8 py-4 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-full font-black text-xl shadow-xl"
+                className="px-8 py-4 bg-linear-to-r from-red-500 to-orange-500 text-white rounded-full font-black text-xl shadow-xl"
               >
                 🎮 Start!
               </motion.button>
@@ -238,7 +238,7 @@ export default function ClickerGame({ onComplete }: ClickerGameProps) {
                 Twój wynik: <span className="font-black text-orange-600">{score}</span> punktów
               </p>
 
-              <div className="bg-gradient-to-r from-orange-100 to-red-100 rounded-lg p-6 inline-block mb-6">
+              <div className="bg-linear-to-r from-orange-100 to-red-100 rounded-lg p-6 inline-block mb-6">
                 <div className="text-sm text-gray-600 mb-2">Twój kupon rabatowy:</div>
                 <div className="text-3xl font-black text-orange-600 mb-1">
                   {getCouponCode().code}
@@ -259,7 +259,7 @@ export default function ClickerGame({ onComplete }: ClickerGameProps) {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={onComplete}
-                  className="px-6 py-3 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-lg font-bold"
+                  className="px-6 py-3 bg-linear-to-r from-red-500 to-orange-500 text-white rounded-lg font-bold"
                 >
                   Użyj kuponu
                 </motion.button>

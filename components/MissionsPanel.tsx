@@ -8,8 +8,8 @@ import { Mission, getMissionsByType } from '@/config/gamification.config';
 import { getMissionProgress } from '@/utils/missionProgress';
 
 export default function MissionsPanel() {
-  const { profile: user } = useSupabaseAuth();
-  const { addPoints, addExp } = useSupabaseLoyalty();
+  const { user, addExp } = useSupabaseAuth();
+  const { addPoints } = useSupabaseLoyalty();
   const [activeTab, setActiveTab] = useState<'daily' | 'weekly'>('daily');
   const [missions, setMissions] = useState<Mission[]>([]);
   const [completedMissions, setCompletedMissions] = useState<Set<string>>(new Set());
@@ -27,10 +27,10 @@ export default function MissionsPanel() {
 
     const completed = new Set<string>();
     filteredMissions.forEach(mission => {
-      const key = mission.type === 'daily' 
+      const key = mission.type === 'daily'
         ? `urwis_mission_${mission.id}_${user.id}_${today}`
         : `urwis_mission_${mission.id}_${user.id}_${weekStart}`;
-      
+
       if (localStorage.getItem(key)) {
         completed.add(mission.id);
       }
@@ -76,7 +76,7 @@ export default function MissionsPanel() {
     }, 5000);
   };
 
-  const claimMissionReward = (mission: Mission) => {
+  const claimMissionReward = async (mission: Mission) => {
     if (!user) return;
     if (completedMissions.has(mission.id)) return;
     if (!mission.progress || mission.progress < mission.requirement) {
@@ -89,10 +89,10 @@ export default function MissionsPanel() {
 
     const today = new Date().toDateString();
     const weekStart = getWeekStart();
-    const key = mission.type === 'daily' 
+    const key = mission.type === 'daily'
       ? `urwis_mission_${mission.id}_${user.id}_${today}`
       : `urwis_mission_${mission.id}_${user.id}_${weekStart}`;
-    
+
     localStorage.setItem(key, 'true');
     setCompletedMissions(prev => new Set([...prev, mission.id]));
 
@@ -124,11 +124,10 @@ export default function MissionsPanel() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setActiveTab('daily')}
-              className={`px-6 py-3 rounded-xl font-bold transition-all ${
-                activeTab === 'daily'
-                  ? 'bg-[linear-gradient(to_right,rgb(59,130,246),rgb(168,85,247))] text-white shadow-lg'
-                  : 'text-gray-600 hover:bg-gray-200'
-              }`}
+              className={`px-6 py-3 rounded-xl font-bold transition-all ${activeTab === 'daily'
+                ? 'bg-[linear-gradient(to_right,rgb(59,130,246),rgb(168,85,247))] text-white shadow-lg'
+                : 'text-gray-600 hover:bg-gray-200'
+                }`}
             >
               📅 Dzienne
             </motion.button>
@@ -136,11 +135,10 @@ export default function MissionsPanel() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setActiveTab('weekly')}
-              className={`px-6 py-3 rounded-xl font-bold transition-all ${
-                activeTab === 'weekly'
-                  ? 'bg-[linear-gradient(to_right,rgb(249,115,22),rgb(239,68,68))] text-white shadow-lg'
-                  : 'text-gray-600 hover:bg-gray-200'
-              }`}
+              className={`px-6 py-3 rounded-xl font-bold transition-all ${activeTab === 'weekly'
+                ? 'bg-[linear-gradient(to_right,rgb(249,115,22),rgb(239,68,68))] text-white shadow-lg'
+                : 'text-gray-600 hover:bg-gray-200'
+                }`}
             >
               📆 Tygodniowe
             </motion.button>
@@ -153,8 +151,8 @@ export default function MissionsPanel() {
             {missions.map((mission, index) => {
               const isCompleted = completedMissions.has(mission.id);
               const canClaim = mission.progress && mission.progress >= mission.requirement && !isCompleted;
-              const progressPercent = mission.progress 
-                ? Math.min((mission.progress / mission.requirement) * 100, 100) 
+              const progressPercent = mission.progress
+                ? Math.min((mission.progress / mission.requirement) * 100, 100)
                 : 0;
 
               return (
@@ -164,13 +162,12 @@ export default function MissionsPanel() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 20 }}
                   transition={{ delay: index * 0.05 }}
-                  className={`p-6 rounded-2xl border-2 transition-all ${
-                    isCompleted
-                      ? 'bg-green-50 border-green-300'
-                      : canClaim
+                  className={`p-6 rounded-2xl border-2 transition-all ${isCompleted
+                    ? 'bg-green-50 border-green-300'
+                    : canClaim
                       ? 'bg-yellow-50 border-yellow-400 shadow-lg'
                       : 'bg-gray-50 border-gray-200'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-4">
                     {/* Icon */}
@@ -206,13 +203,12 @@ export default function MissionsPanel() {
                         </div>
                         <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
                           <motion.div
-                            className={`h-full ${
-                              isCompleted
-                                ? 'bg-green-500'
-                                : canClaim
+                            className={`h-full ${isCompleted
+                              ? 'bg-green-500'
+                              : canClaim
                                 ? 'bg-[linear-gradient(to_right,rgb(251,191,36),rgb(249,115,22))]'
                                 : 'bg-[linear-gradient(to_right,rgb(96,165,250),rgb(168,85,247))]'
-                            }`}
+                              }`}
                             initial={{ width: 0 }}
                             animate={{ width: `${progressPercent}%` }}
                             transition={{ duration: 0.5 }}
