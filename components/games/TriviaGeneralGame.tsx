@@ -1,54 +1,63 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext'
-import { fetchTriviaQuestions, TriviaQuestion, CATEGORIES } from '@/lib/triviaApi'
+import { fetchTriviaQuestions, TriviaQuestion } from '@/lib/triviaApi'
 
-export default function TriviaCategoryGame({ onComplete }: { onComplete: () => void }) {
+export default function TriviaGeneralGame({ onComplete }: { onComplete: () => void }) {
   const { profile } = useSupabaseAuth()
-  const [step, setStep] = useState<'categories' | 'game' | 'results'>('categories')
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
   const [questions, setQuestions] = useState<TriviaQuestion[]>([])
   const [current, setCurrent] = useState(0)
   const [score, setScore] = useState(0)
   const [streak, setStreak] = useState(0)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [gameOver, setGameOver] = useState(false)
 
-  // Kategorie z mnożnikami EXP
-  const categories = [
-    { id: 9, name: '🧬 Biologia', expMultiplier: 1.2, icon: '🧬' },
-    { id: 10, name: '📚 Książki', expMultiplier: 1.1, icon: '📚' },
-    { id: 11, name: '🎬 Filmy', expMultiplier: 1.3, icon: '🎬' },
-    { id: 12, name: '🎵 Muzyka', expMultiplier: 1.1, icon: '🎵' },
-    { id: 17, name: '🌿 Nauka', expMultiplier: 1.4, icon: '🔬' },
-    { id: 18, name: '💻 Komputery', expMultiplier: 1.5, icon: '💻' },
-    { id: 19, name: '🔢 Matematyka', expMultiplier: 1.6, icon: '🔢' },
-    { id: 21, name: '⚽ Sport', expMultiplier: 1.0, icon: '⚽' },
-    { id: 22, name: '🗺️ Geografia', expMultiplier: 1.2, icon: '🗺️' },
-    { id: 23, name: '🏛️ Historia', expMultiplier: 1.3, icon: '🏛️' },
-    { id: 25, name: '🎨 Sztuka', expMultiplier: 1.4, icon: '🎨' },
-    { id: 27, name: '🚗 Motoryzacja', expMultiplier: 1.1, icon: '🚗' },
-    { id: 26, name: '🎲 Gry', expMultiplier: 1.2, icon: '🎮' },
-  ]
+  useEffect(() => {
+    // ✅ FIX: 'mixed' → undefined (API losuje difficulty)
+    fetchTriviaQuestions(20)  // 20 pytań, mixed difficulty (domyślnie)
+      .then(questions => {
+        setQuestions(questions)
+        setLoading(false)
+      })
+  }, [])
 
-  const loadQuestions = useCallback(async () => {
-    if (!selectedCategory) return
+  if (loading) {
+    return (
+      <div className="w-full h-[500px] flex items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          className="text-2xl"
+        >
+          Pobieram pytania... 🧠
+        </motion.div>
+      </div>
+    )
+  }
 
-    setLoading(true)
-    const newQuestions = await fetchTriviaQuestions(15, selectedCategory, 'mixed')
-    setQuestions(newQuestions)
-    setCurrent(0)
-    setScore(0)
-    setStreak(0)
-    setStep('game')
-    setLoading(false)
-  }, [selectedCategory])
+  const q = questions[current]
+  if (!q || questions.length === 0) {
+    return (
+      <div className="w-full h-[500px] flex items-center justify-center p-8 text-center">
+        <div className="bg-white p-8 rounded-2xl shadow-xl">
+          <span className="text-2xl mb-4 block">😅</span>
+          <p className="text-lg mb-4">Brak pytań z API</p>
+          <motion.button
+            onClick={() => window.location.reload()}
+            whileHover={{ scale: 1.05 }}
+            className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold"
+          >
+            Spróbuj ponownie
+          </motion.button>
+        </div>
+      </div>
+    )
+  }
 
   const answer = (index: number) => {
-    const q = questions[current]
     const isCorrect = index === q.correct
-    const multiplier = categories.find(c => c.id === selectedCategory)?.expMultiplier || 1
-    const exp = isCorrect ? Math.floor(q.exp * multiplier * Math.min(streak + 1, 5)) : 0
+    const exp = isCorrect ? q.exp * Math.min(streak + 1, 5) : 0
 
     if (isCorrect) {
       setScore(s => s + exp)
@@ -58,145 +67,94 @@ export default function TriviaCategoryGame({ onComplete }: { onComplete: () => v
     }
 
     setTimeout(() => {
-      if (current + 1 < questions.length) {
+      if (current + 1 < questions.length && !gameOver) {
         setCurrent(c => c + 1)
       } else {
-        setStep('results')
+        setGameOver(true)
+        console.log(`🎉 +${score} EXP za Trivia! Streak: x${streak}`)
       }
-    }, 1400)
+    }, 1500)
   }
 
-  // === KROK 1: WYBIERZ KATEGORIĘ ===
-  if (step === 'categories') {
+  if (gameOver) {
     return (
-      <div className="w-full h-[500px] p-6 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 rounded-2xl overflow-y-auto">
-        <div className="text-center mb-8">
-          <motion.h2
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="text-3xl font-black bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-4"
-          >
-            🧠 Wybierz Kategorię
-          </motion.h2>
-          <p className="text-lg text-gray-600">Wybierz temat i zacznij zarabiać EXP!</p>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-[350px] overflow-y-auto px-2">
-          {categories.map((cat, i) => (
-            <motion.button
-              key={cat.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
-              whileHover={{ scale: 1.05, y: -4 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setSelectedCategory(cat.id)}
-              className="group relative p-6 rounded-2xl bg-white shadow-lg hover:shadow-2xl border-4 border-transparent hover:border-indigo-300 transition-all overflow-hidden h-32 flex flex-col items-center justify-center text-center"
-            >
-              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">{cat.icon}</div>
-              <h3 className="font-bold text-gray-800 text-lg leading-tight">{cat.name}</h3>
-              <div className="absolute -bottom-2 -right-2 bg-gradient-to-r from-emerald-400 to-green-500 text-white px-3 py-1 rounded-tl-xl text-xs font-bold opacity-0 group-hover:opacity-100 transition-all">
-                x{cat.expMultiplier}
-              </div>
-            </motion.button>
-          ))}
-        </div>
-
-        <motion.button
-          onClick={onComplete}
-          whileHover={{ scale: 1.02 }}
-          className="w-full mt-6 p-4 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl"
-        >
-          ← Wróć do Gier
-        </motion.button>
-      </div>
-    )
-  }
-
-  // === KROK 2: GRA ===
-  if (step === 'game' && questions.length > 0) {
-    const q = questions[current]
-    const cat = categories.find(c => c.id === selectedCategory)
-
-    return (
-      <div className="w-full h-[500px] p-6 overflow-hidden bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 rounded-2xl">
-        {/* Header */}
-        <div className="text-center mb-6 p-4 bg-white/80 backdrop-blur-xl rounded-2xl shadow-lg border border-indigo-200">
-          <div className="flex items-center justify-center gap-3 mb-2">
-            <span className="text-2xl">{cat?.icon}</span>
-            <h2 className="text-xl font-black">{cat?.name}</h2>
-          </div>
-          <div className="flex gap-4 text-sm font-semibold text-gray-600">
-            <span>Pytanie {current + 1}/{questions.length}</span>
-            <span className="text-emerald-600">Streak: {streak}x</span>
-            <span className="text-orange-600">EXP: {score}</span>
-          </div>
-        </div>
-
-        {/* Question */}
+      <div className="w-full h-[500px] flex flex-col items-center justify-center p-8 text-center bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl">
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="flex-1 flex flex-col justify-center p-6 bg-white/70 backdrop-blur-xl rounded-3xl shadow-2xl border-4 border-indigo-100 mb-6 overflow-hidden"
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{ scale: 1, rotate: 0 }}
+          className="text-7xl mb-6"
         >
-          <h3 className="text-xl font-bold text-gray-800 text-center leading-relaxed mb-8">
-            {q.question}
-          </h3>
+          🏆
         </motion.div>
+        <h2 className="text-4xl font-black text-white mb-4 drop-shadow-2xl">Geniusz Wiedzy!</h2>
+        <div className="text-3xl text-emerald-100 mb-4 drop-shadow-lg">{score} EXP</div>
+        <div className="text-2xl text-yellow-200 mb-8 drop-shadow-lg">Streak: <span className="font-black">{streak}x</span></div>
 
-        {/* Answers */}
-        <div className="grid grid-cols-2 gap-3 px-2">
-          {q.options.map((option, i) => (
-            <motion.button
-              key={i}
-              onClick={() => answer(i)}
-              whileHover={{ scale: 1.02, y: -2 }}
-              whileTap={{ scale: 0.97 }}
-              className="group relative p-4 rounded-xl font-semibold text-base shadow-lg transition-all
-                bg-gradient-to-r from-white via-gray-50 to-indigo-50 hover:from-indigo-50 hover:to-purple-50
-                border-2 border-gray-200 hover:border-indigo-300 hover:shadow-xl active:shadow-2xl min-h-[70px]
-                flex items-center justify-center text-left"
-            >
-              <span className="relative z-10">{option}</span>
-            </motion.button>
-          ))}
+        <div className="space-y-3 w-full max-w-sm">
+          <motion.button
+            onClick={() => window.location.reload()}
+            whileHover={{ scale: 1.05 }}
+            className="w-full p-4 bg-white/20 backdrop-blur-xl rounded-2xl font-bold text-lg text-white shadow-xl hover:bg-white/30"
+          >
+            Nowa Gra ➡️
+          </motion.button>
+          <motion.button
+            onClick={onComplete}
+            whileHover={{ scale: 1.05 }}
+            className="w-full p-4 bg-white text-emerald-600 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-3xl"
+          >
+            Wróć do Gier 🎮
+          </motion.button>
         </div>
       </div>
     )
   }
 
-  // === KROK 3: WYNIKI ===
   return (
-    <div className="w-full h-[500px] flex flex-col items-center justify-center p-8 text-center bg-gradient-to-br from-emerald-500 via-green-500 to-emerald-600 rounded-2xl">
-      <motion.div
-        initial={{ scale: 0, rotate: -180 }}
-        animate={{ scale: 1, rotate: 0 }}
-        className="text-7xl mb-6"
-      >
-        🏆
-      </motion.div>
-      <h2 className="text-4xl font-black text-white mb-4 drop-shadow-lg">Mistrz Wiedzy!</h2>
-      <div className="text-3xl text-emerald-100 mb-4 drop-shadow-lg">{score} EXP</div>
-      <div className="text-2xl text-yellow-200 mb-8 drop-shadow-lg">Streak x{streak}</div>
+    <div className="w-full h-[500px] p-8 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 rounded-2xl overflow-hidden">
+      {/* Header */}
+      <div className="text-center mb-8 p-6 bg-white/70 backdrop-blur-xl rounded-3xl shadow-xl border border-indigo-200">
+        <h2 className="text-3xl font-black mb-4 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+          🧠 Open Trivia Challenge
+        </h2>
+        <div className="flex gap-6 justify-center items-center text-lg font-semibold text-gray-700">
+          <span className="px-3 py-1 bg-indigo-100 rounded-full text-sm">Pytanie {current + 1}/20</span>
+          <span className="text-emerald-600 font-black">Streak: {streak}x</span>
+          <span className="text-orange-600 font-black">{score} EXP</span>
+        </div>
+        <div className="text-sm text-gray-500 mt-2">{q.category}</div>
+      </div>
 
-      <div className="space-y-3 mb-8 text-white/90">
-        <motion.button
-          onClick={() => {
-            setStep('categories')
-            setSelectedCategory(null)
-          }}
-          whileHover={{ scale: 1.05 }}
-          className="w-full max-w-sm p-4 bg-white/20 backdrop-blur-xl rounded-2xl font-bold text-lg shadow-xl hover:bg-white/30"
-        >
-          Nowa Kategoria ➡️
-        </motion.button>
-        <motion.button
-          onClick={onComplete}
-          whileHover={{ scale: 1.05 }}
-          className="w-full max-w-sm p-4 bg-white text-emerald-600 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-3xl"
-        >
-          Wróć do Gier 🎮
-        </motion.button>
+      {/* Question Card */}
+      <motion.div
+        initial={{ opacity: 0, y: 30, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        className="flex-1 mb-8 p-8 bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border-4 border-indigo-200 flex items-center justify-center"
+      >
+        <h3 className="text-2xl font-bold text-gray-800 text-center leading-relaxed max-w-4xl mx-auto">
+          {q.question}
+        </h3>
+      </motion.div>
+
+      {/* Answer Buttons */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {q.options.map((option, i) => (
+          <motion.button
+            key={i}
+            onClick={() => answer(i)}
+            whileHover={{ scale: 1.03, y: -3 }}
+            whileTap={{ scale: 0.97 }}
+            className="group relative p-6 rounded-2xl font-bold text-lg shadow-xl transition-all duration-300
+              bg-gradient-to-r from-white via-gray-50 to-indigo-50 hover:from-indigo-50 hover:to-purple-50
+              border-4 border-gray-200 hover:border-indigo-400 hover:shadow-2xl active:scale-98 active:shadow-3xl
+              flex items-center justify-center min-h-[80px] text-left overflow-hidden"
+          >
+            <span className="relative z-10 text-gray-800">{option}</span>
+            {/* Subtelny glow */}
+            <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/5 to-purple-500/5 rounded-2xl 
+                           opacity-0 group-hover:opacity-100 transition-opacity" />
+          </motion.button>
+        ))}
       </div>
     </div>
   )
