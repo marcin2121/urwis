@@ -29,15 +29,12 @@ export default function Page() {
     setError(null)
 
     try {
+      // ✅ POPRAWIONE - bez options!
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
-        options: {
-          emailRedirectTo:
-            process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ||
-            `${window.location.origin}/protected`,
-        },
       })
+
       if (error) throw error
       router.push('/protected')
     } catch (error: unknown) {
