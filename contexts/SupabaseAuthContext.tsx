@@ -215,14 +215,6 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
   )
 }
 
-export function useSupabaseAuth() {
-  const context = useContext(SupabaseAuthContext)
-  if (context === undefined) {
-    throw new Error('useSupabaseAuth must be used within SupabaseAuthProvider')
-  }
-  return context
-}
-
 // Compatibility hook for existing components using useSupabaseAuth
 export function useSupabaseAuth() {
   const context = useContext(SupabaseAuthContext)
