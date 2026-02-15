@@ -37,7 +37,7 @@ export default function DailyCalendar() {
     return new Date(year, month, 1).getDay();
   };
 
-  const claimDailyReward = (day: number) => {
+  const claimDailyReward = async (day: number) => {
     if (!user) return;
 
     const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
