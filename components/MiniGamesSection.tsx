@@ -25,6 +25,15 @@ export default function MiniGamesSection() {
 
   const games = [
     {
+      id: 'trivia-api',
+      title: '🧠 Open Trivia 300K+',
+      description: 'Nieskończone pytania z API!',
+      icon: '🧠',
+      color: 'from-indigo-500 to-purple-600',
+      component: TriviaGeneralGame,
+      difficulty: 'Endless 🌍'
+    }
+    {
       id: 'memory',
       title: 'Memory - Zabawki',
       description: 'Znajdź pary zabawek i zdobądź 10% zniżki!',
