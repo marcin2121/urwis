@@ -1,17 +1,17 @@
 'use client'
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useAuth } from '@/contexts/AuthContext';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 
 export default function UserProfile() {
-  const { user, isAuthenticated, logout, updateAvatar } = useAuth();
+  const { profile: user, signOut, updateProfile } = useSupabaseAuth();
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
 
   const avatars = ['🧸', '🎮', '🎨', '⚽', '🎲', '🚀', '🦖', '🦄', '🐶', '🐱', '🦊', '🐼'];
 
-  if (!isAuthenticated || !user) return null;
+  if (!user) return null;
 
-  const progressPercent = (user.exp / user.expToNextLevel) * 100;
+  const progressPercent = (user.total_exp / (100 * user.level * 1.5)) * 100;
 
   return (
     <div className="bg-white rounded-3xl shadow-2xl p-8">
@@ -61,11 +61,11 @@ export default function UserProfile() {
                 whileHover={{ scale: 1.2 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => {
-                  updateAvatar(avatar);
+                  updateProfile({ avatar_url: avatar });
                   setShowAvatarPicker(false);
                 }}
                 className={`text-3xl p-3 rounded-xl transition-all ${
-                  user.avatar === avatar
+                  user.avatar_url === avatar
                     ? 'bg-blue-200 ring-2 ring-blue-500'
                     : 'bg-white hover:bg-gray-100'
                 }`}
@@ -87,7 +87,7 @@ export default function UserProfile() {
             </span>
           </div>
           <span className="text-sm font-semibold text-gray-600">
-            {user.exp} / {user.expToNextLevel} EXP
+            {user.total_exp} / {100 * user.level * 1.5} EXP
           </span>
         </div>
 
@@ -102,7 +102,7 @@ export default function UserProfile() {
         </div>
 
         <p className="text-xs text-gray-500 mt-1 text-center">
-          Jeszcze {user.expToNextLevel - user.exp} EXP do poziomu {user.level + 1}!
+          Jeszcze {100 * user.level * 1.5 - user.total_exp} EXP do poziomu {user.level + 1}!
         </p>
       </div>
 
@@ -131,7 +131,7 @@ export default function UserProfile() {
 
       {/* Member Since */}
       <div className="mt-6 text-center text-xs text-gray-500">
-        Członek od: {new Date(user.createdAt).toLocaleDateString('pl-PL')}
+        Członek od: {new Date(user.created_at).toLocaleDateString('pl-PL')}
       </div>
     </div>
   );

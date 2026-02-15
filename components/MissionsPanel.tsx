@@ -1,15 +1,15 @@
 'use client'
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '@/contexts/AuthContext';
-import { useLoyalty } from '@/contexts/LoyaltyContext';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
+import { useSupabaseLoyalty } from '@/contexts/SupabaseLoyaltyContext';
 import MissionNotification from '@/components/MissionNotification';
 import { Mission, getMissionsByType } from '@/config/gamification.config';
 import { getMissionProgress } from '@/utils/missionProgress';
 
 export default function MissionsPanel() {
-  const { user, addExp } = useAuth();
-  const { addPoints } = useLoyalty();
+  const { profile: user } = useSupabaseAuth();
+  const { addPoints, addExp } = useSupabaseLoyalty();
   const [activeTab, setActiveTab] = useState<'daily' | 'weekly'>('daily');
   const [missions, setMissions] = useState<Mission[]>([]);
   const [completedMissions, setCompletedMissions] = useState<Set<string>>(new Set());
