@@ -76,7 +76,7 @@ export default function MissionsPanel() {
     }, 5000);
   };
 
-  const claimMissionReward = (mission: Mission) => {
+  const claimMissionReward = async (mission: Mission) => {
     if (!user) return;
     if (completedMissions.has(mission.id)) return;
     if (!mission.progress || mission.progress < mission.requirement) {
