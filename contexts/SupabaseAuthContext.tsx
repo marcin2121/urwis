@@ -222,3 +222,41 @@ export function useSupabaseAuth() {
   }
   return context
 }
+
+// Compatibility hook for existing components using useAuth
+export function useAuth() {
+  const context = useContext(SupabaseAuthContext)
+  if (context === undefined) {
+    throw new Error('useAuth must be used within SupabaseAuthProvider (AuthProvider is now SupabaseAuthProvider)')
+  }
+  
+  // Map Supabase auth context to old AuthContext interface for backward compatibility
+  return {
+    user: context.profile ? {
+      id: context.profile.id,
+      email: context.profile.email,
+      username: context.profile.username,
+      level: context.profile.level,
+      exp: context.profile.total_exp,
+      expToNextLevel: 100 * context.profile.level * 1.5, // Approximate
+      avatar: context.profile.avatar_url || '🧸',
+      createdAt: context.profile.created_at,
+    } : null,
+    isAuthenticated: !!context.user,
+    login: async (email: string, password: string) => {
+      const result = await context.signIn(email, password)
+      return !result.error
+    },
+    register: async (email: string, username: string, password: string) => {
+      const result = await context.signUp(email, password, username)
+      return !result.error
+    },
+    logout: context.signOut,
+    addExp: async (amount: number) => {
+      await context.addExp(amount)
+    },
+    updateAvatar: async (avatar: string) => {
+      await context.updateProfile({ avatar_url: avatar })
+    },
+  }
+}
