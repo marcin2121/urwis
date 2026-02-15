@@ -368,20 +368,6 @@ export const TRIVIA_QUESTIONS: TriviaQuestion[] = [
     "category": "👋 Ciało"
   },
   {
-    "question": "Gdzie mieszka ryba?",
-    "options": ["W lesie", "W wodzie", "Na drzewie", "W górach"],
-    "correct": 1,
-    "exp": 10,
-    "category": "🐟 Zwierzęta"
-  },
-  {
-    "question": "Jaki jest największy ocean?",
-    "options": ["Atlantycki", "Indyjski", "Spokojny", "Arktyczny"],
-    "correct": 2,
-    "exp": 15,
-    "category": "🌊 Geografia"
-  },
-  {
     "question": "Ile dni ma tydzień?",
     "options": ["5", "7", "10", "4"],
     "correct": 1,
@@ -390,7 +376,7 @@ export const TRIVIA_QUESTIONS: TriviaQuestion[] = [
   },
   {
     "question": "Kto maluje obrazki?",
-    "options": ["Piosenkarz", "Malarski", "Muzyk", "Tancerz"],
+    "options": ["Piosenkarz", "Malarz", "Muzyk", "Tancerz"],
     "correct": 1,
     "exp": 15,
     "category": "🎨 Zawody"
@@ -401,13 +387,6 @@ export const TRIVIA_QUESTIONS: TriviaQuestion[] = [
     "correct": 1,
     "exp": 10,
     "category": "🍎 Owoce"
-  },
-  {
-    "question": "Ile kółek ma rower?",
-    "options": ["1", "2", "3", "4"],
-    "correct": 1,
-    "exp": 10,
-    "category": "🚲 Pojazdy"
   },
   {
     "question": "Co nosi ptak na skrzydłach?",
@@ -424,12 +403,55 @@ export const TRIVIA_QUESTIONS: TriviaQuestion[] = [
     "category": "📅 Czas"
   },
   {
-    "question": "Kto buduje gniazdo z traw?",
+    "question": "Kto buduje gniazdo?",
     "options": ["Lis", "Ptak", "Ryba", "Żaba"],
     "correct": 1,
     "exp": 15,
     "category": "🐦 Zwierzęta"
-  }
+  },
+  {
+    "question": "Jak nazywa się młode kota?",
+    "options": ["Kociak", "Szczeniak", "Źrebak", "Kurczak"],
+    "correct": 0,
+    "exp": 10,
+    "category": "🐱 Zwierzęta"
+  },
+  {
+    "question": "Jakie zwierzę mówi „hau, hau”?",
+    "options": ["Kot", "Pies", "Krowa", "Koń"],
+    "correct": 1,
+    "exp": 10,
+    "category": "🐶 Zwierzęta"
+  },
+  {
+    "question": "Jakie zwierzę daje nam mleko?",
+    "options": ["Koń", "Krowa", "Kaszalot", "Świnia"],
+    "correct": 1,
+    "exp": 10,
+    "category": "🐄 Zwierzęta"
+  },
+  {
+    "question": "Jak nazywa się największa planeta w Układzie Słonecznym?",
+    "options": ["Mars", "Ziemia", "Jowisz", "Merkury"],
+    "correct": 2,
+    "exp": 15,
+    "category": "🌌 Kosmos"
+  },
+  {
+    "question": "Jak nazywa się miejsce, w którym wypożyczamy książki?",
+    "options": ["Sklep", "Biblioteka", "Stadion", "Apteka"],
+    "correct": 1,
+    "exp": 15,
+    "category": "📚 Miejsca"
+  },
+  {
+    "question": "Które z poniższych to nie jest kapelusz?",
+    "options": ["Melonik", "Arbuzik", "Fedora", "Cylinder"],
+    "correct": 1,
+    "exp": 20,
+    "category": " Język polski"
+  },
+
   // // 800+ więcej z GIST (parsowane)...
   // TODO: Automatycznie sparsuj pełne listy z GIST po przetłumaczeniu
 ]
