@@ -94,10 +94,20 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
         .eq('id', userId)
         .single()
 
-      if (error) throw error
-      setProfile(data)
+      if (error) {
+        if (error.code === 'PGRST116') {
+          // Profile doesn't exist yet - that's OK for new users
+          console.log('[Auth] Profile not found for user:', userId)
+          setProfile(null)
+        } else {
+          throw error
+        }
+      } else {
+        setProfile(data)
+      }
     } catch (error) {
       console.error('Error fetching profile:', error)
+      setProfile(null)
     }
   }
 
