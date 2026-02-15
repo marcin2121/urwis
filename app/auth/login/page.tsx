@@ -29,26 +29,23 @@ export default function Page() {
     setError(null)
 
     try {
-      console.log('[v0] Login attempt started')
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
 
       if (error) {
-        console.error('[v0] Login error:', error.message)
-        throw error
+        setError(error.message)
+        setIsLoading(false)
+        return
       }
       
-      console.log('[v0] Login successful, redirecting to /profil')
-      // Wait for auth state to update
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      // Wait for auth state to update before redirecting
+      await new Promise(resolve => setTimeout(resolve, 500))
       router.push('/profil')
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'An error occurred'
-      console.error('[v0] Login catch error:', message)
       setError(message)
-    } finally {
       setIsLoading(false)
     }
   }
