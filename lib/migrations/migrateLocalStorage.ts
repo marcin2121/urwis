@@ -3,11 +3,11 @@
 import { createClient } from '@/lib/supabase/client'
 
 interface LocalStorageData {
-  points?: string
-  badges?: string
-  history?: string
-  missionProgress?: string
-  streakData?: string
+  points: string
+  badges: string
+  history: string
+  missionProgress: string
+  streakData: string
 }
 
 export async function migrateLocalStorageToSupabase(userId: string) {
@@ -61,7 +61,9 @@ export async function migrateLocalStorageToSupabase(userId: string) {
           user_id: userId,
           current_streak: streakData.currentStreak || 0,
           best_streak: streakData.bestStreak || 0,
-          last_activity_date: streakData.lastActivityDate ? new Date(streakData.lastActivityDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+          last_activity_date: streakData.lastActivityDate
+            ? new Date(streakData.lastActivityDate).toISOString().split('T')[0]
+            : new Date().toISOString().split('T')[0],
         },
         { onConflict: 'user_id' }
       )
@@ -76,7 +78,14 @@ export async function migrateLocalStorageToSupabase(userId: string) {
     localStorage.removeItem('urwis_mission_progress')
     localStorage.removeItem('urwis_streak_data')
 
-    return { success: true, migratedData: { points, badgesCount: badges.length, historyCount: history.length } }
+    return {
+      success: true,
+      migratedData: {
+        points,
+        badgesCount: badges.length,
+        historyCount: history.length
+      }
+    }
   } catch (error: any) {
     console.error('Migration error:', error)
     return { success: false, error: error.message }
