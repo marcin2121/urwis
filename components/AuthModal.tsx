@@ -1,239 +1,217 @@
 'use client'
-import { createContext, useContext, useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import type { User, Session } from '@supabase/supabase-js'
-import type { Profile } from '@/types/database'
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 
-interface AuthContextType {
-  user: User | null
-  session: Session | null
-  profile: Profile | null
-  isAuthenticated: boolean
-  isAdmin: boolean
-  isModerator: boolean
-  loading: boolean
-  login: (email: string, password: string) => Promise<boolean>  // ✅ DODANE
-  register: (email: string, username: string, password: string) => Promise<boolean>  // ✅ DODANE
-  signOut: () => Promise<void>
+interface AuthModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  defaultMode?: 'login' | 'register';
 }
 
-const SupabaseAuthContext = createContext<AuthContextType | undefined>(undefined)
+export default function AuthModal({ isOpen, onClose, defaultMode = 'login' }: AuthModalProps) {
+  const { login, register } = useSupabaseAuth();
+  const [mode, setMode] = useState<'login' | 'register'>(defaultMode);
+  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-const supabase = createClient()
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
 
-export function SupabaseAuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [session, setSession] = useState<Session | null>(null)
-  const [profile, setProfile] = useState<Profile | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [initialized, setInitialized] = useState(false)
+    if (mode === 'register') {
+      if (password !== confirmPassword) {
+        alert('Hasła nie pasują do siebie!');
+        setIsLoading(false);
+        return;
+      }
 
-  useEffect(() => {
-    if (initialized) return
+      if (password.length < 6) {
+        alert('Hasło musi mieć minimum 6 znaków!');
+        setIsLoading(false);
+        return;
+      }
 
-    let mounted = true
-
-    const initAuth = async () => {
-      try {
-        const { data: { session }, error } = await supabase.auth.getSession()
-
-        if (!mounted) return
-
-        if (error) {
-          console.error('❌ Session error:', error)
-          setLoading(false)
-          return
-        }
-
-        console.log('✅ Initial session:', session?.user?.email || 'No session')
-        setSession(session)
-        setUser(session?.user ?? null)
-
-        if (session?.user) {
-          await fetchProfile(session.user.id)
-        } else {
-          setLoading(false)
-        }
-      } catch (err) {
-        console.error('❌ Init auth error:', err)
-        if (mounted) setLoading(false)
-      } finally {
-        if (mounted) setInitialized(true)
+      const success = await register(email, username, password);
+      if (success) {
+        onClose();
+      }
+    } else {
+      const success = await login(email, password);
+      if (success) {
+        onClose();
       }
     }
 
-    initAuth()
+    setIsLoading(false);
+  };
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (!mounted) return
+  const resetForm = () => {
+    setEmail('');
+    setUsername('');
+    setPassword('');
+    setConfirmPassword('');
+  };
 
-      console.log('🔔 Auth event:', event, session?.user?.email || 'No user')
+  const switchMode = () => {
+    setMode(mode === 'login' ? 'register' : 'login');
+    resetForm();
+  };
 
-      if (event === 'INITIAL_SESSION') return
-
-      setSession(session)
-      setUser(session?.user ?? null)
-
-      if (session?.user && event === 'SIGNED_IN') {
-        await fetchProfile(session.user.id)
-      } else if (event === 'SIGNED_OUT') {
-        setProfile(null)
-        setLoading(false)
-      }
-    })
-
-    return () => {
-      mounted = false
-      subscription.unsubscribe()
-    }
-  }, [initialized])
-
-  const fetchProfile = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single()
-
-      if (error) {
-        console.error('❌ Profile error:', error)
-        throw error
-      }
-
-      console.log('✅ Profile loaded:', data?.username, 'Role:', data?.role)
-      setProfile(data)
-    } catch (error) {
-      console.error('❌ Fetch profile error:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // ✅ LOGIN FUNCTION
-  const login = async (email: string, password: string): Promise<boolean> => {
-    try {
-      console.log('🔐 Logging in:', email)
-      setLoading(true)
-
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password: password,
-      })
-
-      if (error) {
-        console.error('❌ Login error:', error)
-        alert(error.message)
-        return false
-      }
-
-      console.log('✅ Logged in:', data.user?.email)
-      return true
-    } catch (err: any) {
-      console.error('❌ Login exception:', err)
-      alert(err.message || 'Błąd logowania')
-      return false
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // ✅ REGISTER FUNCTION
-  const register = async (email: string, username: string, password: string): Promise<boolean> => {
-    try {
-      console.log('📝 Registering:', email, username)
-      setLoading(true)
-
-      const { data, error } = await supabase.auth.signUp({
-        email: email.trim(),
-        password: password,
-        options: {
-          data: {
-            username: username.trim(),
-          },
-        },
-      })
-
-      if (error) {
-        console.error('❌ Register error:', error)
-        alert(error.message)
-        return false
-      }
-
-      console.log('✅ Registered:', data.user?.email)
-
-      // Check if email confirmation is required
-      if (data.user && !data.session) {
-        alert('✅ Konto utworzone! Sprawdź email aby potwierdzić.')
-        return true
-      }
-
-      alert('✅ Konto utworzone! Możesz się teraz zalogować.')
-      return true
-    } catch (err: any) {
-      console.error('❌ Register exception:', err)
-      alert(err.message || 'Błąd rejestracji')
-      return false
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const signOut = async () => {
-    try {
-      console.log('🚪 Signing out...')
-
-      setUser(null)
-      setSession(null)
-      setProfile(null)
-
-      const { error } = await supabase.auth.signOut()
-
-      if (error) throw error
-
-      window.location.href = '/'
-    } catch (error) {
-      console.error('❌ Sign out error:', error)
-    }
-  }
-
-  const isAdmin = profile?.role === 'admin'
-  const isModerator = profile?.role === 'moderator' || profile?.role === 'admin'
-
-  if (loading && !initialized) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-2xl font-bold">Ładowanie... 🦸‍♂️</div>
-      </div>
-    )
-  }
+  if (!isOpen) return null;
 
   return (
-    <SupabaseAuthContext.Provider
-      value={{
-        user,
-        session,
-        profile,
-        isAuthenticated: !!session,
-        isAdmin,
-        isModerator,
-        loading,
-        login,      // ✅ DODANE
-        register,   // ✅ DODANE
-        signOut,
-      }}
-    >
-      {children}
-    </SupabaseAuthContext.Provider>
-  )
-}
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+      >
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.9, opacity: 0 }}
+          onClick={(e) => e.stopPropagation()}
+          className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl"
+        >
+          {/* Header */}
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-3xl font-black">
+              {mode === 'login' ? 'Zaloguj się' : 'Zarejestruj się'}
+            </h2>
+            <motion.button
+              whileHover={{ scale: 1.1, rotate: 90 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={onClose}
+              className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-2xl font-bold"
+            >
+              ×
+            </motion.button>
+          </div>
 
-export const useSupabaseAuth = () => {
-  const context = useContext(SupabaseAuthContext)
-  if (context === undefined) {
-    throw new Error('useSupabaseAuth must be used within SupabaseAuthProvider')
-  }
-  return context
+          {/* Icon */}
+          <div className="text-center mb-6">
+            <div className="text-6xl mb-2">
+              {mode === 'login' ? '👋' : '🎉'}
+            </div>
+            <p className="text-gray-600">
+              {mode === 'login'
+                ? 'Witaj z powrotem w Klubie Urwisa!'
+                : 'Dołącz do Klubu Urwisa i zdobywaj nagrody!'}
+            </p>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {mode === 'register' && (
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  Nazwa użytkownika
+                </label>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Podaj swoją nazwę"
+                  required
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-colors"
+                />
+              </div>
+            )}
+
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="twoj@email.com"
+                required
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-colors"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">
+                Hasło
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                minLength={6}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-colors"
+              />
+            </div>
+
+            {mode === 'register' && (
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  Potwierdź hasło
+                </label>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  minLength={6}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-colors"
+                />
+              </div>
+            )}
+
+            {/* Submit Button */}
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              type="submit"
+              disabled={isLoading}
+              className="w-full py-4 bg-gradient-to-r from-blue-500 to-red-500 text-white rounded-xl font-bold text-lg shadow-lg disabled:opacity-50"
+            >
+              {isLoading
+                ? '⏳ Przetwarzanie...'
+                : mode === 'login' ? '🔓 Zaloguj się' : '🎉 Zarejestruj się'}
+            </motion.button>
+          </form>
+
+          {/* Switch Mode */}
+          <div className="mt-6 text-center">
+            <p className="text-gray-600">
+              {mode === 'login' ? 'Nie masz konta?' : 'Masz już konto?'}
+              {' '}
+              <button
+                onClick={switchMode}
+                className="text-blue-600 font-bold hover:underline"
+              >
+                {mode === 'login' ? 'Zarejestruj się' : 'Zaloguj się'}
+              </button>
+            </p>
+          </div>
+
+          {/* Benefits */}
+          {mode === 'register' && (
+            <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-red-50 rounded-xl">
+              <h4 className="font-bold text-sm mb-2 text-center">Co zyskujesz?</h4>
+              <ul className="text-sm space-y-1 text-gray-700">
+                <li>✅ Codzienne nagrody i bonusy</li>
+                <li>✅ System levelowania</li>
+                <li>✅ Ekskluzywne kupony rabatowe</li>
+                <li>✅ Odznaki i osiągnięcia</li>
+              </ul>
+            </div>
+          )}
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
 }
