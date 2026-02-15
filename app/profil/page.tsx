@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function ProfilePage() {
-  const { user, profile, isLoading, signOut, updateProfile } = useSupabaseAuth();
+  const { user, profile, loading, signOut, updateProfile } = useSupabaseAuth();
   const { points } = useSupabaseLoyalty();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('profile');
@@ -16,13 +16,13 @@ export default function ProfilePage() {
   // Handle auth check and redirect on client side only
   useEffect(() => {
     setMounted(true);
-    if (!isLoading && !user) {
+    if (!loading && !user) {
       router.push('/');
     }
-  }, [user, isLoading, router]);
+  }, [user, loading, router]);
 
   // Don't render until mounted and auth is loaded
-  if (!mounted || isLoading || !user) return null;
+  if (!mounted || loading || !user) return null;
 
   if (!profile) return null;
 
@@ -190,7 +190,7 @@ function ProfileTab({ user, updateAvatar }: any) {
                     whileHover={{ scale: 1.2, rotate: 10 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => {
-                      updateAvatar(avatar);
+                      updateAvatar({ avatar_url: avatar });
                       setShowAvatarPicker(false);
                     }}
                     className={`text-4xl p-4 rounded-2xl transition-all ${user.avatar === avatar
