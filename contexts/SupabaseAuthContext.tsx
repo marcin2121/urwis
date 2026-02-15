@@ -25,8 +25,7 @@ interface SupabaseAuthContextType {
   signIn: (email: string, password: string) => Promise<{ error?: string }>
   signOut: () => Promise<void>
   updateProfile: (updates: Partial<UserProfile>) => Promise<{ error?: string }>
-  addExp: (amount: number, reason?: string) => Promise<{ error?: string }> // ← DODAJ reason
-  refreshProfile: () => Promise<void> // ← DODAJ
+  refreshProfile: () => Promise<void>
 }
 
 const SupabaseAuthContext = createContext<SupabaseAuthContextType | undefined>(undefined)
@@ -56,7 +55,7 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
           if (!migrationDone && localStorage.getItem('urwis_points')) {
             const result = await migrateLocalStorageToSupabase(currentSession.user.id)
             if (result.success) {
-              console.log('[v0] Migrated data:', result.migratedData)
+              console.log('[Urwis] Migrated data:', result.migratedData)
               setMigrationDone(true)
             }
           }
@@ -102,7 +101,6 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  // ← DODAJ funkcję refreshProfile
   const refreshProfile = async () => {
     if (!user) return
     await fetchProfile(user.id)
@@ -172,52 +170,6 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  // ← ZMIANA: dodaj parametr reason
-  const addExp = async (amount: number, reason?: string) => {
-    if (!user || !profile) return { error: 'No user or profile' }
-
-    try {
-      const newTotalExp = profile.total_exp + amount
-      const oldLevel = profile.level
-
-      // Oblicz nowy poziom (przykładowy wzór - dostosuj do swoich potrzeb)
-      const newLevel = Math.floor(Math.sqrt(newTotalExp / 100)) + 1
-
-      // Update profile with new exp and level
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          total_exp: newTotalExp,
-          level: newLevel
-        })
-        .eq('id', user.id)
-
-      if (error) throw error
-
-      // ← ZMIANA: Log exp transaction z powodem
-      await supabase.from('exp_history').insert({
-        user_id: user.id,
-        amount,
-        reason: reason || 'Experience gained', // ← Użyj reason
-        new_total: newTotalExp,
-      })
-
-      setProfile((prev) =>
-        prev ? { ...prev, total_exp: newTotalExp, level: newLevel } : null
-      )
-
-      // ← BONUS: Pokaż notyfikację jeśli level up
-      if (newLevel > oldLevel) {
-        console.log(`🎉 Level UP! ${oldLevel} → ${newLevel}`)
-        // Możesz tu dodać toast notification
-      }
-
-      return { error: undefined }
-    } catch (error: any) {
-      return { error: error.message }
-    }
-  }
-
   return (
     <SupabaseAuthContext.Provider
       value={{
@@ -229,8 +181,7 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
         signIn,
         signOut,
         updateProfile,
-        addExp,
-        refreshProfile, // ← DODAJ
+        refreshProfile,
       }}
     >
       {children}
@@ -238,7 +189,7 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
   )
 }
 
-// ← ULEPSZONE: Compatibility hook dla starych komponentów
+// Compatibility hook dla starych komponentów
 export function useSupabaseAuth() {
   const context = useContext(SupabaseAuthContext)
   if (context === undefined) {
@@ -251,24 +202,22 @@ export function useSupabaseAuth() {
     return nextLevelRequirement - currentExp
   }
 
-  // Map Supabase auth context to old AuthContext interface
   return {
     // ← GŁÓWNE (nowe API):
-    user: context.user, // ← Supabase User
-    profile: context.profile, // ← UserProfile
+    user: context.user,
+    profile: context.profile,
     session: context.session,
     isLoading: context.isLoading,
     signUp: context.signUp,
     signIn: context.signIn,
     signOut: context.signOut,
     updateProfile: context.updateProfile,
-    addExp: context.addExp, // ← Teraz z reason!
-    refreshProfile: context.refreshProfile, // ← DODAJ
+    refreshProfile: context.refreshProfile,
 
-    // ← COMPATIBILITY (stare API dla komponentów):
+    // ← COMPATIBILITY (stare API):
     isAuthenticated: !!context.user,
 
-    // ← MAPPED user object (dla DailyCalendar, MissionsPanel itp.)
+    // ← MAPPED user object
     userLegacy: context.profile ? {
       id: context.profile.id,
       email: context.profile.email,
@@ -280,14 +229,14 @@ export function useSupabaseAuth() {
       createdAt: context.profile.created_at,
     } : null,
 
-    // ← LEGACY functions (dla starych komponentów):
+    // ← LEGACY functions
     login: async (email: string, password: string) => {
       const result = await context.signIn(email, password)
-      return { error: result.error } // ← Poprawka: zwracaj error, nie boolean
+      return { error: result.error }
     },
     register: async (email: string, username: string, password: string) => {
       const result = await context.signUp(email, password, username)
-      return { error: result.error } // ← Poprawka: zwracaj error
+      return { error: result.error }
     },
     logout: context.signOut,
     updateAvatar: async (avatar: string) => {
@@ -296,5 +245,4 @@ export function useSupabaseAuth() {
   }
 }
 
-// ← DODAJ: Export raw context dla zaawansowanych przypadków
 export { SupabaseAuthContext }

@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
+import { useSupabaseLoyalty } from '@/contexts/SupabaseLoyaltyContext';
 
 interface Achievement {
   id: string;
@@ -21,7 +22,8 @@ interface Achievement {
 }
 
 export default function AchievementsPanel() {
-  const { user, profile, addExp } = useSupabaseAuth();
+  const { user, profile } = useSupabaseAuth();
+  const { addExp } = useSupabaseLoyalty();
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [unlockedAchievements, setUnlockedAchievements] = useState<Set<string>>(new Set());
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -370,7 +372,7 @@ export default function AchievementsPanel() {
     setUnlockedAchievements(prev => new Set([...prev, achievement.id]));
 
     // Dodaj EXP
-    addExp(achievement.reward.exp);
+    addExp(achievement.reward.exp, `Achievement: ${achievement.id}`); // ✅
 
     // Pokaż modal
     setUnlockedAchievement(achievement);

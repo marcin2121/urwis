@@ -8,7 +8,8 @@ import { Mission, getMissionsByType } from '@/config/gamification.config';
 import { getMissionProgress } from '@/utils/missionProgress';
 
 export default function MissionsPanel() {
-  const { user, addExp } = useSupabaseAuth();
+  const { user } = useSupabaseAuth();
+  const { addExp } = useSupabaseLoyalty();
   const { addPoints } = useSupabaseLoyalty();
   const [activeTab, setActiveTab] = useState<'daily' | 'weekly'>('daily');
   const [missions, setMissions] = useState<Mission[]>([]);
