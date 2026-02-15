@@ -1,27 +1,27 @@
 'use client'
 import { useEffect, useRef } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useNotifications } from '@/contexts/NotificationContext';
 import { usePathname } from 'next/navigation';
 import { updateStreak } from '@/utils/streakTracker'; // ← DODAJ
 
 export default function MissionTracker() {
-  const { user } = useAuth();
+  const { profile } = useSupabaseAuth();
   const { checkMissionProgress } = useNotifications();
   const pathname = usePathname();
   const checkedToday = useRef<Set<string>>(new Set());
   const sessionStartTime = useRef<number>(Date.now()); // ← Czas startu sesji
 
   useEffect(() => {
-    console.log('🚀 MissionTracker mounted!', { user: user?.id, pathname });
+    console.log('🚀 MissionTracker mounted!', { user: profile?.id, pathname });
     
-    if (!user) {
+    if (!profile) {
       console.log('❌ No user, tracking disabled');
       return;
     }
 
     const today = new Date().toDateString();
-    const trackingKey = `urwis_tracking_${user.id}_${today}`;
+    const trackingKey = `urwis_tracking_${profile.id}_${today}`;
     
     // Pobierz lub utwórz tracking data
     let trackingData = JSON.parse(localStorage.getItem(trackingKey) || '{}');
@@ -152,12 +152,12 @@ export default function MissionTracker() {
     window.addEventListener('pagehide', saveTimeOnExit);
 
     // ===== TRACK TOTAL VISITS =====
-    const totalVisitsKey = `urwis_total_visits_${user.id}`;
+    const totalVisitsKey = `urwis_total_visits_${profile.id}`;
     const totalVisits = parseInt(localStorage.getItem(totalVisitsKey) || '0');
     localStorage.setItem(totalVisitsKey, (totalVisits + 1).toString());
     console.log('🔢 Tracking: Całkowite wizyty:', totalVisits + 1);
  // ===== UPDATE STREAK ===== (DODAJ NA KOŃCU, przed return)
- updateStreak(user.id);
+ updateStreak(profile.id);
  
     return () => {
       clearInterval(interval);
@@ -165,7 +165,7 @@ export default function MissionTracker() {
       window.removeEventListener('beforeunload', saveTimeOnExit);
       window.removeEventListener('pagehide', saveTimeOnExit);
     };
-  }, [user, pathname]);
+  }, [profile, pathname]);
 
   return null;
 }

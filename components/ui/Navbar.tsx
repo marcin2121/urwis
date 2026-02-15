@@ -3,14 +3,15 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { useAuth } from '@/contexts/AuthContext';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import AuthModal from '../AuthModal';
 import { Edu_SA_Beginner } from "next/font/google";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user: profile, session, signOut } = useSupabaseAuth();
+  const isAuthenticated = !!session;
 
   const navItems = [
     { name: "Strona główna", icon: "🏠", href: "/" },
@@ -82,7 +83,7 @@ export default function Navbar() {
 
             {/* Right Side - User Profile or Login */}
             <div className="hidden md:flex items-center gap-4 z-10">
-              {isAuthenticated && user ? (
+              {isAuthenticated && profile ? (
                 <>
                   {/* User Profile Button */}
                   <Link href="/profil">
@@ -93,10 +94,10 @@ export default function Navbar() {
       background: 'linear-gradient(135deg, rgba(191, 32, 36, 0.05), rgba(0, 85, 255, 0.05))',
     }}
   >
-    <span className="text-2xl">{user.avatar}</span>
+    <span className="text-2xl">{profile.avatar_url || '🧸'}</span>
     <div className="text-left">
-      <div className="text-sm font-bold text-gray-900">{user.username}</div>
-      <div className="text-xs text-gray-600">Poziom {user.level}</div>
+      <div className="text-sm font-bold text-gray-900">{profile.username}</div>
+      <div className="text-xs text-gray-600">Poziom {profile.level}</div>
     </div>
   </motion.div>
 </Link>
@@ -105,7 +106,7 @@ export default function Navbar() {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={logout}
+                    onClick={signOut}
                     className="px-4 py-2 rounded-full bg-red-100 text-red-600 font-bold hover:bg-red-200 transition-colors"
                   >
                     Wyloguj
@@ -200,7 +201,7 @@ export default function Navbar() {
               >
                 <div className="flex flex-col space-y-4">
                   {/* User Profile (Mobile) */}
-                  {isAuthenticated && user && (
+                  {isAuthenticated && profile && (
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -209,10 +210,10 @@ export default function Navbar() {
                         background: 'linear-gradient(135deg, rgba(191, 32, 36, 0.1), rgba(0, 85, 255, 0.1))',
                       }}
                     >
-                      <span className="text-3xl">{user.avatar}</span>
+                      <span className="text-3xl">{profile.avatar_url || '🧸'}</span>
                       <div>
-                        <div className="font-bold text-gray-900">{user.username}</div>
-                        <div className="text-sm text-gray-600">Poziom {user.level} • {user.exp} EXP</div>
+                        <div className="font-bold text-gray-900">{profile.username}</div>
+                        <div className="text-sm text-gray-600">Poziom {profile.level} • {profile.total_exp} EXP</div>
                       </div>
                     </motion.div>
                   )}
@@ -238,7 +239,7 @@ export default function Navbar() {
                   {isAuthenticated ? (
                     <motion.button
                       onClick={() => {
-                        logout();
+                        signOut();
                         setIsOpen(false);
                       }}
                       className="w-full px-7 py-5 rounded-2xl text-white text-base font-bold shadow-xl transition-all bg-red-500 hover:bg-red-600"

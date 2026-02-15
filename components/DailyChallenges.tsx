@@ -1,14 +1,15 @@
 'use client'
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '@/contexts/AuthContext';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import DailyCalendar from '@/components/DailyCalendar';
 import DailyChallenge from '@/components/DailyChallenge';
 import MissionsPanel from '@/components/MissionsPanel';
 import AchievementsPanel from '@/components/AchievementsPanel';
 
 export default function DailyChallenges() {
-  const { user, isAuthenticated } = useAuth();
+  const { profile: user, session } = useSupabaseAuth();
+  const isAuthenticated = !!session;
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   return (

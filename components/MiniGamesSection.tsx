@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '@/contexts/AuthContext'; // ← DODAJ
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext'; // ← DODAJ
 import { trackGamePlayed } from '@/utils/missionTracking'; // ← DODAJ
 import MemoryGame from './games/MemoryGame';
 import SpinTheWheel from './games/SpinTheWheel';
@@ -9,7 +9,7 @@ import ClickerGame from './games/ClickerGame';
 import PuzzleSlider from './games/PuzzleSlider';
 
 export default function MiniGamesSection() {
-  const { user } = useAuth(); // ← DODAJ
+  const { profile: user } = useSupabaseAuth(); // ← DODAJ
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
 
   // ← DODAJ tracking przy otwarciu gry

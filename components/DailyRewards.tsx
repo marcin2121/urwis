@@ -1,8 +1,8 @@
 'use client'
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLoyalty } from '@/contexts/LoyaltyContext';
-import { useAuth } from '@/contexts/AuthContext';
+import { useSupabaseLoyalty } from '@/contexts/SupabaseLoyaltyContext';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import AuthModal from './AuthModal';
 
 // Interfejs dla nagród
@@ -15,8 +15,9 @@ interface Reward {
 }
 
 export default function DailyRewards() {
-  const { addPoints } = useLoyalty();
-  const { user, isAuthenticated, addExp } = useAuth();
+  const { addPoints } = useSupabaseLoyalty();
+  const { profile: user, session } = useSupabaseAuth();
+  const isAuthenticated = !!session;
   const [streak, setStreak] = useState(0);
   const [lastVisit, setLastVisit] = useState<string | null>(null);
   const [todayReward, setTodayReward] = useState<any>(null);
