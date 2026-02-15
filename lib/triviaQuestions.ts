@@ -11,7 +11,7 @@ export const TRIVIA_QUESTIONS: TriviaQuestion[] = [
   // GEOGRAFIA (200+)
   {
     "question": "Jaka jest najdłuższa rzeka na świecie?",
-    "options": ["Amazonka", "Nil", "Jangcy", "Missisipi"],
+    "options": ["Amazonka", "Nil", "Jangcy", "Pilica"],
     "correct": 1,
     "exp": 20,
     "category": "🗺️ Geografia"
