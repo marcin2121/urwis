@@ -48,18 +48,18 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
         setSession(currentSession)
         setUser(currentSession?.user ?? null)
 
-      if (currentSession?.user) {
-        await fetchProfile(currentSession.user.id)
-        
-        // Migrate localStorage data on first login
-        if (!migrationDone && localStorage.getItem('urwis_points')) {
-          const result = await migrateLocalStorageToSupabase(currentSession.user.id)
-          if (result.success) {
-            console.log('[v0] Migrated data:', result.migratedData)
-            setMigrationDone(true)
+        if (currentSession?.user) {
+          await fetchProfile(currentSession.user.id)
+
+          // Migrate localStorage data on first login
+          if (!migrationDone && localStorage.getItem('urwis_points')) {
+            const result = await migrateLocalStorageToSupabase(currentSession.user.id)
+            if (result.success) {
+              console.log('[v0] Migrated data:', result.migratedData)
+              setMigrationDone(true)
+            }
           }
         }
-      }
       } catch (error) {
         console.error('Error initializing auth:', error)
       } finally {
@@ -223,13 +223,13 @@ export function useSupabaseAuth() {
   return context
 }
 
-// Compatibility hook for existing components using useAuth
-export function useAuth() {
+// Compatibility hook for existing components using useSupabaseAuth
+export function useSupabaseAuth() {
   const context = useContext(SupabaseAuthContext)
   if (context === undefined) {
-    throw new Error('useAuth must be used within SupabaseAuthProvider (AuthProvider is now SupabaseAuthProvider)')
+    throw new Error('useSupabaseAuth must be used within SupabaseAuthProvider (AuthProvider is now SupabaseAuthProvider)')
   }
-  
+
   // Map Supabase auth context to old AuthContext interface for backward compatibility
   return {
     user: context.profile ? {

@@ -1,13 +1,13 @@
 'use client'
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '@/contexts/SupabaseAuthContext';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useLoyalty } from '@/contexts/SupabaseLoyaltyContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function ProfilePage() {
-  const { user, isAuthenticated, logout, updateAvatar } = useAuth();
+  const { user, isAuthenticated, logout, updateAvatar } = useSupabaseAuth();
   const { points, level, badges, pointsHistory } = useLoyalty();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('profile');
@@ -68,8 +68,8 @@ export default function ProfilePage() {
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setActiveTab(tab.id)}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-left transition-all ${activeTab === tab.id
-                        ? 'bg-linear-to-r from-blue-500 to-purple-500 text-white shadow-lg'
-                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                      ? 'bg-linear-to-r from-blue-500 to-purple-500 text-white shadow-lg'
+                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
                       }`}
                   >
                     <span className="text-2xl">{tab.icon}</span>
@@ -188,8 +188,8 @@ function ProfileTab({ user, updateAvatar }: any) {
                       setShowAvatarPicker(false);
                     }}
                     className={`text-4xl p-4 rounded-2xl transition-all ${user.avatar === avatar
-                        ? 'bg-linear-to-br from-blue-400 to-purple-500 ring-4 ring-blue-400 shadow-xl'
-                        : 'bg-white hover:bg-gray-100 shadow-md hover:shadow-lg'
+                      ? 'bg-linear-to-br from-blue-400 to-purple-500 ring-4 ring-blue-400 shadow-xl'
+                      : 'bg-white hover:bg-gray-100 shadow-md hover:shadow-lg'
                       }`}
                   >
                     {avatar}
@@ -314,8 +314,8 @@ function LoyaltyTab({ points, level, badges }: any) {
                 key={badge.id}
                 whileHover={isUnlocked ? { scale: 1.05, rotate: 5 } : {}}
                 className={`p-6 rounded-2xl text-center transition-all ${isUnlocked
-                    ? 'bg-linear-to-br from-yellow-100 to-orange-100 border-4 border-yellow-400 shadow-xl'
-                    : 'bg-gray-100 opacity-50 border-2 border-gray-300'
+                  ? 'bg-linear-to-br from-yellow-100 to-orange-100 border-4 border-yellow-400 shadow-xl'
+                  : 'bg-gray-100 opacity-50 border-2 border-gray-300'
                   }`}
               >
                 <div className="text-5xl mb-3 filter"
@@ -364,8 +364,8 @@ function ChallengesTab({ user }: any) {
             <div
               key={milestone.days}
               className={`p-4 rounded-xl border-2 ${milestone.unlocked
-                  ? 'bg-green-50 border-green-400'
-                  : 'bg-gray-50 border-gray-300'
+                ? 'bg-green-50 border-green-400'
+                : 'bg-gray-50 border-gray-300'
                 }`}
             >
               <div className="flex items-center justify-between">
@@ -670,8 +670,8 @@ function UrwisHunterTab({ user }: any) {
                 key={badge.id}
                 whileHover={isUnlocked ? { scale: 1.05, rotate: 5 } : {}}
                 className={`p-6 rounded-2xl text-center transition-all ${isUnlocked
-                    ? 'bg-linear-to-br from-yellow-100 to-orange-100 border-4 border-yellow-400 shadow-xl'
-                    : 'bg-gray-100 opacity-50 border-2 border-gray-300'
+                  ? 'bg-linear-to-br from-yellow-100 to-orange-100 border-4 border-yellow-400 shadow-xl'
+                  : 'bg-gray-100 opacity-50 border-2 border-gray-300'
                   }`}
               >
                 <div className="text-5xl mb-3 filter"

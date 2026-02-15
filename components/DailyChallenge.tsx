@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '@/contexts/SupabaseAuthContext';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useLoyalty } from '@/contexts/SupabaseLoyaltyContext';
 
 interface Challenge {
@@ -16,7 +16,7 @@ interface Challenge {
 }
 
 export default function DailyChallenge() {
-  const { user, isAuthenticated, addExp } = useAuth();
+  const { user, isAuthenticated, addExp } = useSupabaseAuth();
   const { addPoints } = useLoyalty();
   const [dailyChallenge, setDailyChallenge] = useState<Challenge | null>(null);
   const [challengeCompleted, setChallengeCompleted] = useState(false);

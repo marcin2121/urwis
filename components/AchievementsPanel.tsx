@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '@/contexts/SupabaseAuthContext';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 
 interface Achievement {
   id: string;
@@ -21,7 +21,7 @@ interface Achievement {
 }
 
 export default function AchievementsPanel() {
-  const { user, addExp } = useAuth();
+  const { user, addExp } = useSupabaseAuth();
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [unlockedAchievements, setUnlockedAchievements] = useState<Set<string>>(new Set());
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -263,10 +263,10 @@ export default function AchievementsPanel() {
     if (!user) return;
 
     // Filtruj osiągnięcia według kategorii
-    const filtered = selectedCategory === 'all' 
-      ? allAchievements 
+    const filtered = selectedCategory === 'all'
+      ? allAchievements
       : allAchievements.filter(a => a.category === selectedCategory);
-    
+
     setAchievements(filtered);
 
     // Pobierz odblokowane osiągnięcia
@@ -305,10 +305,10 @@ export default function AchievementsPanel() {
     switch (type) {
       case 'level':
         return user.level;
-      
+
       case 'total_points':
         return parseInt(localStorage.getItem(`urwis_total_points_${user.id}`) || '0');
-      
+
       case 'missions_completed':
         let missionCount = 0;
         Object.keys(localStorage).forEach(key => {
@@ -317,7 +317,7 @@ export default function AchievementsPanel() {
           }
         });
         return missionCount;
-      
+
       case 'urwis_found':
         let urwisCount = 0;
         Object.keys(localStorage).forEach(key => {
@@ -326,13 +326,13 @@ export default function AchievementsPanel() {
           }
         });
         return urwisCount;
-      
+
       case 'streak':
         return parseInt(localStorage.getItem(`urwis_streak_${user.id}`) || '0');
-      
+
       case 'games_played':
         return parseInt(localStorage.getItem(`urwis_games_played_${user.id}`) || '0');
-      
+
       case 'unique_pages':
         const allVisitedPages = new Set();
         Object.keys(localStorage).forEach(key => {
@@ -342,10 +342,10 @@ export default function AchievementsPanel() {
           }
         });
         return allVisitedPages.size;
-      
+
       case 'visits':
         return parseInt(localStorage.getItem(`urwis_total_visits_${user.id}`) || '0');
-      
+
       case 'points_earned':
         return parseInt(localStorage.getItem(`urwis_points_earned_${user.id}`) || '0');
 
@@ -441,11 +441,10 @@ export default function AchievementsPanel() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setSelectedCategory(category.id)}
-              className={`px-4 py-2 rounded-xl font-bold transition-all ${
-                selectedCategory === category.id
+              className={`px-4 py-2 rounded-xl font-bold transition-all ${selectedCategory === category.id
                   ? 'bg-linear-to-r from-purple-500 to-pink-500 text-white shadow-lg'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
+                }`}
             >
               {category.icon} {category.name}
             </motion.button>
@@ -465,14 +464,13 @@ export default function AchievementsPanel() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.05 }}
-                className={`p-6 rounded-2xl border-4 transition-all ${
-                  isUnlocked
+                className={`p-6 rounded-2xl border-4 transition-all ${isUnlocked
                     ? `bg-linear-to-br ${getRarityColor(achievement.rarity)} ${getRarityBorder(achievement.rarity)} shadow-xl`
                     : 'bg-gray-50 border-gray-200 opacity-60'
-                }`}
+                  }`}
               >
                 <div className="text-center">
-                  <div 
+                  <div
                     className={`text-5xl mb-3 ${!isUnlocked && 'grayscale filter'}`}
                     style={{ filter: isUnlocked ? 'none' : 'grayscale(100%)' }}
                   >
@@ -492,7 +490,7 @@ export default function AchievementsPanel() {
                         {progress} / {achievement.requirement.value}
                       </div>
                       <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div 
+                        <div
                           className="h-full bg-purple-500"
                           style={{ width: `${progressPercent}%` }}
                         />
@@ -506,9 +504,8 @@ export default function AchievementsPanel() {
                   </div>
 
                   {/* Rarity Badge */}
-                  <div className={`mt-2 text-xs font-bold uppercase ${
-                    isUnlocked ? 'text-white' : 'text-gray-500'
-                  }`}>
+                  <div className={`mt-2 text-xs font-bold uppercase ${isUnlocked ? 'text-white' : 'text-gray-500'
+                    }`}>
                     {achievement.rarity === 'common' && '⚪ Pospolite'}
                     {achievement.rarity === 'rare' && '🔵 Rzadkie'}
                     {achievement.rarity === 'epic' && '🟣 Epickie'}
@@ -577,7 +574,7 @@ export default function AchievementsPanel() {
               className={`bg-linear-to-br ${getRarityColor(unlockedAchievement.rarity)} rounded-3xl p-8 max-w-md text-center shadow-2xl border-4 ${getRarityBorder(unlockedAchievement.rarity)}`}
             >
               <motion.div
-                animate={{ 
+                animate={{
                   scale: [1, 1.2, 1],
                   rotate: [0, 360]
                 }}
