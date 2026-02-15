@@ -261,7 +261,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
           Ładowanie Urwisa... 🦸‍♂️⚡
         </div>
         <div className="text-sm text-gray-500 mt-2">
-          Sprawdź Console (F12) jeśli wisi >3s
+          Sprawdź Console (F12) jeśli wisi 3s
         </div>
       </div>
     )
