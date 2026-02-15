@@ -3,6 +3,8 @@ import { Canvas, useFrame, useLoader, useThree, invalidate } from '@react-three/
 import { OrbitControls, useGLTF, useFBX, useProgress, Html, Environment, ContactShadows } from '@react-three/drei';
 import * as THREE from 'three';
 
+const isTouch = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+
 export interface ViewerProps {
   url: string;
   width?: number | string;

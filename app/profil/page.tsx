@@ -235,7 +235,7 @@ function ProfileTab({ user, updateAvatar }: any) {
           <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border-2 border-purple-200 text-center">
             <div className="text-3xl mb-2">🏆</div>
             <div className="text-2xl font-black text-purple-600">
-              {parseInt(localStorage.getItem(`urwis_streak_${user.id}`) || '0')}
+              0
             </div>
             <div className="text-xs text-gray-600">Seria dni</div>
           </div>

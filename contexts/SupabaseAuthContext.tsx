@@ -1,5 +1,5 @@
 'use client'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { User, Session } from '@supabase/supabase-js'
 import type { Profile } from '@/types/database'
@@ -14,12 +14,11 @@ interface AuthContextType {
   loading: boolean
   login: (email: string, password: string) => Promise<boolean>
   register: (email: string, username: string, password: string) => Promise<boolean>
-  updateProfile: (updates: Partial<Profile>) => Promise<boolean>  // ✅ DODANE
+  updateProfile: (updates: Partial<Profile>) => Promise<boolean>
   signOut: () => Promise<void>
 }
 
 const SupabaseAuthContext = createContext<AuthContextType | undefined>(undefined)
-
 const supabase = createClient()
 
 export function SupabaseAuthProvider({ children }: { children: React.ReactNode }) {
@@ -27,71 +26,8 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
   const [session, setSession] = useState<Session | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
-  const [initialized, setInitialized] = useState(false)
 
-  useEffect(() => {
-    if (initialized) return
-
-    let mounted = true
-
-    const initAuth = async () => {
-      try {
-        const { data: { session }, error } = await supabase.auth.getSession()
-
-        if (!mounted) return
-
-        if (error) {
-          console.error('❌ Session error:', error)
-          setLoading(false)
-          return
-        }
-
-        console.log('✅ Initial session:', session?.user?.email || 'No session')
-        setSession(session)
-        setUser(session?.user ?? null)
-
-        if (session?.user) {
-          await fetchProfile(session.user.id)
-        } else {
-          setLoading(false)
-        }
-      } catch (err) {
-        console.error('❌ Init auth error:', err)
-        if (mounted) setLoading(false)
-      } finally {
-        if (mounted) setInitialized(true)
-      }
-    }
-
-    initAuth()
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (!mounted) return
-
-      console.log('🔔 Auth event:', event, session?.user?.email || 'No user')
-
-      if (event === 'INITIAL_SESSION') return
-
-      setSession(session)
-      setUser(session?.user ?? null)
-
-      if (session?.user && event === 'SIGNED_IN') {
-        await fetchProfile(session.user.id)
-      } else if (event === 'SIGNED_OUT') {
-        setProfile(null)
-        setLoading(false)
-      }
-    })
-
-    return () => {
-      mounted = false
-      subscription.unsubscribe()
-    }
-  }, [initialized])
-
-  const fetchProfile = async (userId: string) => {
+  const fetchProfile = useCallback(async (userId: string, email?: string) => {
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -100,56 +36,124 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
         .single()
 
       if (error) {
-        console.error('❌ Profile error:', error)
+        if (error.code === 'PGRST116') {
+          // Profile doesn't exist yet - create a fallback
+          const fallback: Profile = {
+            id: userId,
+            username: email?.split('@')[0]?.replace('.', '_') || 'Urwis',
+            email: email || '',
+            level: 1,
+            total_exp: 0,
+            role: 'user',
+            avatar_url: null,
+            created_at: new Date().toISOString(),
+          }
+          setProfile(fallback)
+          return
+        }
         throw error
       }
-
-      console.log('✅ Profile loaded:', data?.username, 'Role:', data?.role)
       setProfile(data)
-    } catch (error) {
-      console.error('❌ Fetch profile error:', error)
-    } finally {
-      setLoading(false)
+    } catch (err) {
+      console.error('Error fetching profile:', err)
+      // Set a minimal fallback so the app doesn't break
+      setProfile({
+        id: userId,
+        username: email?.split('@')[0]?.replace('.', '_') || 'Urwis',
+        email: email || '',
+        level: 1,
+        total_exp: 0,
+        role: 'user',
+        avatar_url: null,
+        created_at: new Date().toISOString(),
+      })
     }
-  }
+  }, [])
 
-  // ✅ LOGIN FUNCTION
+  useEffect(() => {
+    let mounted = true
+
+    const initAuth = async () => {
+      try {
+        const { data: { session: currentSession }, error } = await supabase.auth.getSession()
+
+        if (!mounted) return
+
+        if (error) {
+          console.error('Session error:', error)
+          setLoading(false)
+          return
+        }
+
+        setSession(currentSession)
+        setUser(currentSession?.user ?? null)
+
+        if (currentSession?.user) {
+          await fetchProfile(currentSession.user.id, currentSession.user.email ?? undefined)
+        }
+      } catch (err) {
+        console.error('Init auth error:', err)
+      } finally {
+        if (mounted) setLoading(false)
+      }
+    }
+
+    initAuth()
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+      if (!mounted) return
+      if (event === 'INITIAL_SESSION') return
+
+      setSession(newSession)
+      setUser(newSession?.user ?? null)
+
+      if (newSession?.user && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
+        await fetchProfile(newSession.user.id, newSession.user.email ?? undefined)
+        if (mounted) setLoading(false)
+      } else if (event === 'SIGNED_OUT') {
+        setProfile(null)
+        if (mounted) setLoading(false)
+      }
+    })
+
+    return () => {
+      mounted = false
+      subscription.unsubscribe()
+    }
+  }, [fetchProfile])
+
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      console.log('🔐 Logging in:', email)
       setLoading(true)
 
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
-        password: password,
+        password,
       })
 
       if (error) {
-        console.error('❌ Login error:', error)
-        alert(error.message)
+        console.error('Login error:', error.message)
         return false
       }
 
-      console.log('✅ Logged in:', data.user?.email)
       return true
     } catch (err: any) {
-      console.error('❌ Login exception:', err)
-      alert(err.message || 'Błąd logowania')
+      console.error('Login exception:', err.message)
       return false
     } finally {
       setLoading(false)
     }
   }
 
-  // ✅ REGISTER FUNCTION
   const register = async (email: string, username: string, password: string): Promise<boolean> => {
     try {
-      console.log('📝 Registering:', email, username)
       setLoading(true)
 
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email: email.trim(),
-        password: password,
+        password,
         options: {
           data: {
             username: username.trim(),
@@ -158,39 +162,23 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       })
 
       if (error) {
-        console.error('❌ Register error:', error)
-        alert(error.message)
+        console.error('Register error:', error.message)
         return false
       }
 
-      console.log('✅ Registered:', data.user?.email)
-
-      if (data.user && !data.session) {
-        alert('✅ Konto utworzone! Sprawdź email aby potwierdzić.')
-        return true
-      }
-
-      alert('✅ Konto utworzone! Możesz się teraz zalogować.')
       return true
     } catch (err: any) {
-      console.error('❌ Register exception:', err)
-      alert(err.message || 'Błąd rejestracji')
+      console.error('Register exception:', err.message)
       return false
     } finally {
       setLoading(false)
     }
   }
 
-  // ✅ UPDATE PROFILE FUNCTION
   const updateProfile = async (updates: Partial<Profile>): Promise<boolean> => {
-    if (!user) {
-      console.error('❌ No user to update')
-      return false
-    }
+    if (!user) return false
 
     try {
-      console.log('🔄 Updating profile:', updates)
-
       const { data, error } = await supabase
         .from('profiles')
         .update(updates)
@@ -199,49 +187,35 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
         .single()
 
       if (error) {
-        console.error('❌ Update profile error:', error)
-        alert('Błąd aktualizacji profilu: ' + error.message)
+        console.error('Update profile error:', error.message)
         return false
       }
 
-      console.log('✅ Profile updated:', data)
       setProfile(data)
       return true
     } catch (err: any) {
-      console.error('❌ Update profile exception:', err)
-      alert(err.message || 'Błąd aktualizacji profilu')
+      console.error('Update profile exception:', err.message)
       return false
     }
   }
 
   const signOut = async () => {
     try {
-      console.log('🚪 Signing out...')
-
       setUser(null)
       setSession(null)
       setProfile(null)
 
       const { error } = await supabase.auth.signOut()
-
       if (error) throw error
 
       window.location.href = '/'
     } catch (error) {
-      console.error('❌ Sign out error:', error)
+      console.error('Sign out error:', error)
     }
   }
 
   const isAdmin = profile?.role === 'admin'
   const isModerator = profile?.role === 'moderator' || profile?.role === 'admin'
-
-  if (loading && !initialized) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-2xl font-bold">Ładowanie... 🦸‍♂️</div>
-      </div>
-    )
-  }
 
   return (
     <SupabaseAuthContext.Provider

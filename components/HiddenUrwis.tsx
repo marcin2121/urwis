@@ -1,52 +1,47 @@
 'use client'
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';  // ✅ DODANE AnimatePresence
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
 export default function HiddenUrwis() {
-  const { user, isAuthenticated } = useSupabaseAuth();
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [shouldShow, setShouldShow] = useState(false);
+  const { user, isAuthenticated } = useSupabaseAuth();  // ✅ DODANE isAuthenticated
+  const [foundToday, setFoundToday] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);  // ✅ DODANE
+  const [showLoginModal, setShowLoginModal] = useState(false);      // ✅ DODANE
   const [position, setPosition] = useState({ top: '50%', left: '50%' });
 
+  // SEEDOWANA losowa pozycja dla wszystkich (ten sam dzień = ta sama pozycja)
+  const getDailyPosition = useCallback(() => {
+    const now = new Date();
+    const seed = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
+
+    const hash = seed.toString().split('').reduce((a, b) => {
+      a = ((a << 5) - a) + b.charCodeAt(0);
+      return a & a;
+    }, 0);
+
+    const top = 15 + (Math.abs(hash % 70)); // 15-85%
+    const left = 10 + (Math.abs((hash * 31) % 80)); // 10-90%
+
+    return { top: `${top}%`, left: `${left}%` };
+  }, []);
+
   useEffect(() => {
-    // Sprawdź czy dzisiaj jest wyzwanie "find"
-    const today = new Date().toDateString();
-    const dayOfYear = Math.floor(
-      (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24)
-    );
+    const todayKey = `urwis_hidden_${new Date().toDateString()}`;
 
-    // Tymczasowo: zawsze pokazuj (później zmienimy na logikę challenge)
-    // const challengeIndex = dayOfYear % 20; // liczba challenges
-    // const isFindDay = challengeIndex === 14; // indeks wyzwania "find"
-
-    const isFindDay = true; // TYMCZASOWO dla testów
-
-    if (!isFindDay) return;
-
-    // Sprawdź czy już znalazł dzisiaj
-    if (user) {
-      const found = localStorage.getItem(`urwis_hidden_found_${user.id}_${today}`);
-      if (found) {
-        setShouldShow(false);
-        return;
-      }
+    // Sprawdź czy już znaleziony dzisiaj
+    const found = localStorage.getItem(todayKey);
+    if (found) {
+      setFoundToday(true);
+      return;
     }
 
-    // Losowa pozycja (unikaj skrajnych brzegów)
-    const randomTop = Math.random() * 60 + 20; // 20-80%
-    const randomLeft = Math.random() * 60 + 20; // 20-80%
-
-    setPosition({
-      top: `${randomTop}%`,
-      left: `${randomLeft}%`
-    });
-
-    setShouldShow(true);
-  }, [user]);
+    // Ustaw codzienną pozycję (taka sama dla wszystkich)
+    const pos = getDailyPosition();
+    setPosition(pos);
+  }, [getDailyPosition]);
 
   const handleClick = () => {
     if (!isAuthenticated || !user) {
@@ -54,72 +49,50 @@ export default function HiddenUrwis() {
       return;
     }
 
-    const today = new Date().toDateString();
-    localStorage.setItem(`urwis_hidden_found_${user.id}_${today}`, 'true');
-    setShouldShow(false);
+    const todayKey = `urwis_hidden_${new Date().toDateString()}`;
+    localStorage.setItem(todayKey, 'true');
+
+    // Nagroda!
     setShowSuccessModal(true);
+    setFoundToday(true);
   };
 
-  if (!shouldShow) return null;
+  if (foundToday) return null;
 
   return (
     <>
-      {/* Ukryta Ikonka Urwisa */}
+      {/* SAM OBRAZEK Urwisa */}
       <motion.div
         onClick={handleClick}
-        initial={{ scale: 0, rotate: -360, opacity: 0 }}
+        initial={{ opacity: 0, scale: 0.5 }}
         animate={{
+          opacity: 0.9,
           scale: 1,
-          rotate: 0,
-          opacity: 1,
-          y: [0, -10, 0]
+          rotate: [0, 5, -5, 0]
         }}
         transition={{
-          scale: { duration: 0.8, delay: 3 },
-          rotate: { duration: 0.8, delay: 3 },
-          opacity: { duration: 0.5, delay: 3 },
-          y: { repeat: Infinity, duration: 2, delay: 3.8 }
+          opacity: { duration: 1, delay: 2 },
+          scale: { duration: 1, delay: 2 },
+          rotate: { duration: 3, repeat: Infinity, ease: "easeInOut" }
         }}
-        whileHover={{ scale: 1.2, rotate: 15 }}
-        whileTap={{ scale: 0.9 }}
-        className="fixed w-24 h-24 cursor-pointer"
+        whileHover={{ scale: 1.3, opacity: 1 }}
+        whileTap={{ scale: 0.8 }}
+        className="fixed w-16 h-16 cursor-pointer select-none pointer-events-auto z-40"
         style={{
           top: position.top,
           left: position.left,
-          zIndex: 9999,
-          transform: 'translate(-50%, -50%)'
+          transform: 'translate(-50%, -50%)',
+          pointerEvents: 'auto'
         }}
-        title="Ukryty Urwis! Kliknij mnie!"
+        title="🦸‍♂️ Ukryty Urwis! Kliknij!"
       >
-        {/* Świecący efekt */}
-        <div className="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-60 animate-pulse" />
-
-        {/* Ikonka Urwisa */}
-        <div className="relative w-full h-full bg-white rounded-full shadow-2xl border-4 border-yellow-400 flex items-center justify-center overflow-hidden">
-          {/* Zastąp tym swoją ikonkę: */}
-          <Image
-            src="/urwis-icon.svg" // ← Twoja ikonka
-            alt="Schowany Urwis"
-            width={80}
-            height={80}
-            className="w-16 h-16 object-contain"
-          />
-          {/* LUB użyj emoji jeśli nie masz jeszcze ikonki: */}
-          {/* <span className="text-4xl">🧸</span> */}
-        </div>
-
-        {/* Błyszczący pierścień */}
-        <motion.div
-          className="absolute inset-0 rounded-full border-4 border-yellow-400"
-          animate={{
-            scale: [1, 1.3, 1],
-            opacity: [0.8, 0, 0.8]
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
+        <Image
+          src="/urwis-icon.svg"
+          alt="🦸‍♂️ Ukryty Urwis"
+          width={64}
+          height={64}
+          className="w-full h-full object-contain drop-shadow-lg hover:drop-shadow-2xl transition-all duration-200"
+          priority={false}
         />
       </motion.div>
 
@@ -131,15 +104,14 @@ export default function HiddenUrwis() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setShowSuccessModal(false)}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center p-4"
-            style={{ zIndex: 10000 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[10000]"
           >
             <motion.div
               initial={{ scale: 0.8, opacity: 0, y: 50 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.8, opacity: 0, y: 50 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-3xl p-8 max-w-md text-center shadow-2xl"
+              className="bg-white rounded-3xl p-8 max-w-md text-center shadow-2xl max-h-[90vh] overflow-auto"
             >
               <motion.div
                 className="text-7xl mb-4"
@@ -151,11 +123,11 @@ export default function HiddenUrwis() {
               >
                 🎉
               </motion.div>
-              <h3 className="text-3xl font-black mb-4 bg-linear-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
+              <h3 className="text-3xl font-black mb-4 bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
                 Znalazłeś Urwisa!
               </h3>
               <p className="text-lg text-gray-700 mb-6">
-                Gratulacje! Znalazłeś ukrytego Urwisa! 🧸<br />
+                Gratulacje! Znalazłeś ukrytego Urwisa! 🦸‍♂️<br />
                 <span className="text-sm text-gray-600 mt-2 block">
                   Wróć do sekcji <strong>"Dzienne Wyzwania"</strong> i kliknij <strong>"Znalazłem!"</strong> aby odebrać nagrodę!
                 </span>
@@ -166,7 +138,7 @@ export default function HiddenUrwis() {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="px-6 py-3 bg-linear-to-r from-yellow-500 to-orange-500 text-white rounded-full font-bold shadow-lg"
+                    className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-full font-bold shadow-lg"
                   >
                     Odbierz Nagrodę! 🎁
                   </motion.button>
@@ -193,18 +165,17 @@ export default function HiddenUrwis() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setShowLoginModal(false)}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center p-4"
-            style={{ zIndex: 10000 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[10000]"
           >
             <motion.div
               initial={{ scale: 0.8, opacity: 0, y: 50 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.8, opacity: 0, y: 50 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-3xl p-8 max-w-md text-center shadow-2xl"
+              className="bg-white rounded-3xl p-8 max-w-md text-center shadow-2xl max-h-[90vh] overflow-auto"
             >
               <div className="text-7xl mb-4">🔒</div>
-              <h3 className="text-3xl font-black mb-4 bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <h3 className="text-3xl font-black mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 Zaloguj się
               </h3>
               <p className="text-lg text-gray-700 mb-6">
@@ -216,7 +187,7 @@ export default function HiddenUrwis() {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="px-6 py-3 bg-linear-to-r from-blue-500 to-purple-500 text-white rounded-full font-bold shadow-lg"
+                    className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full font-bold shadow-lg"
                   >
                     Zaloguj się 👤
                   </motion.button>
