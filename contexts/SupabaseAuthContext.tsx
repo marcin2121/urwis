@@ -19,7 +19,6 @@ interface AuthContextType {
 }
 
 const SupabaseAuthContext = createContext<AuthContextType | undefined>(undefined)
-
 const supabase = createClient()
 
 export function SupabaseAuthProvider({ children }: { children: React.ReactNode }) {
@@ -29,45 +28,16 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
   const [loading, setLoading] = useState(true)
   const [initialized, setInitialized] = useState(false)
 
-  const fetchProfile = async (userId: string) => {
-    console.log('🔍 Fetching profile for:', userId)
-    console.log('🧪 Supabase client:', !!supabase)
-
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single()
-
-      console.log('📦 Profile response:', { data: !!data, error: error?.message })
-
-      if (error) {
-        console.error('❌ Profile error:', error.message)
-        setProfile({
-          id: userId,
-          username: 'Urwis',
-          email: 'urwis@urwis.pl',
-          level: 1,
-          total_exp: 0,
-          role: 'user',
-          avatar_url: null,
-        } as any)
-        return  // ✅ DODANE
-      }
-
-      if (data) {
-        console.log('✅ Profile loaded:', data.username)
-        setProfile(data)
-      }
-    } catch (error) {
-      console.error('💥 fetchProfile crashed:', error)
-      setProfile(null)
-    } finally {
-      console.log('🏁 Setting loading to false')
-      setLoading(false)
-    }
-  }
+  // ✅ DUMMY PROFILE (zawsze działa!)
+  const createDummyProfile = (userId: string, email?: string) => ({
+    id: userId,
+    username: email?.split('@')[0]?.replace('.', '_') || 'Urwis',
+    email: email || 'urwis@urwis.pl',
+    level: 1,
+    total_exp: 0,
+    role: 'user',
+    avatar_url: null,
+  } as any)
 
   useEffect(() => {
     if (initialized) return
@@ -91,10 +61,12 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
         setUser(session?.user ?? null)
 
         if (session?.user) {
-          await fetchProfile(session.user.id)
-        } else {
-          setLoading(false)
+          // ✅ DUMMY zamiast fetchProfile
+          const dummy = createDummyProfile(session.user.id, session.user.email)
+          setProfile(dummy)
+          console.log('✅ Init dummy profile:', dummy.username)
         }
+        setLoading(false)
       } catch (err) {
         console.error('❌ Init auth error:', err)
         if (mounted) setLoading(false)
@@ -121,8 +93,11 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       setUser(session?.user ?? null)
 
       if (session?.user && event === 'SIGNED_IN') {
-        console.log('🎯 SIGNED_IN - wołam fetchProfile')
-        await fetchProfile(session.user.id)
+        console.log('🎯 SIGNED_IN - dummy profile')
+        const dummy = createDummyProfile(session.user.id, session.user.email)
+        setProfile(dummy)
+        console.log('✅ Login dummy profile:', dummy.username)
+        setLoading(false)
       } else if (event === 'SIGNED_OUT') {
         setProfile(null)
         setLoading(false)
@@ -135,7 +110,6 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     }
   }, [initialized])
 
-  // ✅ POPRAWIONE FUNKCJE Z RETURN
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       console.log('🔐 Logging in:', email)
@@ -149,15 +123,15 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       if (error) {
         console.error('❌ Login error:', error)
         alert(error.message)
-        return false  // ✅ RETURN
+        return false
       }
 
       console.log('✅ Logged in:', data.user?.email)
-      return true  // ✅ RETURN
+      return true
     } catch (err: any) {
       console.error('❌ Login exception:', err)
       alert(err.message || 'Błąd logowania')
-      return false  // ✅ RETURN
+      return false
     } finally {
       setLoading(false)
     }
@@ -181,22 +155,16 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       if (error) {
         console.error('❌ Register error:', error)
         alert(error.message)
-        return false  // ✅ RETURN
+        return false
       }
 
       console.log('✅ Registered:', data.user?.email)
-
-      if (data.user && !data.session) {
-        alert('✅ Konto utworzone! Sprawdź email aby potwierdzić.')
-        return true  // ✅ RETURN
-      }
-
-      alert('✅ Konto utworzone! Możesz się teraz zalogować.')
-      return true  // ✅ RETURN
+      alert('✅ Konto utworzone! Sprawdź email aby potwierdzić.')
+      return true
     } catch (err: any) {
       console.error('❌ Register exception:', err)
       alert(err.message || 'Błąd rejestracji')
-      return false  // ✅ RETURN
+      return false
     } finally {
       setLoading(false)
     }
@@ -205,7 +173,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
   const updateProfile = async (updates: Partial<Profile>): Promise<boolean> => {
     if (!user) {
       console.error('❌ No user to update')
-      return false  // ✅ RETURN
+      return false
     }
 
     try {
@@ -221,16 +189,16 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       if (error) {
         console.error('❌ Update profile error:', error)
         alert('Błąd aktualizacji profilu: ' + error.message)
-        return false  // ✅ RETURN
+        return false
       }
 
       console.log('✅ Profile updated:', data)
       setProfile(data)
-      return true  // ✅ RETURN
+      return true
     } catch (err: any) {
       console.error('❌ Update profile exception:', err)
       alert(err.message || 'Błąd aktualizacji profilu')
-      return false  // ✅ RETURN
+      return false
     }
   }
 
@@ -259,9 +227,6 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-yellow-50">
         <div className="text-2xl font-bold text-blue-600 animate-bounce">
           Ładowanie Urwisa... 🦸‍♂️⚡
-        </div>
-        <div className="text-sm text-gray-500 mt-2">
-          Sprawdź Console (F12) jeśli wisi 3s
         </div>
       </div>
     )
