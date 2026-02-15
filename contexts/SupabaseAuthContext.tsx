@@ -255,7 +255,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
         loading,
         login,
         register,
-        updateProfile,  // ✅ DODANE
+        updateProfile,
         signOut,
       }}
     >
