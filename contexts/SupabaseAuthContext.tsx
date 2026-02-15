@@ -4,15 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { User, Session } from '@supabase/supabase-js'
 import type { Profile, UserRole } from '@/types/database';
 
-interface Profile {
-  id: string
-  username: string
-  email: string
-  level: number
-  total_exp: number
-  avatar_url: string | null
-  role: UserRole  // ✅ DODANE
-}
+
 
 interface AuthContextType {
   user: User | null
