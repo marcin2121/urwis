@@ -2,11 +2,11 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
-import { useLoyalty } from '@/contexts/SupabaseLoyaltyContext';
+import { useSupabaseLoyalty } from '@/contexts/SupabaseLoyaltyContext';
 
 export default function DailyCalendar() {
   const { user, isAuthenticated, addExp } = useSupabaseAuth();
-  const { addPoints } = useLoyalty();
+  const { addPoints } = useSupabaseLoyalty();
   const [isOpen, setIsOpen] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());

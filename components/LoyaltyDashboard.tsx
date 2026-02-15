@@ -1,10 +1,10 @@
 'use client'
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLoyalty } from '@/contexts/SupabaseLoyaltyContext';
+import { useSupabaseLoyalty } from '@/contexts/SupabaseLoyaltyContext';
 
 export default function LoyaltyDashboard() {
-  const { points, level, badges, addPoints, redeemPoints, pointsHistory } = useLoyalty();
+  const { points, level, badges, addPoints, redeemPoints, pointsHistory } = useSupabaseLoyalty();
   const [showRewards, setShowRewards] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
 
@@ -144,8 +144,8 @@ export default function LoyaltyDashboard() {
                       key={badge.id}
                       whileHover={isUnlocked ? { scale: 1.05 } : {}}
                       className={`p-4 rounded-2xl text-center ${isUnlocked
-                          ? 'bg-gradient-to-br from-yellow-100 to-orange-100 border-2 border-yellow-400'
-                          : 'bg-gray-100 opacity-50'
+                        ? 'bg-gradient-to-br from-yellow-100 to-orange-100 border-2 border-yellow-400'
+                        : 'bg-gray-100 opacity-50'
                         }`}
                     >
                       <div className="text-4xl mb-2 filter"
@@ -218,8 +218,8 @@ export default function LoyaltyDashboard() {
                       <div
                         key={reward.id}
                         className={`p-4 rounded-xl border-2 ${points >= reward.points
-                            ? 'border-green-400 bg-green-50'
-                            : 'border-gray-200 bg-gray-50'
+                          ? 'border-green-400 bg-green-50'
+                          : 'border-gray-200 bg-gray-50'
                           }`}
                       >
                         <div className="flex items-center justify-between">
@@ -237,8 +237,8 @@ export default function LoyaltyDashboard() {
                             onClick={() => handleRedeem(reward)}
                             disabled={points < reward.points}
                             className={`px-3 py-1 rounded-full text-xs font-bold ${points >= reward.points
-                                ? 'bg-green-500 text-white hover:bg-green-600'
-                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                              ? 'bg-green-500 text-white hover:bg-green-600'
+                              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                               }`}
                           >
                             Wymień

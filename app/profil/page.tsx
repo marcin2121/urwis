@@ -2,13 +2,13 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
-import { useLoyalty } from '@/contexts/SupabaseLoyaltyContext';
+import { useSupabaseLoyalty } from '@/contexts/SupabaseLoyaltyContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function ProfilePage() {
   const { user, isAuthenticated, logout, updateAvatar } = useSupabaseAuth();
-  const { points, level, badges, pointsHistory } = useLoyalty();
+  const { points, level, badges, pointsHistory } = useSupabaseLoyalty();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('profile');
 

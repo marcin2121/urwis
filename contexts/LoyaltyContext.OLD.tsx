@@ -135,10 +135,10 @@ export function LoyaltyProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useLoyalty() {
+export function useSupabaseLoyalty() {
   const context = useContext(LoyaltyContext);
   if (!context) {
-    throw new Error('useLoyalty must be used within LoyaltyProvider');
+    throw new Error('useSupabaseLoyalty must be used within LoyaltyProvider');
   }
   return context;
 }
