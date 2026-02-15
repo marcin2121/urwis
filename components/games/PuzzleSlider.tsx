@@ -49,7 +49,7 @@ export default function PuzzleSlider({ onComplete }: PuzzleSliderProps) {
     // Sprawdź czy puzzle jest rozwiązywalny
     return isSolvable(shuffled) ? shuffled : shuffleTiles(array);
   };
-  
+
 
   const isSolvable = (tiles: number[]) => {
     let inversions = 0;
@@ -77,7 +77,7 @@ export default function PuzzleSlider({ onComplete }: PuzzleSliderProps) {
 
   const handleTileClick = (index: number) => {
     if (!isPlaying) setIsPlaying(true);
-    
+
     const emptyIndex = tiles.indexOf(0);
     if (canMove(index, emptyIndex)) {
       const newTiles = [...tiles];
@@ -119,7 +119,7 @@ export default function PuzzleSlider({ onComplete }: PuzzleSliderProps) {
             <div className="text-lg font-black text-blue-600">{moves}</div>
           </div>
         </div>
-        
+
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -132,9 +132,9 @@ export default function PuzzleSlider({ onComplete }: PuzzleSliderProps) {
 
       {/* Puzzle board */}
       <div className="mx-auto" style={{ width: 'fit-content' }}>
-        <div 
+        <div
           className="grid gap-2 bg-gray-200 p-4 rounded-2xl"
-          style={{ 
+          style={{
             gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
             gridTemplateRows: `repeat(${gridSize}, 1fr)`
           }}
@@ -146,11 +146,10 @@ export default function PuzzleSlider({ onComplete }: PuzzleSliderProps) {
               whileHover={tile !== 0 ? { scale: 1.05 } : {}}
               whileTap={tile !== 0 ? { scale: 0.95 } : {}}
               onClick={() => handleTileClick(index)}
-              className={`w-24 h-24 flex items-center justify-center text-5xl font-black rounded-xl cursor-pointer transition-all ${
-                tile === 0
+              className={`w-24 h-24 flex items-center justify-center text-5xl font-black rounded-xl cursor-pointer transition-all ${tile === 0
                   ? 'bg-transparent'
-                  : 'bg-gradient-to-br from-green-400 to-emerald-500 text-white shadow-lg hover:shadow-xl'
-              }`}
+                  : 'bg-linear-to-br from-green-400 to-emerald-500 text-white shadow-lg hover:shadow-xl'
+                }`}
             >
               {tile !== 0 && (
                 <div className="flex flex-col items-center">
@@ -184,7 +183,7 @@ export default function PuzzleSlider({ onComplete }: PuzzleSliderProps) {
           <p className="text-gray-700 mb-4">
             Ukończyłeś puzzle w {moves} ruchach i czasie {formatTime(timer)}!
           </p>
-          
+
           {/* Ocena wyniku */}
           <div className="mb-4">
             {moves < 30 && timer < 60 && (
@@ -203,7 +202,7 @@ export default function PuzzleSlider({ onComplete }: PuzzleSliderProps) {
             <div className="text-2xl font-black text-green-600">PUZZLE15</div>
             <div className="text-sm text-gray-600">15% zniżki na puzzle i układanki</div>
           </div>
-          
+
           <div className="flex gap-3 justify-center">
             <motion.button
               whileHover={{ scale: 1.05 }}

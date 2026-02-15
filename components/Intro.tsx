@@ -5,14 +5,14 @@ import LoadingScreen from '@/components/LoadingScreen';
 import confetti from 'canvas-confetti';
 
 // Typing effect component
-function TypewriterText({ text, className, delay, onComplete }: { 
-  text: string; 
-  className: string; 
+function TypewriterText({ text, className, delay, onComplete }: {
+  text: string;
+  className: string;
   delay: number;
   onComplete?: () => void;
 }) {
   const [displayText, setDisplayText] = useState('');
-  
+
   useEffect(() => {
     let i = 0;
     const timer = setTimeout(() => {
@@ -27,10 +27,10 @@ function TypewriterText({ text, className, delay, onComplete }: {
       }, 90); // 100ms -> 90ms = 10% szybciej
       return () => clearInterval(interval);
     }, delay * 1000 * 0.9); // delay też 10% szybciej
-    
+
     return () => clearTimeout(timer);
   }, [text, delay, onComplete]);
-  
+
   return (
     <h1 className={className}>
       {displayText}
@@ -74,7 +74,7 @@ export default function UrwisIntro({ children }: { children: React.ReactNode }) 
       return Math.random() * (max - min) + min;
     }
 
-    const interval: any = setInterval(function() {
+    const interval: any = setInterval(function () {
       const timeLeft = animationEnd - Date.now();
 
       if (timeLeft <= 0) {
@@ -150,7 +150,7 @@ export default function UrwisIntro({ children }: { children: React.ReactNode }) 
       return Math.random() * (max - min) + min;
     }
 
-    const interval: any = setInterval(function() {
+    const interval: any = setInterval(function () {
       const timeLeft = animationEnd - Date.now();
 
       if (timeLeft <= 0) {
@@ -158,7 +158,7 @@ export default function UrwisIntro({ children }: { children: React.ReactNode }) 
       }
 
       const particleCount = 50 * (timeLeft / duration);
-      
+
       confetti({
         ...defaults,
         particleCount,
@@ -170,17 +170,17 @@ export default function UrwisIntro({ children }: { children: React.ReactNode }) 
 
   useEffect(() => {
     if (!loadingComplete || !shouldShowIntro) return;
-    
+
     const video = videoRef.current;
     if (!video) return;
 
     const handleCanPlay = () => {
       if (hasEndedRef.current) return;
       setStep('video');
-      
+
       // Ustaw prędkość odtwarzania na 110% (10% szybciej)
       video.playbackRate = 1.1;
-      
+
       video.play().catch(console.error);
     };
 
@@ -233,13 +233,13 @@ export default function UrwisIntro({ children }: { children: React.ReactNode }) 
 
     if (step === 'loading' || step === 'video') {
       hasEndedRef.current = true;
-      
+
       const video = videoRef.current;
       if (video) {
         video.pause();
         video.currentTime = 0;
       }
-      
+
       setStep('text');
     } else if (step === 'text') {
       setStep('done');
@@ -277,35 +277,35 @@ export default function UrwisIntro({ children }: { children: React.ReactNode }) 
             pointerEvents: step !== 'done' ? 'all' : 'none'
           }}
         >
-<video
-  ref={videoRef}
-  playsInline
-  muted
-  poster="/poster-70.webp"
-  preload="auto"
-  loop={false}
-  style={{
-    position: 'absolute',
-    inset: 0,
-    width: '100vw',
-    height: '100vh',
-    objectFit: 'cover',
-    opacity: step === 'video' ? 1 : 0,
-    transition: 'opacity 0.45s'
-  }}
->
-  {/* WebM pierwszy - mniejszy rozmiar */}
-  <source src="/urwisintro.webm" type="video/webm" />
-  
-  {/* MP4 fallback - dla starszych Safari */}
-  <source src="/urwisintro.mp4" type="video/mp4" />
-  
-  {/* Tekst dla przeglądarek bez wsparcia video */}
-  Twoja przeglądarka nie wspiera video HTML5.
-</video>
+          <video
+            ref={videoRef}
+            playsInline
+            muted
+            poster="/poster-70.webp"
+            preload="auto"
+            loop={false}
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100vw',
+              height: '100vh',
+              objectFit: 'cover',
+              opacity: step === 'video' ? 1 : 0,
+              transition: 'opacity 0.45s'
+            }}
+          >
+            {/* WebM pierwszy - mniejszy rozmiar */}
+            <source src="/urwisintro.webm" type="video/webm" />
+
+            {/* MP4 fallback - dla starszych Safari */}
+            <source src="/urwisintro.mp4" type="video/mp4" />
+
+            {/* Tekst dla przeglądarek bez wsparcia video */}
+            Twoja przeglądarka nie wspiera video HTML5.
+          </video>
 
           {step === 'video' && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               style={{
@@ -327,37 +327,37 @@ export default function UrwisIntro({ children }: { children: React.ReactNode }) 
             </motion.div>
           )}
 
-          {/* Typing Effect + Canvas Confetti - PEŁNY EKRAN Z EFEKTAMI */} 
+          {/* Typing Effect + Canvas Confetti - PEŁNY EKRAN Z EFEKTAMI */}
           {step === 'text' && (
-            <div className="fixed inset-0 bg-gradient-to-br from-orange-50 via-white to-red-50 flex flex-col items-center justify-center overflow-visible z-50 pb-12">
-              
+            <div className="fixed inset-0 bg-linear-to-br from-orange-50 via-white to-red-50 flex flex-col items-center justify-center overflow-visible z-50 pb-12">
+
               {/* Animated Background Orbs - 10% szybciej */}
               <motion.div
-                animate={{ 
+                animate={{
                   scale: [1, 1.2, 1],
                   rotate: [0, 180, 360],
                   opacity: [0.1, 0.2, 0.1]
                 }}
                 transition={{ duration: 13.5, repeat: Infinity, ease: "linear" }} // 15s -> 13.5s
-                className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-br from-red-400 to-orange-400 rounded-full blur-3xl pointer-events-none"
+                className="absolute top-20 left-10 w-96 h-96 bg-linear-to-br from-red-400 to-orange-400 rounded-full blur-3xl pointer-events-none"
               />
               <motion.div
-                animate={{ 
+                animate={{
                   scale: [1, 1.3, 1],
                   rotate: [360, 180, 0],
                   opacity: [0.1, 0.2, 0.1]
                 }}
                 transition={{ duration: 18, repeat: Infinity, ease: "linear" }} // 20s -> 18s
-                className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full blur-3xl pointer-events-none"
+                className="absolute bottom-20 right-10 w-96 h-96 bg-linear-to-br from-blue-400 to-purple-400 rounded-full blur-3xl pointer-events-none"
               />
               <motion.div
-                animate={{ 
+                animate={{
                   scale: [1, 1.15, 1],
                   x: [-50, 50, -50],
                   opacity: [0.05, 0.15, 0.05]
                 }}
                 transition={{ duration: 16.2, repeat: Infinity, ease: "easeInOut" }} // 18s -> 16.2s
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-br from-orange-300 to-yellow-300 rounded-full blur-3xl pointer-events-none"
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-linear-to-br from-orange-300 to-yellow-300 rounded-full blur-3xl pointer-events-none"
               />
 
               {/* Logo entrance with glow */}
@@ -367,14 +367,14 @@ export default function UrwisIntro({ children }: { children: React.ReactNode }) 
                   transition={{ duration: 3.6, repeat: Infinity, ease: "linear" }} // 4s -> 3.6s
                   className="absolute -inset-8 bg-gradient-to-r from-red-500 via-orange-500 via-yellow-500 via-blue-500 to-purple-500 rounded-full blur-2xl opacity-40"
                 />
-                
+
                 <motion.img
                   src="/logo.png"
                   alt="Urwis"
                   className="relative w-56 h-56 sm:w-64 sm:h-64 lg:w-80 lg:h-80 drop-shadow-2xl"
                   initial={{ scale: 0, rotate: -180, opacity: 0 }}
                   animate={{ scale: 1, rotate: 0, opacity: 1 }}
-                  transition={{ 
+                  transition={{
                     duration: 0.9, // 1s -> 0.9s = 10% szybciej
                     ease: [0.34, 1.56, 0.64, 1],
                     type: "spring",
@@ -411,19 +411,19 @@ export default function UrwisIntro({ children }: { children: React.ReactNode }) 
 
               {/* Typing text with enhanced effects */}
               <div className="text-center px-6 pb-16 relative z-10">
-                
+
                 {/* Main Title */}
-                <div 
+                <div
                   className="relative"
-                  style={{ 
-                    paddingBottom: '0.4em', 
+                  style={{
+                    paddingBottom: '0.4em',
                     lineHeight: '1.15',
                     overflow: 'visible'
                   }}
                 >
                   {/* Text glow effect - 10% szybciej */}
                   <motion.div
-                    animate={{ 
+                    animate={{
                       opacity: [0.3, 0.6, 0.3],
                       scale: [1, 1.05, 1]
                     }}
@@ -447,7 +447,7 @@ export default function UrwisIntro({ children }: { children: React.ReactNode }) 
                   className="flex justify-center my-8"
                 >
                   <motion.div
-                    animate={{ 
+                    animate={{
                       backgroundPosition: ['0% 50%', '100% 50%', '0% 50%']
                     }}
                     transition={{ duration: 2.7, repeat: Infinity, ease: "linear" }} // 3s -> 2.7s
@@ -458,13 +458,13 @@ export default function UrwisIntro({ children }: { children: React.ReactNode }) 
                     }}
                   />
                 </motion.div>
-                
+
                 {/* Subtitle with particles */}
                 <motion.div
                   className="relative"
                   initial={{ opacity: 0, y: 30, scale: 0.9 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ 
+                  transition={{
                     delay: 2.25, // 2.5s -> 2.25s = 10% szybciej
                     duration: 0.72, // 0.8s -> 0.72s
                     type: "spring",
@@ -498,14 +498,14 @@ export default function UrwisIntro({ children }: { children: React.ReactNode }) 
 
                   <div
                     className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black relative"
-                    style={{ 
+                    style={{
                       paddingBottom: '0.4em',
                       lineHeight: '1.5',
                       overflow: 'visible'
                     }}
                   >
                     <motion.span
-                      animate={{ 
+                      animate={{
                         backgroundPosition: ['0% 50%', '100% 50%', '0% 50%']
                       }}
                       transition={{ duration: 4.5, repeat: Infinity, ease: "linear" }} // 5s -> 4.5s
@@ -519,14 +519,14 @@ export default function UrwisIntro({ children }: { children: React.ReactNode }) 
                     >
                       Witaj w magicznym świecie Urwisa!
                     </motion.span>
-                    
+
                     <motion.span
                       className="inline-block ml-3 text-4xl sm:text-5xl"
-                      animate={{ 
+                      animate={{
                         rotate: [0, 15, -15, 0],
                         scale: [1, 1.2, 1]
                       }}
-                      transition={{ 
+                      transition={{
                         duration: 1.35, // 1.5s -> 1.35s = 10% szybciej
                         repeat: Infinity,
                         ease: "easeInOut",
@@ -539,7 +539,7 @@ export default function UrwisIntro({ children }: { children: React.ReactNode }) 
 
                   {/* Pulsing glow under subtitle - 10% szybciej */}
                   <motion.div
-                    animate={{ 
+                    animate={{
                       scale: [1, 1.2, 1],
                       opacity: [0.2, 0.4, 0.2]
                     }}
@@ -552,7 +552,7 @@ export default function UrwisIntro({ children }: { children: React.ReactNode }) 
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: [0, 1, 0] }}
-                  transition={{ 
+                  transition={{
                     duration: 1.8, // 2s -> 1.8s = 10% szybciej
                     repeat: Infinity,
                     ease: "easeInOut",

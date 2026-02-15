@@ -137,7 +137,7 @@ function ProfileTab({ user, updateAvatar }: any) {
             whileHover={{ scale: 1.05, rotate: 5 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowAvatarPicker(!showAvatarPicker)}
-            className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-7xl cursor-pointer hover:shadow-2xl transition-shadow relative"
+            className="w-32 h-32 rounded-full bg-linear-to-br from-blue-400 to-purple-500 flex items-center justify-center text-7xl cursor-pointer hover:shadow-2xl transition-shadow relative"
           >
             {user.avatar}
             <div className="absolute bottom-0 right-0 w-10 h-10 bg-white rounded-full flex items-center justify-center text-xl shadow-lg">
@@ -188,7 +188,7 @@ function ProfileTab({ user, updateAvatar }: any) {
                       setShowAvatarPicker(false);
                     }}
                     className={`text-4xl p-4 rounded-2xl transition-all ${user.avatar === avatar
-                      ? 'bg-gradient-to-br from-blue-400 to-purple-500 ring-4 ring-blue-400 shadow-xl'
+                      ? 'bg-linear-to-br from-blue-400 to-purple-500 ring-4 ring-blue-400 shadow-xl'
                       : 'bg-white hover:bg-gray-100 shadow-md hover:shadow-lg'
                       }`}
                   >
@@ -235,19 +235,19 @@ function ProfileTab({ user, updateAvatar }: any) {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="p-4 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl border-2 border-yellow-200 text-center">
+          <div className="p-4 bg-linear-to-br from-yellow-50 to-orange-50 rounded-xl border-2 border-yellow-200 text-center">
             <div className="text-3xl mb-2">🎯</div>
             <div className="text-2xl font-black text-orange-600">{user.level}</div>
             <div className="text-xs text-gray-600">Poziom</div>
           </div>
 
-          <div className="p-4 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl border-2 border-blue-200 text-center">
+          <div className="p-4 bg-linear-to-br from-blue-50 to-cyan-50 rounded-xl border-2 border-blue-200 text-center">
             <div className="text-3xl mb-2">⭐</div>
             <div className="text-2xl font-black text-blue-600">{user.exp}</div>
             <div className="text-xs text-gray-600">Doświadczenie</div>
           </div>
 
-          <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border-2 border-purple-200 text-center">
+          <div className="p-4 bg-linear-to-br from-purple-50 to-pink-50 rounded-xl border-2 border-purple-200 text-center">
             <div className="text-3xl mb-2">🏆</div>
             <div className="text-2xl font-black text-purple-600">
               {parseInt(localStorage.getItem(`urwis_streak_${user.id}`) || '0')}
@@ -255,7 +255,7 @@ function ProfileTab({ user, updateAvatar }: any) {
             <div className="text-xs text-gray-600">Seria dni</div>
           </div>
 
-          <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border-2 border-green-200 text-center">
+          <div className="p-4 bg-linear-to-br from-green-50 to-emerald-50 rounded-xl border-2 border-green-200 text-center">
             <div className="text-3xl mb-2">📅</div>
             <div className="text-2xl font-black text-green-600">
               {Math.floor((Date.now() - new Date(user.createdAt).getTime()) / (1000 * 60 * 60 * 24))}
@@ -314,7 +314,7 @@ function LoyaltyTab({ points, level, badges }: any) {
                 key={badge.id}
                 whileHover={isUnlocked ? { scale: 1.05, rotate: 5 } : {}}
                 className={`p-6 rounded-2xl text-center transition-all ${isUnlocked
-                  ? 'bg-gradient-to-br from-yellow-100 to-orange-100 border-4 border-yellow-400 shadow-xl'
+                  ? 'bg-linear-to-br from-yellow-100 to-orange-100 border-4 border-yellow-400 shadow-xl'
                   : 'bg-gray-100 opacity-50 border-2 border-gray-300'
                   }`}
               >
@@ -670,7 +670,7 @@ function UrwisHunterTab({ user }: any) {
                 key={badge.id}
                 whileHover={isUnlocked ? { scale: 1.05, rotate: 5 } : {}}
                 className={`p-6 rounded-2xl text-center transition-all ${isUnlocked
-                  ? 'bg-gradient-to-br from-yellow-100 to-orange-100 border-4 border-yellow-400 shadow-xl'
+                  ? 'bg-linear-to-br from-yellow-100 to-orange-100 border-4 border-yellow-400 shadow-xl'
                   : 'bg-gray-100 opacity-50 border-2 border-gray-300'
                   }`}
               >

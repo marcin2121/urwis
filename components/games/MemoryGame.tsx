@@ -37,11 +37,11 @@ export default function MemoryGame({ onComplete }: MemoryGameProps) {
 
     if (newFlipped.length === 2) {
       setMoves(moves + 1);
-      
+
       if (cards[newFlipped[0]] === cards[newFlipped[1]]) {
         setMatched([...matched, ...newFlipped]);
         setFlipped([]);
-        
+
         if (matched.length + 2 === cards.length) {
           setTimeout(() => setGameWon(true), 500);
         }
@@ -74,11 +74,10 @@ export default function MemoryGame({ onComplete }: MemoryGameProps) {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => handleCardClick(index)}
-            className={`aspect-square rounded-xl cursor-pointer flex items-center justify-center text-5xl font-bold transition-all ${
-              flipped.includes(index) || matched.includes(index)
-                ? 'bg-gradient-to-br from-purple-500 to-pink-500 text-white'
-                : 'bg-gradient-to-br from-gray-200 to-gray-300'
-            }`}
+            className={`aspect-square rounded-xl cursor-pointer flex items-center justify-center text-5xl font-bold transition-all ${flipped.includes(index) || matched.includes(index)
+                ? 'bg-linear-to-br from-purple-500 to-pink-500 text-white'
+                : 'bg-linear-to-br from-gray-200 to-gray-300'
+              }`}
           >
             {(flipped.includes(index) || matched.includes(index)) ? emoji : '?'}
           </motion.div>

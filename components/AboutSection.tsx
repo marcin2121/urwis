@@ -40,35 +40,35 @@ export default function AboutSection() {
   ];
 
   return (
-    <section 
-      id="o-nas" 
+    <section
+      id="o-nas"
       ref={ref}
-      className="relative py-32 overflow-hidden bg-gradient-to-br from-orange-50 via-white to-red-50"
+      className="relative py-32 overflow-hidden bg-linear-to-br from-orange-50 via-white to-red-50"
     >
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
-          animate={{ 
+          animate={{
             scale: [1, 1.2, 1],
             rotate: [0, 90, 0],
             opacity: [0.05, 0.1, 0.05]
           }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-br from-red-400 to-orange-400 rounded-full blur-3xl"
+          className="absolute top-20 left-10 w-96 h-96 bg-linear-to-br from-red-400 to-orange-400 rounded-full blur-3xl"
         />
         <motion.div
-          animate={{ 
+          animate={{
             scale: [1, 1.3, 1],
             rotate: [0, -90, 0],
             opacity: [0.05, 0.1, 0.05]
           }}
           transition={{ duration: 25, repeat: Infinity, ease: "linear", delay: 5 }}
-          className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full blur-3xl"
+          className="absolute bottom-20 right-10 w-96 h-96 bg-linear-to-br from-blue-400 to-purple-400 rounded-full blur-3xl"
         />
       </div>
 
       <div className="container mx-auto px-6 relative z-10">
-        
+
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
@@ -83,10 +83,10 @@ export default function AboutSection() {
             className="inline-block mb-6"
           >
             <div className="relative">
-              <Image 
-                src="/logo.png" 
-                alt="Urwis Logo" 
-                width={120} 
+              <Image
+                src="/logo.png"
+                alt="Urwis Logo"
+                width={120}
                 height={120}
                 className="drop-shadow-2xl"
               />
@@ -98,7 +98,7 @@ export default function AboutSection() {
             </div>
           </motion.div>
 
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -117,7 +117,7 @@ export default function AboutSection() {
             className="text-xl sm:text-2xl text-gray-700 max-w-3xl mx-auto font-medium leading-relaxed"
             style={{ paddingBottom: '0.2em' }}
           >
-            Jesteśmy <span className="font-black text-red-600">lokalnym sklepem z pasją</span> do 
+            Jesteśmy <span className="font-black text-red-600">lokalnym sklepem z pasją</span> do
             dostarczania radości dzieciom i dorosłym w Białobrzegach i okolicach! 🎉
           </motion.p>
         </motion.div>
@@ -129,20 +129,20 @@ export default function AboutSection() {
               key={idx}
               initial={{ opacity: 0, y: 50, scale: 0.8 }}
               animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
-              transition={{ 
-                duration: 0.6, 
+              transition={{
+                duration: 0.6,
                 delay: feature.delay,
                 type: "spring",
                 bounce: 0.4
               }}
-              whileHover={{ 
-                scale: 1.05, 
+              whileHover={{
+                scale: 1.05,
                 y: -10,
                 transition: { duration: 0.2 }
               }}
               className="relative group"
             >
-              <div 
+              <div
                 className="relative h-full p-8 rounded-3xl backdrop-blur-xl border-2 border-white shadow-2xl overflow-hidden"
                 style={{
                   background: 'rgba(255, 255, 255, 0.7)',
@@ -150,17 +150,17 @@ export default function AboutSection() {
               >
                 {/* Animated gradient background */}
                 <motion.div
-                  className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
+                  className={`absolute inset-0 bg-linear-to-br ${feature.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
                 />
 
                 {/* Floating icon */}
                 <motion.div
-                  animate={{ 
+                  animate={{
                     y: [0, -10, 0],
                     rotate: [0, 5, -5, 0]
                   }}
-                  transition={{ 
-                    duration: 3, 
+                  transition={{
+                    duration: 3,
                     repeat: Infinity,
                     delay: idx * 0.2
                   }}
@@ -194,7 +194,7 @@ export default function AboutSection() {
           transition={{ duration: 0.8, delay: 0.6 }}
           className="relative max-w-5xl mx-auto"
         >
-          <div 
+          <div
             className="relative p-12 rounded-[3rem] backdrop-blur-xl border-2 border-white shadow-2xl overflow-hidden"
             style={{
               background: 'rgba(255, 255, 255, 0.8)',
@@ -204,12 +204,12 @@ export default function AboutSection() {
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-              className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-red-500 to-orange-500 opacity-20 rounded-full blur-2xl"
+              className="absolute top-0 right-0 w-40 h-40 bg-linear-to-br from-red-500 to-orange-500 opacity-20 rounded-full blur-2xl"
             />
             <motion.div
               animate={{ rotate: -360 }}
               transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-              className="absolute bottom-0 left-0 w-40 h-40 bg-gradient-to-br from-blue-500 to-purple-500 opacity-20 rounded-full blur-2xl"
+              className="absolute bottom-0 left-0 w-40 h-40 bg-linear-to-br from-blue-500 to-purple-500 opacity-20 rounded-full blur-2xl"
             />
 
             <div className="relative z-10">
@@ -233,17 +233,17 @@ export default function AboutSection() {
                 style={{ paddingBottom: '0.2em' }}
               >
                 <p className="font-medium">
-                  <span className="text-2xl font-black text-red-600">Sklep Urwis</span> to <span className="font-bold">rodzinny biznes</span>, 
+                  <span className="text-2xl font-black text-red-600">Sklep Urwis</span> to <span className="font-bold">rodzinny biznes</span>,
                   który powstał z <span className="font-bold text-orange-600">miłości do dziecięcej radości</span> i pasji do gier.
                 </p>
                 <p className="font-medium">
-                  Od <span className="font-black text-blue-600">2007 roku</span> dostarczamy najlepsze zabawki, gry planszowe i karciane 
-                  mieszkańcom Białobrzegów i okolic. Nasza <span className="font-bold">lokalna obecność</span> to gwarancja 
+                  Od <span className="font-black text-blue-600">2007 roku</span> dostarczamy najlepsze zabawki, gry planszowe i karciane
+                  mieszkańcom Białobrzegów i okolic. Nasza <span className="font-bold">lokalna obecność</span> to gwarancja
                   <span className="font-bold text-red-600"> szybkiej obsługi</span> i <span className="font-bold text-orange-600">osobistego podejścia</span>.
                 </p>
                 <p className="font-medium">
-                  Każdy produkt wybieramy z <span className="font-black text-purple-600">dbałością o jakość</span> i 
-                  <span className="font-bold"> bezpieczeństwo</span>. Wierzymy, że zabawa to nie tylko rozrywka, 
+                  Każdy produkt wybieramy z <span className="font-black text-purple-600">dbałością o jakość</span> i
+                  <span className="font-bold"> bezpieczeństwo</span>. Wierzymy, że zabawa to nie tylko rozrywka,
                   ale też <span className="font-bold text-blue-600">nauka i rozwój</span>! ✨
                 </p>
               </motion.div>

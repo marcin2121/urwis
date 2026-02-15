@@ -94,7 +94,7 @@ export default function LoyaltyDashboard() {
                   <h3 className="text-3xl font-black text-gray-800">Twoje Punkty</h3>
                   <p className="text-gray-600">Poziom: {level}</p>
                 </div>
-                <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${currentLevel.color} flex items-center justify-center text-4xl`}>
+                <div className={`w-20 h-20 rounded-full bg-linear-to-br ${currentLevel.color} flex items-center justify-center text-4xl`}>
                   {currentLevel.icon}
                 </div>
               </div>
@@ -144,7 +144,7 @@ export default function LoyaltyDashboard() {
                       key={badge.id}
                       whileHover={isUnlocked ? { scale: 1.05 } : {}}
                       className={`p-4 rounded-2xl text-center ${isUnlocked
-                        ? 'bg-gradient-to-br from-yellow-100 to-orange-100 border-2 border-yellow-400'
+                        ? 'bg-linear-to-br from-yellow-100 to-orange-100 border-2 border-yellow-400'
                         : 'bg-gray-100 opacity-50'
                         }`}
                     >

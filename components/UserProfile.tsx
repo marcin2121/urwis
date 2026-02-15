@@ -23,7 +23,7 @@ export default function UserProfile() {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => setShowAvatarPicker(!showAvatarPicker)}
-            className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-4xl cursor-pointer hover:shadow-xl transition-shadow"
+            className="w-20 h-20 rounded-full bg-linear-to-br from-blue-400 to-purple-500 flex items-center justify-center text-4xl cursor-pointer hover:shadow-xl transition-shadow"
           >
             {user.avatar}
           </motion.button>
@@ -64,11 +64,10 @@ export default function UserProfile() {
                   updateProfile({ avatar_url: avatar });
                   setShowAvatarPicker(false);
                 }}
-                className={`text-3xl p-3 rounded-xl transition-all ${
-                  user.avatar_url === avatar
+                className={`text-3xl p-3 rounded-xl transition-all ${user.avatar_url === avatar
                     ? 'bg-blue-200 ring-2 ring-blue-500'
                     : 'bg-white hover:bg-gray-100'
-                }`}
+                  }`}
               >
                 {avatar}
               </motion.button>
@@ -108,7 +107,7 @@ export default function UserProfile() {
 
       {/* Level Benefits */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="p-4 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl border-2 border-yellow-200">
+        <div className="p-4 bg-linear-to-br from-yellow-50 to-orange-50 rounded-xl border-2 border-yellow-200">
           <div className="text-3xl mb-2">🏆</div>
           <div className="font-bold text-sm text-gray-700">Poziom {user.level}</div>
           <div className="text-xs text-gray-600">
@@ -120,7 +119,7 @@ export default function UserProfile() {
           </div>
         </div>
 
-        <div className="p-4 bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl border-2 border-blue-200">
+        <div className="p-4 bg-linear-to-br from-blue-50 to-purple-50 rounded-xl border-2 border-blue-200">
           <div className="text-3xl mb-2">🎁</div>
           <div className="font-bold text-sm text-gray-700">Bonusy</div>
           <div className="text-xs text-gray-600">

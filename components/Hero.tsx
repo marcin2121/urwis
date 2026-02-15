@@ -12,14 +12,14 @@ export default function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isMapOpen, setIsMapOpen] = useState(false);
-  
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"]
   });
 
   const springConfig = { stiffness: 100, damping: 30, restDelta: 0.001 };
-  
+
   const y = useSpring(useTransform(scrollYProgress, [0, 1], [0, 300]), springConfig);
   const opacity = useSpring(useTransform(scrollYProgress, [0, 0.5, 1], [1, 0.8, 0]), springConfig);
   const scale = useSpring(useTransform(scrollYProgress, [0, 1], [1, 0.95]), springConfig);
@@ -40,29 +40,29 @@ export default function HeroSection() {
   const mapEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`;
 
   return (
-    <section 
-      ref={containerRef} 
+    <section
+      ref={containerRef}
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
     >
-      
+
       {/* Background */}
-      <motion.div 
+      <motion.div
         style={{ opacity }}
-        className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-blue-50"
+        className="absolute inset-0 bg-linear-to-br from-gray-50 via-white to-blue-50"
       >
         {/* Animated Gradient Blobs */}
-        <motion.div 
+        <motion.div
           style={{ y: useTransform(scrollYProgress, [0, 1], [0, -100]) }}
           className="absolute inset-0 opacity-40"
         >
-          <div 
+          <div
             className="absolute top-0 right-0 w-[800px] h-[800px] rounded-full blur-3xl transition-transform duration-300"
             style={{
               background: `radial-gradient(circle, #BF2024 0%, transparent 70%)`,
               transform: `translate(${mousePosition.x * 0.02}px, ${mousePosition.y * 0.02}px)`,
             }}
           />
-          <div 
+          <div
             className="absolute bottom-0 left-0 w-[700px] h-[700px] rounded-full blur-3xl transition-transform duration-300"
             style={{
               background: `radial-gradient(circle, #0055ff 0%, transparent 70%)`,
@@ -72,7 +72,7 @@ export default function HeroSection() {
         </motion.div>
 
         {/* Grid Pattern */}
-        <div className="absolute inset-0 opacity-[0.03]" 
+        <div className="absolute inset-0 opacity-[0.03]"
           style={{
             backgroundImage: `linear-gradient(#BF2024 1px, transparent 1px), linear-gradient(90deg, #BF2024 1px, transparent 1px)`,
             backgroundSize: '50px 50px',
@@ -81,15 +81,15 @@ export default function HeroSection() {
       </motion.div>
 
       {/* Main Content */}
-      <motion.div 
-        style={{ 
-          y, 
+      <motion.div
+        style={{
+          y,
           opacity,
           scale,
         }}
         className="relative z-10 container mx-auto px-6 lg:px-12 text-center"
       >
-        
+
         {/* Badge */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -119,7 +119,7 @@ export default function HeroSection() {
         >
           <h1 className="text-6xl sm:text-7xl lg:text-8xl xl:text-9xl font-black leading-[1.1] tracking-tight mb-6">
             <span className="block text-gray-900 pb-2">Witaj w</span>
-            <span 
+            <span
               className="block mt-4 pb-4 text-transparent bg-clip-text"
               style={{
                 backgroundImage: 'linear-gradient(135deg, #BF2024 0%, #0055ff 100%)',
@@ -209,7 +209,7 @@ export default function HeroSection() {
             </div>
           </div>
 
-          <motion.div 
+          <motion.div
             onClick={() => setIsMapOpen(true)}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -244,7 +244,7 @@ export default function HeroSection() {
       >
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold text-gray-900">Nasza lokalizacja</h2>
-          <motion.button 
+          <motion.button
             onClick={() => setIsMapOpen(false)}
             whileHover={{ scale: 1.1, rotate: 90 }}
             whileTap={{ scale: 0.9 }}
@@ -253,11 +253,11 @@ export default function HeroSection() {
             ×
           </motion.button>
         </div>
-        
+
         <div className="text-gray-600 mb-4">
           <p className="font-semibold">{address}</p>
         </div>
-        
+
         <iframe
           src={mapEmbedUrl}
           width="100%"
@@ -270,12 +270,12 @@ export default function HeroSection() {
       </Modal>
 
       {/* Floating Elements */}
-      <motion.div 
+      <motion.div
         style={{ y: useTransform(scrollYProgress, [0, 1], [0, 200]) }}
         className="absolute inset-0 pointer-events-none overflow-hidden"
       >
         <motion.div
-          animate={{ 
+          animate={{
             y: [0, -20, 0],
             rotate: [0, 5, 0]
           }}
@@ -285,7 +285,7 @@ export default function HeroSection() {
           🎮
         </motion.div>
         <motion.div
-          animate={{ 
+          animate={{
             y: [0, 20, 0],
             rotate: [0, -5, 0]
           }}
@@ -295,7 +295,7 @@ export default function HeroSection() {
           🧸
         </motion.div>
         <motion.div
-          animate={{ 
+          animate={{
             y: [0, -15, 0],
             rotate: [0, 8, 0]
           }}
@@ -308,7 +308,7 @@ export default function HeroSection() {
 
       {/* Scroll Indicator */}
       <motion.div
-        style={{ 
+        style={{
           opacity: useTransform(scrollYProgress, [0, 0.3], [1, 0])
         }}
         className="absolute bottom-12 left-1/2 -translate-x-1/2 cursor-pointer group z-20"
@@ -322,7 +322,7 @@ export default function HeroSection() {
           <div className="absolute -inset-4 rounded-full blur-xl opacity-50"
             style={{ background: 'linear-gradient(135deg, #BF2024 0%, #0055ff 100%)' }}
           />
-          
+
           <div className="relative px-8 py-4 bg-white rounded-full shadow-2xl border-2 group-hover:scale-105 transition-transform"
             style={{ borderColor: '#BF2024' }}
           >
@@ -330,7 +330,7 @@ export default function HeroSection() {
               <span className="text-base font-black uppercase tracking-wider" style={{ color: '#BF2024' }}>
                 Poznaj Urwisa
               </span>
-              <motion.span 
+              <motion.span
                 animate={{ rotate: [0, 15, -15, 0] }}
                 transition={{ repeat: Infinity, duration: 1.5 }}
                 className="text-2xl"

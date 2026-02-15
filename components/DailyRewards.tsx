@@ -378,7 +378,7 @@ export default function DailyRewards() {
                     <div
                       key={i}
                       className={`w-10 h-10 rounded-full flex items-center justify-center text-xl ${i < streak % 7
-                        ? 'bg-gradient-to-br from-yellow-400 to-orange-500 text-white'
+                        ? 'bg-linear-to-br from-yellow-400 to-orange-500 text-white'
                         : 'bg-gray-200 text-gray-400'
                         }`}
                     >
