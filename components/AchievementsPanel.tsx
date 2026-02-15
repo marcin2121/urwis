@@ -370,7 +370,7 @@ export default function AchievementsPanel() {
     setUnlockedAchievements(prev => new Set([...prev, achievement.id]));
 
     // Dodaj EXP
-    addExp(achievement.reward.exp, `Osiągnięcie: ${achievement.title}`);
+    addExp(achievement.reward.exp);
 
     // Pokaż modal
     setUnlockedAchievement(achievement);
@@ -442,8 +442,8 @@ export default function AchievementsPanel() {
               whileTap={{ scale: 0.95 }}
               onClick={() => setSelectedCategory(category.id)}
               className={`px-4 py-2 rounded-xl font-bold transition-all ${selectedCategory === category.id
-                  ? 'bg-linear-to-r from-purple-500 to-pink-500 text-white shadow-lg'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'bg-linear-to-r from-purple-500 to-pink-500 text-white shadow-lg'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
             >
               {category.icon} {category.name}
@@ -465,8 +465,8 @@ export default function AchievementsPanel() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.05 }}
                 className={`p-6 rounded-2xl border-4 transition-all ${isUnlocked
-                    ? `bg-linear-to-br ${getRarityColor(achievement.rarity)} ${getRarityBorder(achievement.rarity)} shadow-xl`
-                    : 'bg-gray-50 border-gray-200 opacity-60'
+                  ? `bg-linear-to-br ${getRarityColor(achievement.rarity)} ${getRarityBorder(achievement.rarity)} shadow-xl`
+                  : 'bg-gray-50 border-gray-200 opacity-60'
                   }`}
               >
                 <div className="text-center">
