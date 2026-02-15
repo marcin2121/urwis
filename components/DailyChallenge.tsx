@@ -16,8 +16,8 @@ interface Challenge {
 }
 
 export default function DailyChallenge() {
-  const { user, isAuthenticated, addExp } = useSupabaseAuth();
-  const { addPoints } = useSupabaseLoyalty();
+  const { user, isAuthenticated } = useSupabaseAuth();
+  const { addPoints, addExp } = useSupabaseLoyalty();
   const [dailyChallenge, setDailyChallenge] = useState<Challenge | null>(null);
   const [challengeCompleted, setChallengeCompleted] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
