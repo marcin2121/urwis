@@ -67,7 +67,7 @@ export const TRIVIA_QUESTIONS: TriviaQuestion[] = [
   },
   {
     "question": "Który miesiąc ma 28 dni?",
-    "options": ["Styczeń", "Luty", "Marzec", "Wszystkie"],
+    "options": ["Styczeń", "Luty", "Marzec", "Każdy"],
     "correct": 3,
     "exp": 25,
     "category": "📅 Kalendarz"
@@ -95,7 +95,7 @@ export const TRIVIA_QUESTIONS: TriviaQuestion[] = [
   },
   {
     "question": "Jaki jest pierwszy wers słynnej powieści „Moby Dick”?",
-    "options": ["Zadzwoń do mnie Ahab", "Nazywaj mnie Ismaelem", "Statek płynął", "Wieloryb był wielki"],
+    "options": ["Zadzwoń do mnie Ahab", "Nazywaj mnie Ismael", "Statek płynął", "Wieloryb był wielki"],
     "correct": 1,
     "exp": 25,
     "category": "📚 Literatura"
