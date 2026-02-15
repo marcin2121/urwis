@@ -92,12 +92,15 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
   }, [initialized])
 
   const fetchProfile = async (userId: string) => {
+    console.log('🔍 Fetching profile for:', userId)
     try {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single()
+
+      console.log('📦 Profile response:', { data, error })
 
       if (error) {
         console.error('❌ Profile error:', error)
