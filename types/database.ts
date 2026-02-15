@@ -97,4 +97,15 @@ export interface Database {
         Update: Partial<Omit<UserMission, 'id' | 'user_id' | 'mission_id' | 'created_at'>>;
       };
     };
-    Funct
+    Functions: {
+      get_top_urwis_hunters: {
+        Args: { limit_count: number };
+        Returns: Array<{
+          user_id: string;
+          username: string;
+          find_count: number;
+        }>;
+      };
+    };
+  };
+}
