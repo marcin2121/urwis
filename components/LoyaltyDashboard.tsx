@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useSupabaseLoyalty } from '@/contexts/SupabaseLoyaltyContext';
 
 export default function LoyaltyDashboard() {
-  const { points, level, badges, addPoints, redeemPoints, pointsHistory } = useSupabaseLoyalty();
+  const { points, pointsHistory } = useSupabaseLoyalty(); // ← USUŃ level, badges, redeemPoints
   const [showRewards, setShowRewards] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
 
@@ -16,11 +16,19 @@ export default function LoyaltyDashboard() {
     { name: 'Diamentowy', min: 2000, max: 9999, color: 'from-purple-400 to-pink-600', icon: '👑' },
   ];
 
-  const currentLevel = levels.find(l => l.name === level) || levels[0];
+  // ✅ Oblicz level z punktów
+  const currentLevel = levels.find(l => points >= l.min && points <= l.max) || levels[0];
   const nextLevel = levels[levels.indexOf(currentLevel) + 1];
   const progress = nextLevel
     ? ((points - currentLevel.min) / (nextLevel.min - currentLevel.min)) * 100
     : 100;
+
+  // ✅ Oblicz badges z punktów
+  const badges: string[] = [];
+  if (points >= 100) badges.push('first_100');
+  if (points >= 500) badges.push('collector');
+  if (points >= 1000) badges.push('master');
+  // TODO: dodaj logikę dla 'regular' (10 transakcji) - pobierz z localStorage lub Supabase
 
   const rewards = [
     { id: 1, name: '10% Rabatu', points: 100, code: 'LOYALTY10', icon: '🎁' },
@@ -38,15 +46,31 @@ export default function LoyaltyDashboard() {
     { id: 'regular', name: 'Stały Klient', icon: '❤️', description: '10 transakcji' },
   ];
 
-  const handleRedeem = (reward: typeof rewards[0]) => {
-    if (redeemPoints(reward.points)) {
-      alert(`Gratulacje! Twój kod rabatowy: ${reward.code}`);
-    } else {
+  // ✅ Ręczna implementacja redeemPoints
+  const handleRedeem = async (reward: typeof rewards[0]) => {
+    if (points < reward.points) {
       alert('Masz za mało punktów!');
+      return;
     }
+
+    // TODO: Dodaj do Supabase user_coupons
+    // await supabase.from('user_coupons').insert({...})
+
+    // Tymczasowo zapisz w localStorage
+    const coupons = JSON.parse(localStorage.getItem('urwis_redeemed_coupons') || '[]');
+    coupons.push({
+      code: reward.code,
+      name: reward.name,
+      redeemedAt: new Date().toISOString()
+    });
+    localStorage.setItem('urwis_redeemed_coupons', JSON.stringify(coupons));
+
+    alert(`Gratulacje! Twój kod rabatowy: ${reward.code}`);
   };
 
-  // Demo - przyznaj punkty (usuń w produkcji)
+  // Demo - usuń w produkcji lub zabezpiecz
+  const { addPoints } = useSupabaseLoyalty();
+
   const demoActions = [
     { label: 'Zakup za 100zł', points: 10, reason: 'Zakup w sklepie' },
     { label: 'Polecenie znajomemu', points: 50, reason: 'Program poleceń' },
@@ -55,7 +79,7 @@ export default function LoyaltyDashboard() {
   ];
 
   return (
-    <section className="py-24 bg-gradient-to-b from-purple-50 to-pink-50">
+    <section className="py-24 bg-linear-to-b from-purple-50 to-pink-50">
       <div className="container mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -92,7 +116,7 @@ export default function LoyaltyDashboard() {
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h3 className="text-3xl font-black text-gray-800">Twoje Punkty</h3>
-                  <p className="text-gray-600">Poziom: {level}</p>
+                  <p className="text-gray-600">Poziom: {currentLevel.name}</p>
                 </div>
                 <div className={`w-20 h-20 rounded-full bg-linear-to-br ${currentLevel.color} flex items-center justify-center text-4xl`}>
                   {currentLevel.icon}
@@ -144,8 +168,8 @@ export default function LoyaltyDashboard() {
                       key={badge.id}
                       whileHover={isUnlocked ? { scale: 1.05 } : {}}
                       className={`p-4 rounded-2xl text-center ${isUnlocked
-                        ? 'bg-linear-to-br from-yellow-100 to-orange-100 border-2 border-yellow-400'
-                        : 'bg-gray-100 opacity-50'
+                          ? 'bg-linear-to-br from-yellow-100 to-orange-100 border-2 border-yellow-400'
+                          : 'bg-gray-100 opacity-50'
                         }`}
                     >
                       <div className="text-4xl mb-2 filter"
@@ -161,7 +185,7 @@ export default function LoyaltyDashboard() {
               </div>
             </motion.div>
 
-            {/* Demo Actions (usuń w produkcji) */}
+            {/* Demo Actions */}
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -218,8 +242,8 @@ export default function LoyaltyDashboard() {
                       <div
                         key={reward.id}
                         className={`p-4 rounded-xl border-2 ${points >= reward.points
-                          ? 'border-green-400 bg-green-50'
-                          : 'border-gray-200 bg-gray-50'
+                            ? 'border-green-400 bg-green-50'
+                            : 'border-gray-200 bg-gray-50'
                           }`}
                       >
                         <div className="flex items-center justify-between">
@@ -237,8 +261,8 @@ export default function LoyaltyDashboard() {
                             onClick={() => handleRedeem(reward)}
                             disabled={points < reward.points}
                             className={`px-3 py-1 rounded-full text-xs font-bold ${points >= reward.points
-                              ? 'bg-green-500 text-white hover:bg-green-600'
-                              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                ? 'bg-green-500 text-white hover:bg-green-600'
+                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                               }`}
                           >
                             Wymień
@@ -291,12 +315,11 @@ export default function LoyaltyDashboard() {
                             <div>
                               <div className="text-sm font-semibold">{entry.reason}</div>
                               <div className="text-xs text-gray-500">
-                                {new Date(entry.date).toLocaleDateString('pl-PL')}
+                                {new Date(entry.created_at).toLocaleDateString('pl-PL')}
                               </div>
                             </div>
-                            <div className={`font-black ${entry.type === 'earned' ? 'text-green-600' : 'text-red-600'
-                              }`}>
-                              {entry.type === 'earned' ? '+' : ''}{entry.amount}
+                            <div className="font-black text-green-600">
+                              +{entry.amount}
                             </div>
                           </div>
                         </div>

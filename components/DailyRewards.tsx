@@ -16,7 +16,7 @@ interface Reward {
 
 export default function DailyRewards() {
   const { addPoints } = useSupabaseLoyalty();
-  const { profile: user, session } = useSupabaseAuth();
+  const { profile: user, session, addExp } = useSupabaseAuth();
   const isAuthenticated = !!session;
   const [streak, setStreak] = useState(0);
   const [lastVisit, setLastVisit] = useState<string | null>(null);
@@ -170,7 +170,7 @@ export default function DailyRewards() {
 
   }, [isAuthenticated, user]);
 
-  const claimDailyReward = () => {
+  const claimDailyReward = async () => {
     if (!isAuthenticated || !user) {
       setShowAuthModal(true);
       return;
@@ -214,8 +214,8 @@ export default function DailyRewards() {
 
     setTodayReward({ points: totalPoints, exp: expAmount, rewards, streak });
 
-    addPoints(totalPoints, `Codzienna wizyta - dzień ${streak}`);
-    addExp(expAmount, `Codzienna nagroda - seria ${streak} dni`);
+    await addPoints(totalPoints, `Codzienna wizyta - dzień ${streak}`);
+    await addExp(expAmount, `Codzienna nagroda - seria ${streak} dni`);
 
     const today = new Date().toDateString();
     localStorage.setItem(`urwis_last_visit_${user.id}`, today);

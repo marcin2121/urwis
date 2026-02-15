@@ -65,8 +65,8 @@ export default function UserProfile() {
                   setShowAvatarPicker(false);
                 }}
                 className={`text-3xl p-3 rounded-xl transition-all ${user.avatar_url === avatar
-                    ? 'bg-blue-200 ring-2 ring-blue-500'
-                    : 'bg-white hover:bg-gray-100'
+                  ? 'bg-blue-200 ring-2 ring-blue-500'
+                  : 'bg-white hover:bg-gray-100'
                   }`}
               >
                 {avatar}
