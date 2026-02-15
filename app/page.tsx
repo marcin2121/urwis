@@ -54,7 +54,7 @@ function QuickLinksSection() {
       title: 'Dzienne Wyzwania',
       description: 'Wykonuj codzienne misje i zdobywaj EXP!',
       icon: '🎯',
-      href: '/challenges',
+      href: '/misje',
       gradient: 'from-blue-500 to-purple-500',
       bgGradient: 'from-blue-50 to-purple-50'
     },
@@ -62,7 +62,7 @@ function QuickLinksSection() {
       title: 'Program Lojalnościowy',
       description: 'Zbieraj punkty i wymieniaj na nagrody!',
       icon: '🏆',
-      href: '/loyalty',
+      href: '/nagrody',
       gradient: 'from-yellow-500 to-orange-500',
       bgGradient: 'from-yellow-50 to-orange-50'
     },
@@ -70,7 +70,7 @@ function QuickLinksSection() {
       title: 'Mini Gry',
       description: 'Zagraj w gry i zdobądź dodatkowe punkty!',
       icon: '🎮',
-      href: '/games',
+      href: '/gry',
       gradient: 'from-green-500 to-emerald-500',
       bgGradient: 'from-green-50 to-emerald-50'
     },
@@ -78,7 +78,7 @@ function QuickLinksSection() {
       title: 'Mój Profil',
       description: 'Zobacz swoje osiągnięcia i statystyki!',
       icon: '👤',
-      href: '/profile',
+      href: '/profil',
       gradient: 'from-pink-500 to-red-500',
       bgGradient: 'from-pink-50 to-red-50'
     },
