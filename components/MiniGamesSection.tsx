@@ -27,7 +27,7 @@ export default function MiniGamesSection() {
   const games = [
     {
       id: 'trivia-api',
-      title: '🧠 Open Trivia 300K+',
+      title: '🧠 Quiz 300 tysięcy pytań.',
       description: 'Nieskończone pytania z API!',
       icon: '🧠',
       color: 'from-indigo-500 to-purple-600',
