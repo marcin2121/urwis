@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { migrateLocalStorageToSupabase } from '@/lib/migrations/migrateLocalStorage'
 import type { User as SupabaseUser, Session } from '@supabase/supabase-js'
 
 interface UserProfile {
@@ -34,6 +35,7 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [migrationDone, setMigrationDone] = useState(false)
   const supabase = createClient()
 
   // Initialize auth session
@@ -46,9 +48,18 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
         setSession(currentSession)
         setUser(currentSession?.user ?? null)
 
-        if (currentSession?.user) {
-          await fetchProfile(currentSession.user.id)
+      if (currentSession?.user) {
+        await fetchProfile(currentSession.user.id)
+        
+        // Migrate localStorage data on first login
+        if (!migrationDone && localStorage.getItem('urwis_points')) {
+          const result = await migrateLocalStorageToSupabase(currentSession.user.id)
+          if (result.success) {
+            console.log('[v0] Migrated data:', result.migratedData)
+            setMigrationDone(true)
+          }
         }
+      }
       } catch (error) {
         console.error('Error initializing auth:', error)
       } finally {
