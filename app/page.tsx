@@ -113,7 +113,7 @@ function QuickLinksSection() {
                 transition={{ delay: index * 0.1 }}
                 whileHover={{ scale: 1.05, y: -10 }}
                 whileTap={{ scale: 0.95 }}
-                className={`bg-linear-to-br ${link.bgGradient} rounded-3xl p-8 shadow-xl cursor-pointer border-2 border-white hover:shadow-2xl transition-all`}
+                className={`bg-gradient-to-br ${link.bgGradient} rounded-3xl p-8 shadow-xl cursor-pointer border-2 border-white hover:shadow-2xl transition-all`}
               >
                 <div className="text-6xl mb-4 text-center">{link.icon}</div>
                 <h3 className="text-xl font-black text-gray-900 mb-2 text-center">

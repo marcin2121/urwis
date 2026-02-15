@@ -108,7 +108,7 @@ export default function MiniGamesSection() {
               >
                 <div className="relative bg-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all border-2 border-transparent hover:border-purple-300 overflow-hidden group">
                   {/* Gradient background */}
-                  <div className={`absolute inset-0 bg-linear-to-br ${game.color} opacity-0 group-hover:opacity-10 transition-opacity`} />
+                  <div className={`absolute inset-0 bg-gradient-to-br ${game.color} opacity-0 group-hover:opacity-10 transition-opacity`} />
 
                   {/* Content */}
                   <div className="relative z-10">
@@ -140,7 +140,7 @@ export default function MiniGamesSection() {
                   </div>
 
                   {/* Corner decoration */}
-                  <div className="absolute top-0 right-0 w-20 h-20 bg-linear-to-br from-yellow-400 to-orange-500 opacity-0 group-hover:opacity-20 rounded-bl-full transition-opacity" />
+                  <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-500 opacity-0 group-hover:opacity-20 rounded-bl-full transition-opacity" />
                 </div>
               </motion.div>
             ))}

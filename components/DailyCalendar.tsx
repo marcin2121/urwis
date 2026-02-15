@@ -149,9 +149,9 @@ export default function DailyCalendar() {
           onClick={() => isToday && !isClaimed && claimDailyReward(day)}
           disabled={!isToday || isClaimed}
           className={`aspect-square rounded-xl flex flex-col items-center justify-center font-bold text-sm relative transition-all ${isClaimed
-            ? 'bg-linear-to-br from-green-400 to-emerald-500 text-white shadow-lg'
+            ? 'bg-gradient-to-br from-green-400 to-emerald-500 text-white shadow-lg'
             : isToday
-              ? 'bg-linear-to-br from-yellow-400 to-orange-500 text-white shadow-xl animate-pulse cursor-pointer'
+              ? 'bg-gradient-to-br from-yellow-400 to-orange-500 text-white shadow-xl animate-pulse cursor-pointer'
               : isPast
                 ? 'bg-gray-100 text-gray-400'
                 : 'bg-gray-50 text-gray-300'
@@ -264,17 +264,17 @@ export default function DailyCalendar() {
 
                 {/* Statystyki */}
                 <div className="mt-6 grid grid-cols-3 gap-4">
-                  <div className="p-4 bg-linear-to-br from-green-50 to-emerald-50 rounded-xl text-center border-2 border-green-200">
+                  <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl text-center border-2 border-green-200">
                     <div className="text-3xl mb-1">✅</div>
                     <div className="text-2xl font-black text-green-600">{claimedDays.size}</div>
                     <div className="text-xs text-gray-600">Odebrane</div>
                   </div>
-                  <div className="p-4 bg-linear-to-br from-orange-50 to-red-50 rounded-xl text-center border-2 border-orange-200">
+                  <div className="p-4 bg-gradient-to-br from-orange-50 to-red-50 rounded-xl text-center border-2 border-orange-200">
                     <div className="text-3xl mb-1">🔥</div>
                     <div className="text-2xl font-black text-orange-600">{calculateStreak()}</div>
                     <div className="text-xs text-gray-600">Seria</div>
                   </div>
-                  <div className="p-4 bg-linear-to-br from-purple-50 to-pink-50 rounded-xl text-center border-2 border-purple-200">
+                  <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl text-center border-2 border-purple-200">
                     <div className="text-3xl mb-1">🎁</div>
                     <div className="text-2xl font-black text-purple-600">
                       {getDaysInMonth(currentMonth, currentYear) - claimedDays.size}

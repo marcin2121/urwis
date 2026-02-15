@@ -465,7 +465,7 @@ export default function AchievementsPanel() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.05 }}
                 className={`p-6 rounded-2xl border-4 transition-all ${isUnlocked
-                  ? `bg-linear-to-br ${getRarityColor(achievement.rarity)} ${getRarityBorder(achievement.rarity)} shadow-xl`
+                  ? `bg-gradient-to-br ${getRarityColor(achievement.rarity)} ${getRarityBorder(achievement.rarity)} shadow-xl`
                   : 'bg-gray-50 border-gray-200 opacity-60'
                   }`}
               >
@@ -571,7 +571,7 @@ export default function AchievementsPanel() {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.5, opacity: 0, y: 100 }}
               onClick={(e) => e.stopPropagation()}
-              className={`bg-linear-to-br ${getRarityColor(unlockedAchievement.rarity)} rounded-3xl p-8 max-w-md text-center shadow-2xl border-4 ${getRarityBorder(unlockedAchievement.rarity)}`}
+              className={`bg-gradient-to-br ${getRarityColor(unlockedAchievement.rarity)} rounded-3xl p-8 max-w-md text-center shadow-2xl border-4 ${getRarityBorder(unlockedAchievement.rarity)}`}
             >
               <motion.div
                 animate={{
