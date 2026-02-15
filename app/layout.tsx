@@ -1,0 +1,39 @@
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import Navbar from "@/components/ui/Navbar";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { LoyaltyProvider } from "@/contexts/LoyaltyContext";
+import { NotificationProvider } from "@/contexts/NotificationContext"; 
+import HiddenUrwis from "@/components/HiddenUrwis";
+import MissionTracker from "@/components/MissionTracker";
+
+const inter = Inter({ subsets: ["latin"] });
+
+export const metadata: Metadata = {
+  title: "Sklep Urwis",
+  description: "Twój lokalny sklep w Białobrzegach",
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="pl">
+      <body>
+        <AuthProvider>
+          <LoyaltyProvider>
+            <NotificationProvider>
+              <MissionTracker /> {/* ← MUSI BYĆ TUTAJ! */}
+              <Navbar />
+              {children}
+              <HiddenUrwis />
+            </NotificationProvider>
+          </LoyaltyProvider>
+        </AuthProvider>
+      </body>
+    </html>
+  );
+}
