@@ -1,151 +1,149 @@
 'use client'
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
-import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
-export default function RegisterPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');  // ← DODAJ TO!
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+export default function Page() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [repeatPassword, setRepeatPassword] = useState('')
+  const [username, setUsername] = useState('')  // ← DODANE!
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
 
-  const { signUp } = useSupabaseAuth();
-  const router = useRouter();
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const supabase = createClient()
+    setIsLoading(true)
+    setError(null)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+    if (password !== repeatPassword) {
+      setError('Passwords do not match')
+      setIsLoading(false)
+      return
+    }
 
     try {
-      const { data, error } = await signUp(email, password, username);
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username,
+          },
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
 
-      if (error) {
-        setError(error.message);
-        return;
-      }
-
-      // Success message or redirect
-      router.push('/auth/verify-email');
-    } catch (err: any) {
-      setError(err.message || 'Wystąpił błąd podczas rejestracji');
+      if (error) throw error
+      router.push('/auth/sign-up-success')
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {
-      setLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl border-4 border-foreground p-8 shadow-comic">
+    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+      <div className="w-full max-w-sm">
+        <div className="flex flex-col gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">Sign up</CardTitle>
+              <CardDescription>Create a new account</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSignUp}>
+                <div className="flex flex-col gap-6">
 
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-full border-4 border-foreground mb-4">
-              <span className="text-white font-black text-2xl">U</span>
-            </div>
-            <h1 className="text-3xl font-heading font-black text-foreground mb-2">
-              DOŁĄCZ DO MISJI
-            </h1>
-            <p className="text-muted-foreground">
-              Zostań bohaterem Urwis! 🦸‍♂️
-            </p>
-          </div>
+                  {/* ← DODANY USERNAME INPUT */}
+                  <div className="grid gap-2">
+                    <Label htmlFor="username">Username</Label>
+                    <Input
+                      id="username"
+                      type="text"
+                      placeholder="your_username"
+                      required
+                      minLength={3}
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                    />
+                  </div>
 
-          {/* Error */}
-          {error && (
-            <div className="mb-6 p-4 rounded-lg bg-destructive/10 border-2 border-destructive text-destructive text-sm">
-              {error}
-            </div>
-          )}
+                  <div className="grid gap-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="m@example.com"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid gap-2">
+                    <div className="flex items-center">
+                      <Label htmlFor="password">Password</Label>
+                    </div>
+                    <Input
+                      id="password"
+                      type="password"
+                      required
+                      minLength={6}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
 
-            {/* Username */}
-            <div>
-              <label htmlFor="username" className="block text-sm font-bold text-foreground mb-2">
-                NAZWA UŻYTKOWNIKA
-              </label>
-              <input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                minLength={3}
-                className="w-full px-4 py-3 rounded-lg border-2 border-border focus:border-primary focus:outline-none transition-colors"
-                placeholder="twoja_nazwa"
-              />
-            </div>
+                  <div className="grid gap-2">
+                    <div className="flex items-center">
+                      <Label htmlFor="repeat-password">Repeat Password</Label>
+                    </div>
+                    <Input
+                      id="repeat-password"
+                      type="password"
+                      required
+                      value={repeatPassword}
+                      onChange={(e) => setRepeatPassword(e.target.value)}
+                    />
+                  </div>
 
-            {/* Email */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-bold text-foreground mb-2">
-                EMAIL
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-4 py-3 rounded-lg border-2 border-border focus:border-primary focus:outline-none transition-colors"
-                placeholder="twoj@email.com"
-              />
-            </div>
+                  {error && <p className="text-sm text-red-500">{error}</p>}
 
-            {/* Password */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-bold text-foreground mb-2">
-                HASŁO
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-                className="w-full px-4 py-3 rounded-lg border-2 border-border focus:border-primary focus:outline-none transition-colors"
-                placeholder="••••••••"
-              />
-              <p className="mt-1 text-xs text-muted-foreground">
-                Minimum 6 znaków
-              </p>
-            </div>
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? 'Creating an account...' : 'Sign up'}
+                  </Button>
+                </div>
 
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full px-6 py-4 rounded-xl bg-primary text-white font-black text-lg border-3 border-foreground hover:scale-105 active:scale-95 transition-transform shadow-hero disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? 'REJESTRACJA...' : 'ZAREJESTRUJ SIĘ ⚡'}
-            </button>
-          </form>
-
-          {/* Links */}
-          <div className="mt-6 text-center">
-            <div className="text-sm text-muted-foreground">
-              Masz już konto?{' '}
-              <Link href="/auth/login" className="text-primary hover:underline font-bold">
-                Zaloguj się
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* Back */}
-        <div className="mt-6 text-center">
-          <Link href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-            ← Wróć do strony głównej
-          </Link>
+                <div className="mt-4 text-center text-sm">
+                  Already have an account?{' '}
+                  <Link
+                    href="/auth/login"
+                    className="underline underline-offset-4"
+                  >
+                    Login
+                  </Link>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
-  );
+  )
 }
