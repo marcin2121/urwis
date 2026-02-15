@@ -12,12 +12,13 @@ interface AuthContextType {
   isAdmin: boolean
   isModerator: boolean
   loading: boolean
+  login: (email: string, password: string) => Promise<boolean>  // ✅ DODANE
+  register: (email: string, username: string, password: string) => Promise<boolean>  // ✅ DODANE
   signOut: () => Promise<void>
 }
 
 const SupabaseAuthContext = createContext<AuthContextType | undefined>(undefined)
 
-// ✅ Client POZA komponentem (singleton)
 const supabase = createClient()
 
 export function SupabaseAuthProvider({ children }: { children: React.ReactNode }) {
@@ -28,7 +29,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
   const [initialized, setInitialized] = useState(false)
 
   useEffect(() => {
-    if (initialized) return // ✅ Prevent double init
+    if (initialized) return
 
     let mounted = true
 
@@ -63,7 +64,6 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
 
     initAuth()
 
-    // ✅ Auth listener
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -71,7 +71,6 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
 
       console.log('🔔 Auth event:', event, session?.user?.email || 'No user')
 
-      // ✅ Ignore initial SIGNED_IN (już mamy session)
       if (event === 'INITIAL_SESSION') return
 
       setSession(session)
@@ -113,11 +112,79 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     }
   }
 
+  // ✅ LOGIN FUNCTION
+  const login = async (email: string, password: string): Promise<boolean> => {
+    try {
+      console.log('🔐 Logging in:', email)
+      setLoading(true)
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password: password,
+      })
+
+      if (error) {
+        console.error('❌ Login error:', error)
+        alert(error.message)
+        return false
+      }
+
+      console.log('✅ Logged in:', data.user?.email)
+      return true
+    } catch (err: any) {
+      console.error('❌ Login exception:', err)
+      alert(err.message || 'Błąd logowania')
+      return false
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // ✅ REGISTER FUNCTION
+  const register = async (email: string, username: string, password: string): Promise<boolean> => {
+    try {
+      console.log('📝 Registering:', email, username)
+      setLoading(true)
+
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password: password,
+        options: {
+          data: {
+            username: username.trim(),
+          },
+        },
+      })
+
+      if (error) {
+        console.error('❌ Register error:', error)
+        alert(error.message)
+        return false
+      }
+
+      console.log('✅ Registered:', data.user?.email)
+
+      // Check if email confirmation is required
+      if (data.user && !data.session) {
+        alert('✅ Konto utworzone! Sprawdź email aby potwierdzić.')
+        return true
+      }
+
+      alert('✅ Konto utworzone! Możesz się teraz zalogować.')
+      return true
+    } catch (err: any) {
+      console.error('❌ Register exception:', err)
+      alert(err.message || 'Błąd rejestracji')
+      return false
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const signOut = async () => {
     try {
       console.log('🚪 Signing out...')
 
-      // ✅ Clear state first
       setUser(null)
       setSession(null)
       setProfile(null)
@@ -126,7 +193,6 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
 
       if (error) throw error
 
-      // ✅ Force reload
       window.location.href = '/'
     } catch (error) {
       console.error('❌ Sign out error:', error)
@@ -136,7 +202,6 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
   const isAdmin = profile?.role === 'admin'
   const isModerator = profile?.role === 'moderator' || profile?.role === 'admin'
 
-  // ✅ Show loading state
   if (loading && !initialized) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -155,6 +220,8 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
         isAdmin,
         isModerator,
         loading,
+        login,      // ✅ DODANE
+        register,   // ✅ DODANE
         signOut,
       }}
     >
