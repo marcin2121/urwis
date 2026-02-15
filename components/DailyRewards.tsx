@@ -214,8 +214,8 @@ export default function DailyRewards() {
 
     setTodayReward({ points: totalPoints, exp: expAmount, rewards, streak });
 
-    addPoints(totalPoints, `Codzienna wizyta - dzień ${streak}`);
-    addExp(expAmount, `Codzienna nagroda - seria ${streak} dni`);
+    await addPoints(totalPoints, `Codzienna wizyta - dzień ${streak}`);
+    await addExp(expAmount, `Codzienna nagroda - seria ${streak} dni`);
 
     const today = new Date().toDateString();
     localStorage.setItem(`urwis_last_visit_${user.id}`, today);
