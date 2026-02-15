@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import DailyCalendar from '@/components/DailyCalendar';
@@ -11,12 +11,17 @@ export default function DailyChallenges() {
   const { profile: user, session } = useSupabaseAuth();
   const isAuthenticated = !!session;
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <div className="min-h-screen bg-linear-to-b from-yellow-50 to-orange-50 relative overflow-hidden">
       {/* Animated background */}
       <div className="absolute inset-0 opacity-10 pointer-events-none">
-        {typeof window !== 'undefined' && [...Array(20)].map((_, i) => ( // ← DODAJ CHECK
+        {mounted && [...Array(20)].map((_, i) => (
           <motion.div
             key={i}
             className="absolute text-4xl"
