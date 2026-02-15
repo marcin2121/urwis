@@ -112,6 +112,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     } catch (error) {
       console.error('❌ Fetch profile error:', error)
     } finally {
+      console.log('🏁 Setting loading to false')
       setLoading(false)
     }
   }
