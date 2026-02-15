@@ -40,10 +40,11 @@ export default function MiniGamesSection() {
   }, [selectedGame, handleGameStart])
 
   const games: Game[] = [
+    // 🧠 QUIZ NA PIERWSZYM MIEJSCU!
     {
       id: 'trivia-api',
-      title: '🧠 Quiz 300 tysięcy pytań',
-      description: 'Nieskończone pytania z całego świata!',
+      title: '🧠 Quiz Wiedzy 300K+',
+      description: 'Nieskończone pytania z API!',
       icon: '🧠',
       color: 'from-indigo-500 to-purple-600',
       component: TriviaGeneralGame,
@@ -51,8 +52,8 @@ export default function MiniGamesSection() {
     },
     {
       id: 'memory',
-      title: '🧠 Memory - Zabawki',
-      description: 'Znajdź pary i zdobądź 10% zniżki!',
+      title: 'Memory - Zabawki',
+      description: 'Znajdź pary zabawek!',
       icon: '🧠',
       color: 'from-purple-500 to-pink-500',
       component: MemoryGame,
@@ -60,16 +61,16 @@ export default function MiniGamesSection() {
     },
     {
       id: 'wheel',
-      title: '🎡 Koło Fortuny',
-      description: 'Zakręć i wygraj kupony!',
+      title: 'Koło Fortuny',
+      description: 'Zakręć i wygraj!',
       icon: '🎡',
       color: 'from-blue-500 to-cyan-500',
       component: SpinTheWheel,
-      difficulty: '🎲 Szczęście'
+      difficulty: 'Szczęście'
     },
     {
       id: 'clicker',
-      title: '🎁 Złap Prezenty',
+      title: 'Złap Prezenty',
       description: 'Klikaj spadające prezenty!',
       icon: '🎁',
       color: 'from-red-500 to-orange-500',
@@ -78,14 +79,15 @@ export default function MiniGamesSection() {
     },
     {
       id: 'puzzle',
-      title: '🧩 Puzzle Układanka',
-      description: 'Ułóż obrazek i odbierz nagrodę!',
+      title: 'Puzzle Układanka',
+      description: 'Ułóż obrazek!',
       icon: '🧩',
       color: 'from-green-500 to-emerald-500',
       component: PuzzleSlider,
       difficulty: 'Trudne'
     }
   ]
+
 
   return (
     <section className="py-24 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
