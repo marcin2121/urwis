@@ -144,13 +144,13 @@ export const TRIVIA_QUESTIONS: TriviaQuestion[] = [
   },
   {
     "question": "Kto napisał 'Pana Tadeusza'?",
-    "options": ["Mickiewicz", "Sienkiewicz", "Orzeszkowa", "Żeromski"],
+    "options": ["Adam Mickiewicz", "Henryk Sienkiewicz", "Eliza Orzeszkowa", "Stefan Żeromski"],
     "correct": 0,
     "exp": 25,
     "category": "📚 Literatura"
   },
   {
-    "question": "Jaka jest prędkość światła?",
+    "question": "Jaka jest przybliżona prędkość światła?",
     "options": ["300 000 km/s", "150 000 km/s", "500 000 km/s", "100 000 km/s"],
     "correct": 0,
     "exp": 20,
@@ -186,7 +186,7 @@ export const TRIVIA_QUESTIONS: TriviaQuestion[] = [
   },
   {
     question: "Stolica Polski?",
-    options: ["Kraków", "Warszawa", "Gdańsk", "Wrocław"],
+    options: ["Kraków", "Warszawa", "Białobrzegi", "Wrocław"],
     correct: 1,
     exp: 15,
     category: "🗺️ Geografia"
