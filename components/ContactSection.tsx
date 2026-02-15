@@ -1,10 +1,19 @@
 'use client'
 import { motion } from 'framer-motion';
 import { useForm, ValidationError } from '@formspree/react';
+import { useState, useEffect } from 'react';
 import MagicBento from '@/components/ui/MagicBento';
 
 export default function ContactSection() {
   const [state, handleSubmit] = useForm("mdalgzln");
+  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    setWindowSize({
+      width: window.innerWidth,
+      height: window.innerHeight,
+    });
+  }, []);
 
   const contactInfo = [
     {
@@ -61,13 +70,13 @@ export default function ContactSection() {
     <section className="py-24 relative overflow-hidden bg-white">
       {/* Background decoration */}
       <div className="absolute inset-0 opacity-5">
-        {[...Array(20)].map((_, i) => (
+        {windowSize.width > 0 && [...Array(20)].map((_, i) => (
           <motion.div
             key={i}
             className="absolute text-6xl"
             initial={{
-              x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
-              y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000)
+              x: Math.random() * windowSize.width,
+              y: Math.random() * windowSize.height
             }}
             animate={{
               y: [0, -30, 0],

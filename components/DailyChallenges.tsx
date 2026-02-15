@@ -12,26 +12,31 @@ export default function DailyChallenges() {
   const isAuthenticated = !!session;
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
     setMounted(true);
+    setWindowSize({
+      width: window.innerWidth,
+      height: window.innerHeight,
+    });
   }, []);
 
   return (
     <div className="min-h-screen bg-linear-to-b from-yellow-50 to-orange-50 relative overflow-hidden">
       {/* Animated background */}
       <div className="absolute inset-0 opacity-10 pointer-events-none">
-        {mounted && [...Array(20)].map((_, i) => (
+        {mounted && windowSize.width > 0 && [...Array(20)].map((_, i) => (
           <motion.div
             key={i}
             className="absolute text-4xl"
             initial={{
               y: -100,
-              x: Math.random() * window.innerWidth
+              x: Math.random() * windowSize.width
             }}
             animate={{
-              y: window.innerHeight + 100,
-              x: Math.random() * window.innerWidth,
+              y: windowSize.height + 100,
+              x: Math.random() * windowSize.width,
             }}
             transition={{
               duration: Math.random() * 10 + 10,
