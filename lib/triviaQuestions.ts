@@ -10,6 +10,181 @@ export interface TriviaQuestion {
 export const TRIVIA_QUESTIONS: TriviaQuestion[] = [
   // GEOGRAFIA (200+)
   {
+    "question": "Jaka jest najdłuższa rzeka na świecie?",
+    "options": ["Amazonka", "Nil", "Jangcy", "Missisipi"],
+    "correct": 1,
+    "exp": 20,
+    "category": "🗺️ Geografia"
+  },
+  {
+    "question": "Kto namalował Monę Lisę?",
+    "options": ["Michał Anioł", "Leonardo da Vinci", "Rafael", "Rembrandt"],
+    "correct": 1,
+    "exp": 25,
+    "category": "🎨 Sztuka"
+  },
+  {
+    "question": "Jak nazywa się największa firma technologiczna w Korei Południowej?",
+    "options": ["LG", "Hyundai", "Samsung", "SK Hynix"],
+    "correct": 2,
+    "exp": 20,
+    "category": "💻 Technologia"
+  },
+  {
+    "question": "Jaki jest symbol chemiczny wody?",
+    "options": ["H2O", "CO2", "NaCl", "O2"],
+    "correct": 0,
+    "exp": 15,
+    "category": "🔬 Chemia"
+  },
+  {
+    "question": "Który organ w ciele człowieka jest największy?",
+    "options": ["Wątroba", "Skóra", "Płuca", "Mózg"],
+    "correct": 1,
+    "exp": 20,
+    "category": "🩺 Biologia"
+  },
+  {
+    "question": "Ile dni ma rok?",
+    "options": ["360", "365", "300", "364"],
+    "correct": 1,
+    "exp": 15,
+    "category": "📅 Kalendarz"
+  },
+  {
+    "question": "Jak nazywa się dom w całości wykonany z lodu?",
+    "options": ["Tipi", "Igloo", "Jurta", "Chata"],
+    "correct": 1,
+    "exp": 20,
+    "category": "🏠 Architektura"
+  },
+  {
+    "question": "Jaki jest pierwiastek kwadratowy z 64?",
+    "options": ["6", "7", "8", "9"],
+    "correct": 2,
+    "exp": 15,
+    "category": "➗ Matematyka"
+  },
+  {
+    "question": "Który miesiąc ma 28 dni?",
+    "options": ["Styczeń", "Luty", "Marzec", "Wszystkie"],
+    "correct": 3,
+    "exp": 25,
+    "category": "📅 Kalendarz"
+  },
+  {
+    "question": "Jaka jest stolica Portugalii?",
+    "options": ["Porto", "Lizbona", "Coimbra", "Faro"],
+    "correct": 1,
+    "exp": 20,
+    "category": "🗺️ Geografia"
+  },
+  {
+    "question": "Ile oddechów bierze dziennie ludzkie ciało?",
+    "options": ["10 000", "15 000", "20 000", "25 000"],
+    "correct": 2,
+    "exp": 20,
+    "category": "🩺 Biologia"
+  },
+  {
+    "question": "Jaki jest symbol chemiczny srebra?",
+    "options": ["Au", "Ag", "Fe", "Cu"],
+    "correct": 1,
+    "exp": 15,
+    "category": "🔬 Chemia"
+  },
+  {
+    "question": "Jaki jest pierwszy wers słynnej powieści „Moby Dick”?",
+    "options": ["Zadzwoń do mnie Ahab", "Nazywaj mnie Ismaelem", "Statek płynął", "Wieloryb był wielki"],
+    "correct": 1,
+    "exp": 25,
+    "category": "📚 Literatura"
+  },
+  {
+    "question": "Jaki jest najmniejszy ptak na świecie?",
+    "options": ["Wróbel", "Koliber", "Sikorka", "Zięba"],
+    "correct": 1,
+    "exp": 20,
+    "category": "🐦 Zwierzęta"
+  },
+  {
+    "question": "Jakie jest pełne imię Barbie?",
+    "options": ["Barbara Millicent Roberts", "Betty Marie Smith", "Brenda Ann Davis", "Bethany Louise Wilson"],
+    "correct": 0,
+    "exp": 25,
+    "category": "🎀 Kultura"
+  },
+  {
+    "question": "Za co Paul Hunn dzierży rekord 118.1 decybeli?",
+    "options": ["Najgłośniejszy krzyk", "Najgłośniejsze beknięcie", "Najgłośniejszy śmiech", "Najgłośniejszy klaskanie"],
+    "correct": 1,
+    "exp": 30,
+    "category": "🏆 Rekordy"
+  },
+  {
+    "question": "Jaka była pierwsza pełnokolorowa kreskówka Disneya?",
+    "options": ["Królik Bugs", "Kwiaty i drzewa", "Myszka Miki", "Król Lew"],
+    "correct": 1,
+    "exp": 25,
+    "category": "🎬 Film"
+  },
+  {
+    "question": "Ile minut ma godzina?",
+    "options": ["50", "60", "70", "55"],
+    "correct": 1,
+    "exp": 10,
+    "category": "⏰ Czas"
+  },
+  {
+    "question": "Jaka jest stolica Francji?",
+    "options": ["Londyn", "Berlin", "Paryż", "Madryt"],
+    "correct": 2,
+    "exp": 15,
+    "category": "🗺️ Geografia"
+  },
+  {
+    "question": "Kto napisał 'Pana Tadeusza'?",
+    "options": ["Mickiewicz", "Sienkiewicz", "Orzeszkowa", "Żeromski"],
+    "correct": 0,
+    "exp": 25,
+    "category": "📚 Literatura"
+  },
+  {
+    "question": "Jaka jest prędkość światła?",
+    "options": ["300 000 km/s", "150 000 km/s", "500 000 km/s", "100 000 km/s"],
+    "correct": 0,
+    "exp": 20,
+    "category": "🔬 Fizyka"
+  },
+  {
+    "question": "Który pierwiastek ma symbol O?",
+    "options": ["Złoto", "Tlen", "Węgiel", "Wodór"],
+    "correct": 1,
+    "exp": 15,
+    "category": "🔬 Chemia"
+  },
+  {
+    "question": "Jaka planeta jest najbliższa Słońcu?",
+    "options": ["Mars", "Wenus", "Merkury", "Jowisz"],
+    "correct": 2,
+    "exp": 20,
+    "category": "🌌 Astronomia"
+  },
+  {
+    "question": "Kto wynalazł telefon?",
+    "options": ["Edison", "Bell", "Tesla", "Marconi"],
+    "correct": 1,
+    "exp": 25,
+    "category": "💡 Wynalazki"
+  },
+  {
+    "question": "Ile kontynentów jest na Ziemi?",
+    "options": ["6", "7", "5", "8"],
+    "correct": 1,
+    "exp": 15,
+    "category": "🗺️ Geografia"
+  },
+  {
     question: "Stolica Polski?",
     options: ["Kraków", "Warszawa", "Gdańsk", "Wrocław"],
     correct: 1,
