@@ -1,6 +1,6 @@
 'use client'
 import { useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { useNotifications } from '@/contexts/NotificationContext';
 import { usePathname } from 'next/navigation';
 

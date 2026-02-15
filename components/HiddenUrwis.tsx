@@ -1,6 +1,6 @@
 'use client'
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
