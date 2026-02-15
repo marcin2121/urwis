@@ -147,8 +147,8 @@ export default function PuzzleSlider({ onComplete }: PuzzleSliderProps) {
               whileTap={tile !== 0 ? { scale: 0.95 } : {}}
               onClick={() => handleTileClick(index)}
               className={`w-24 h-24 flex items-center justify-center text-5xl font-black rounded-xl cursor-pointer transition-all ${tile === 0
-                  ? 'bg-transparent'
-                  : 'bg-linear-to-br from-green-400 to-emerald-500 text-white shadow-lg hover:shadow-xl'
+                ? 'bg-transparent'
+                : 'bg-linear-to-br from-green-400 to-emerald-500 text-white shadow-lg hover:shadow-xl'
                 }`}
             >
               {tile !== 0 && (
@@ -176,7 +176,7 @@ export default function PuzzleSlider({ onComplete }: PuzzleSliderProps) {
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="text-center p-8 bg-gradient-to-r from-green-100 to-emerald-100 rounded-2xl"
+          className="text-center p-8 bg-linear-to-r from-green-100 to-emerald-100 rounded-2xl"
         >
           <div className="text-6xl mb-4">🏆</div>
           <h3 className="text-2xl font-black mb-2">Gratulacje!</h3>
@@ -216,7 +216,7 @@ export default function PuzzleSlider({ onComplete }: PuzzleSliderProps) {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={onComplete}
-              className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg font-bold"
+              className="px-6 py-3 bg-linear-to-r from-green-500 to-emerald-500 text-white rounded-lg font-bold"
             >
               Użyj kuponu
             </motion.button>

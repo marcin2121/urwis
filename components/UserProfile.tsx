@@ -65,8 +65,8 @@ export default function UserProfile() {
                   setShowAvatarPicker(false);
                 }}
                 className={`text-3xl p-3 rounded-xl transition-all ${user.avatar_url === avatar
-                    ? 'bg-blue-200 ring-2 ring-blue-500'
-                    : 'bg-white hover:bg-gray-100'
+                  ? 'bg-blue-200 ring-2 ring-blue-500'
+                  : 'bg-white hover:bg-gray-100'
                   }`}
               >
                 {avatar}
@@ -93,7 +93,7 @@ export default function UserProfile() {
         {/* Progress Bar */}
         <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
           <motion.div
-            className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
+            className="h-full bg-linear-to-r from-blue-500 to-purple-500"
             initial={{ width: 0 }}
             animate={{ width: `${progressPercent}%` }}
             transition={{ duration: 1, ease: 'easeOut' }}

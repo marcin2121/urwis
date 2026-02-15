@@ -424,7 +424,7 @@ export default function AchievementsPanel() {
             </div>
             <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
               <motion.div
-                className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
+                className="h-full bg-linear-to-r from-purple-500 to-pink-500"
                 initial={{ width: 0 }}
                 animate={{ width: `${stats.percentage}%` }}
                 transition={{ duration: 1 }}
@@ -442,7 +442,7 @@ export default function AchievementsPanel() {
               whileTap={{ scale: 0.95 }}
               onClick={() => setSelectedCategory(category.id)}
               className={`px-4 py-2 rounded-xl font-bold transition-all ${selectedCategory === category.id
-                ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
+                ? 'bg-linear-to-r from-purple-500 to-pink-500 text-white shadow-lg'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
             >

@@ -94,7 +94,7 @@ function QuickLinksSection() {
           className="text-center mb-16"
         >
           <h2 className="text-5xl font-black mb-4">
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Odkryj Klub Urwisa
             </span>
           </h2>
@@ -122,7 +122,7 @@ function QuickLinksSection() {
                 <p className="text-sm text-gray-700 text-center mb-4">
                   {link.description}
                 </p>
-                <div className={`w-full py-2 bg-gradient-to-r ${link.gradient} text-white rounded-xl font-bold text-center text-sm`}>
+                <div className={`w-full py-2 bg-linear-to-r ${link.gradient} text-white rounded-xl font-bold text-center text-sm`}>
                   Przejdź →
                 </div>
               </motion.div>

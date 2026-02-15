@@ -78,12 +78,12 @@ export default function MiniGamesSection() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-100 to-pink-100 mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-linear-to-r from-purple-100 to-pink-100 mb-4">
             <span className="text-2xl">🎮</span>
             <span className="font-bold text-purple-600">Strefa Rozrywki</span>
           </div>
 
-          <h2 className="text-5xl font-black mb-4 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          <h2 className="text-5xl font-black mb-4 bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
             Zagraj i Wygraj!
           </h2>
 
@@ -132,7 +132,7 @@ export default function MiniGamesSection() {
                       <motion.button
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
-                        className={`px-4 py-2 rounded-full bg-gradient-to-r ${game.color} text-white font-bold text-sm shadow-lg`}
+                        className={`px-4 py-2 rounded-full bg-linear-to-r ${game.color} text-white font-bold text-sm shadow-lg`}
                       >
                         Graj →
                       </motion.button>

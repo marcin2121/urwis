@@ -365,7 +365,7 @@ export default function UrwisIntro({ children }: { children: React.ReactNode }) 
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 3.6, repeat: Infinity, ease: "linear" }} // 4s -> 3.6s
-                  className="absolute -inset-8 bg-gradient-to-r from-red-500 via-orange-500 via-yellow-500 via-blue-500 to-purple-500 rounded-full blur-2xl opacity-40"
+                  className="absolute -inset-8 bg-linear-to-r from-red-500 via-orange-500 via-yellow-500 via-blue-500 to-purple-500 rounded-full blur-2xl opacity-40"
                 />
 
                 <motion.img
@@ -428,12 +428,12 @@ export default function UrwisIntro({ children }: { children: React.ReactNode }) 
                       scale: [1, 1.05, 1]
                     }}
                     transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }} // 2s -> 1.8s
-                    className="absolute inset-0 bg-gradient-to-r from-red-600 via-orange-500 to-blue-600 blur-3xl opacity-40 -z-10"
+                    className="absolute inset-0 bg-linear-to-r from-red-600 via-orange-500 to-blue-600 blur-3xl opacity-40 -z-10"
                   />
 
                   <TypewriterText
                     text="Sklep Urwis"
-                    className="text-7xl sm:text-8xl lg:text-9xl xl:text-[11rem] font-black text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-orange-500 to-blue-600 drop-shadow-2xl"
+                    className="text-7xl sm:text-8xl lg:text-9xl xl:text-[11rem] font-black text-transparent bg-clip-text bg-linear-to-r from-red-600 via-orange-500 to-blue-600 drop-shadow-2xl"
                     delay={0.45} // 0.5s -> 0.45s = 10% szybciej
                     onComplete={handleTypingComplete}
                   />
@@ -544,7 +544,7 @@ export default function UrwisIntro({ children }: { children: React.ReactNode }) 
                       opacity: [0.2, 0.4, 0.2]
                     }}
                     transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }} // 2s -> 1.8s
-                    className="absolute inset-0 bg-gradient-to-r from-orange-400 to-red-400 blur-2xl -z-10"
+                    className="absolute inset-0 bg-linear-to-r from-orange-400 to-red-400 blur-2xl -z-10"
                   />
                 </motion.div>
 

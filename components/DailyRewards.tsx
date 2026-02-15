@@ -308,13 +308,13 @@ export default function DailyRewards() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-yellow-100 to-orange-100 mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-linear-to-r from-yellow-100 to-orange-100 mb-4">
             <span className="text-2xl">🌟</span>
             <span className="font-bold text-orange-600">Codzienna Przygoda</span>
           </div>
 
           <h2 className="text-5xl font-black mb-4">
-            <span className="bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
               Wróć Jutro!
             </span>
           </h2>
@@ -327,7 +327,7 @@ export default function DailyRewards() {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-6 p-6 bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-2xl max-w-md mx-auto"
+              className="mt-6 p-6 bg-linear-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-2xl max-w-md mx-auto"
             >
               <div className="text-5xl mb-3">🎁</div>
               <p className="text-blue-900 font-bold text-lg mb-4">
@@ -337,7 +337,7 @@ export default function DailyRewards() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setShowAuthModal(true)}
-                className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full font-bold shadow-lg"
+                className="px-8 py-3 bg-linear-to-r from-blue-500 to-purple-500 text-white rounded-full font-bold shadow-lg"
               >
                 👤 Zaloguj się lub Zarejestruj
               </motion.button>
@@ -361,7 +361,7 @@ export default function DailyRewards() {
 
             {/* Streak Counter */}
             {isAuthenticated && (
-              <div className="bg-gradient-to-r from-yellow-100 to-orange-100 rounded-2xl p-6 mb-6">
+              <div className="bg-linear-to-r from-yellow-100 to-orange-100 rounded-2xl p-6 mb-6">
                 <div className="text-center">
                   <div className="text-sm text-gray-600 mb-2">Twoja seria</div>
                   <div className="text-5xl font-black text-orange-600 mb-2">
@@ -395,7 +395,7 @@ export default function DailyRewards() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={claimDailyReward}
-                className="w-full py-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-full font-black text-xl shadow-xl"
+                className="w-full py-4 bg-linear-to-r from-yellow-500 to-orange-500 text-white rounded-full font-black text-xl shadow-xl"
               >
                 {isAuthenticated ? '🎁 Odbierz Nagrodę!' : '👤 Zaloguj się'}
               </motion.button>
@@ -440,7 +440,7 @@ export default function DailyRewards() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setShowAuthModal(true)}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full font-bold"
+                  className="px-6 py-3 bg-linear-to-r from-blue-500 to-purple-500 text-white rounded-full font-bold"
                 >
                   Zaloguj się
                 </motion.button>
@@ -471,7 +471,7 @@ export default function DailyRewards() {
                           whileHover={{ scale: 1.03 }}
                           whileTap={{ scale: 0.97 }}
                           onClick={() => completeDailyChallenge(i)}
-                          className="w-full p-4 bg-gray-100 hover:bg-gradient-to-r hover:from-yellow-100 hover:to-orange-100 rounded-xl font-semibold transition-all"
+                          className="w-full p-4 bg-gray-100 hover:bg-linear-to-r hover:from-yellow-100 hover:to-orange-100 rounded-xl font-semibold transition-all"
                         >
                           {option}
                         </motion.button>
@@ -493,7 +493,7 @@ export default function DailyRewards() {
                         setHiddenItemFound(true);
                         completeDailyChallenge();
                       }}
-                      className="px-8 py-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-full font-bold"
+                      className="px-8 py-4 bg-linear-to-r from-yellow-500 to-orange-500 text-white rounded-full font-bold"
                     >
                       Znalazłem! 🔍
                     </motion.button>
@@ -510,7 +510,7 @@ export default function DailyRewards() {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => completeDailyChallenge()}
-                      className="px-8 py-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-full font-bold"
+                      className="px-8 py-4 bg-linear-to-r from-yellow-500 to-orange-500 text-white rounded-full font-bold"
                     >
                       Zrobione! ✓
                     </motion.button>
@@ -536,7 +536,7 @@ export default function DailyRewards() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-12 max-w-2xl mx-auto bg-gradient-to-r from-purple-100 to-pink-100 rounded-3xl p-8 text-center"
+          className="mt-12 max-w-2xl mx-auto bg-linear-to-r from-purple-100 to-pink-100 rounded-3xl p-8 text-center"
         >
           <div className="text-4xl mb-4">👀</div>
           <h3 className="text-2xl font-black mb-2">Jutro czeka na Ciebie...</h3>
@@ -599,7 +599,7 @@ export default function DailyRewards() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setShowReward(false)}
-                className="px-8 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-full font-bold"
+                className="px-8 py-3 bg-linear-to-r from-yellow-500 to-orange-500 text-white rounded-full font-bold"
               >
                 Super! 🎊
               </motion.button>
@@ -635,7 +635,7 @@ export default function DailyRewards() {
               >
                 {modalMessage.icon}
               </motion.div>
-              <h3 className="text-3xl font-black mb-4 bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+              <h3 className="text-3xl font-black mb-4 bg-linear-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
                 {modalMessage.title}
               </h3>
               <p className="text-lg text-gray-700 mb-6">
@@ -646,7 +646,7 @@ export default function DailyRewards() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setShowSuccessModal(false)}
-                className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-full font-bold shadow-lg"
+                className="px-8 py-3 bg-linear-to-r from-green-500 to-emerald-500 text-white rounded-full font-bold shadow-lg"
               >
                 Super! 🎊
               </motion.button>
@@ -681,7 +681,7 @@ export default function DailyRewards() {
               >
                 {modalMessage.icon}
               </motion.div>
-              <h3 className="text-3xl font-black mb-4 bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">
+              <h3 className="text-3xl font-black mb-4 bg-linear-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">
                 {modalMessage.title}
               </h3>
               <p className="text-lg text-gray-700 mb-6">
@@ -692,7 +692,7 @@ export default function DailyRewards() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setShowErrorModal(false)}
-                className="px-8 py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-full font-bold shadow-lg"
+                className="px-8 py-3 bg-linear-to-r from-red-500 to-pink-500 text-white rounded-full font-bold shadow-lg"
               >
                 Rozumiem 💪
               </motion.button>

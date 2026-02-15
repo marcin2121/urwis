@@ -46,13 +46,13 @@ export default function DailyChallenges() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-yellow-100 to-orange-100 mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-linear-to-r from-yellow-100 to-orange-100 mb-4">
             <span className="text-2xl">🌟</span>
             <span className="font-bold text-orange-600">Codzienne Wyzwania</span>
           </div>
 
           <h1 className="text-5xl md:text-6xl font-black mb-4">
-            <span className="bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
               Twoje Misje
             </span>
           </h1>
@@ -65,7 +65,7 @@ export default function DailyChallenges() {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-6 p-6 bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-2xl max-w-md mx-auto"
+              className="mt-6 p-6 bg-linear-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-2xl max-w-md mx-auto"
             >
               <div className="text-5xl mb-3">🔒</div>
               <p className="text-blue-900 font-bold text-lg mb-4">
@@ -75,7 +75,7 @@ export default function DailyChallenges() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setShowAuthModal(true)}
-                className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full font-bold shadow-lg"
+                className="px-8 py-3 bg-linear-to-r from-blue-500 to-purple-500 text-white rounded-full font-bold shadow-lg"
               >
                 👤 Zaloguj się
               </motion.button>
@@ -140,7 +140,7 @@ export default function DailyChallenges() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="mt-12 max-w-2xl mx-auto bg-gradient-to-r from-purple-100 to-pink-100 rounded-3xl p-8 text-center"
+          className="mt-12 max-w-2xl mx-auto bg-linear-to-r from-purple-100 to-pink-100 rounded-3xl p-8 text-center"
         >
           <div className="text-4xl mb-4">👀</div>
           <h3 className="text-2xl font-black mb-2">Jutro czeka na Ciebie...</h3>
@@ -195,7 +195,7 @@ export default function DailyChallenges() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full font-bold"
+                className="px-8 py-3 bg-linear-to-r from-blue-500 to-purple-500 text-white rounded-full font-bold"
               >
                 Przejdź do logowania
               </motion.button>

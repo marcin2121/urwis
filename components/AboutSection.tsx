@@ -93,7 +93,7 @@ export default function AboutSection() {
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                className="absolute -inset-4 bg-gradient-to-r from-red-500 via-orange-500 to-blue-500 rounded-full blur-xl opacity-30"
+                className="absolute -inset-4 bg-linear-to-r from-red-500 via-orange-500 to-blue-500 rounded-full blur-xl opacity-30"
               />
             </div>
           </motion.div>
@@ -105,7 +105,7 @@ export default function AboutSection() {
             className="text-5xl sm:text-6xl lg:text-7xl font-black mb-6"
             style={{ paddingBottom: '0.1em' }}
           >
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-orange-500 to-blue-600">
+            <span className="text-transparent bg-clip-text bg-linear-to-r from-red-600 via-orange-500 to-blue-600">
               O nas
             </span>
           </motion.h2>
@@ -178,7 +178,7 @@ export default function AboutSection() {
 
                 {/* Shine effect */}
                 <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-30"
+                  className="absolute inset-0 bg-linear-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-30"
                   animate={{ x: ['-100%', '100%'] }}
                   transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 3 }}
                 />
@@ -220,9 +220,9 @@ export default function AboutSection() {
                 className="mb-8"
               >
                 <h3 className="text-4xl sm:text-5xl font-black text-gray-900 mb-6" style={{ paddingBottom: '0.1em' }}>
-                  Nasza <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-orange-500">Historia</span>
+                  Nasza <span className="text-transparent bg-clip-text bg-linear-to-r from-red-600 to-orange-500">Historia</span>
                 </h3>
-                <div className="w-24 h-2 bg-gradient-to-r from-red-500 via-orange-500 to-blue-500 rounded-full" />
+                <div className="w-24 h-2 bg-linear-to-r from-red-500 via-orange-500 to-blue-500 rounded-full" />
               </motion.div>
 
               <motion.div
@@ -268,7 +268,7 @@ export default function AboutSection() {
                     📍 Odwiedź nas
                   </span>
                   <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-orange-500 via-red-500 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    className="absolute inset-0 bg-linear-to-r from-orange-500 via-red-500 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                   />
                 </motion.a>
 

@@ -339,7 +339,7 @@ export default function DailyChallenge() {
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.97 }}
                         onClick={() => completeDailyChallenge(i)}
-                        className="w-full p-4 bg-gray-100 hover:bg-gradient-to-r hover:from-yellow-100 hover:to-orange-100 rounded-xl font-semibold transition-all text-left"
+                        className="w-full p-4 bg-gray-100 hover:bg-linear-to-r hover:from-yellow-100 hover:to-orange-100 rounded-xl font-semibold transition-all text-left"
                       >
                         {option}
                       </motion.button>
@@ -364,7 +364,7 @@ export default function DailyChallenge() {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => completeDailyChallenge()}
-                      className="px-8 py-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-full font-bold shadow-xl"
+                      className="px-8 py-4 bg-linear-to-r from-yellow-500 to-orange-500 text-white rounded-full font-bold shadow-xl"
                     >
                       Znalazłem! 🔍
                     </motion.button>
@@ -395,7 +395,7 @@ export default function DailyChallenge() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => completeDailyChallenge()}
-                  className="px-8 py-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-full font-bold"
+                  className="px-8 py-4 bg-linear-to-r from-yellow-500 to-orange-500 text-white rounded-full font-bold"
                 >
                   Zrobione! ✓
                 </motion.button>
@@ -443,7 +443,7 @@ export default function DailyChallenge() {
               >
                 {modalMessage.icon}
               </motion.div>
-              <h3 className="text-3xl font-black mb-4 bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+              <h3 className="text-3xl font-black mb-4 bg-linear-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
                 {modalMessage.title}
               </h3>
               <p className="text-lg text-gray-700 mb-6">
@@ -454,7 +454,7 @@ export default function DailyChallenge() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setShowSuccessModal(false)}
-                className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-full font-bold shadow-lg"
+                className="px-8 py-3 bg-linear-to-r from-green-500 to-emerald-500 text-white rounded-full font-bold shadow-lg"
               >
                 Super! 🎊
               </motion.button>
@@ -489,7 +489,7 @@ export default function DailyChallenge() {
               >
                 {modalMessage.icon}
               </motion.div>
-              <h3 className="text-3xl font-black mb-4 bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">
+              <h3 className="text-3xl font-black mb-4 bg-linear-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">
                 {modalMessage.title}
               </h3>
               <p className="text-lg text-gray-700 mb-6">
@@ -500,7 +500,7 @@ export default function DailyChallenge() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setShowErrorModal(false)}
-                className="px-8 py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-full font-bold shadow-lg"
+                className="px-8 py-3 bg-linear-to-r from-red-500 to-pink-500 text-white rounded-full font-bold shadow-lg"
               >
                 Rozumiem 💪
               </motion.button>

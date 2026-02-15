@@ -43,7 +43,7 @@ export default function ProfilePage() {
           className="mb-8"
         >
           <h1 className="text-5xl font-black mb-2">
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Mój Profil
             </span>
           </h1>
@@ -68,7 +68,7 @@ export default function ProfilePage() {
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setActiveTab(tab.id)}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-left transition-all ${activeTab === tab.id
-                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
+                      ? 'bg-linear-to-r from-blue-500 to-purple-500 text-white shadow-lg'
                       : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
                       }`}
                   >
@@ -151,10 +151,10 @@ function ProfileTab({ user, updateAvatar }: any) {
             <p className="text-gray-600 mb-4">{user.email}</p>
 
             <div className="flex flex-wrap gap-3 justify-center md:justify-start">
-              <div className="px-4 py-2 bg-gradient-to-r from-yellow-100 to-orange-100 rounded-full border-2 border-yellow-300">
+              <div className="px-4 py-2 bg-linear-to-r from-yellow-100 to-orange-100 rounded-full border-2 border-yellow-300">
                 <span className="text-sm font-bold text-orange-700">⭐ Poziom {user.level}</span>
               </div>
-              <div className="px-4 py-2 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full border-2 border-blue-300">
+              <div className="px-4 py-2 bg-linear-to-r from-blue-100 to-purple-100 rounded-full border-2 border-blue-300">
                 <span className="text-sm font-bold text-purple-700">
                   {user.level < 5 && '🥉 Nowicjusz'}
                   {user.level >= 5 && user.level < 10 && '🥈 Doświadczony'}
@@ -174,7 +174,7 @@ function ProfileTab({ user, updateAvatar }: any) {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="mb-6 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl border-2 border-blue-200"
+              className="mb-6 p-6 bg-linear-to-r from-blue-50 to-purple-50 rounded-2xl border-2 border-blue-200"
             >
               <p className="text-sm font-bold text-gray-700 mb-4 text-center">Wybierz swój avatar:</p>
               <div className="grid grid-cols-8 gap-3">
@@ -217,7 +217,7 @@ function ProfileTab({ user, updateAvatar }: any) {
           {/* Progress Bar */}
           <div className="h-6 bg-gray-200 rounded-full overflow-hidden shadow-inner">
             <motion.div
-              className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 flex items-center justify-end pr-2"
+              className="h-full bg-linear-to-r from-blue-500 via-purple-500 to-pink-500 flex items-center justify-end pr-2"
               initial={{ width: 0 }}
               animate={{ width: `${progressPercent}%` }}
               transition={{ duration: 1, ease: 'easeOut' }}
@@ -297,7 +297,7 @@ function LoyaltyTab({ points, level, badges }: any) {
       <div className="bg-white rounded-3xl shadow-xl p-8 text-center">
         <div className="text-7xl mb-4">💰</div>
         <h3 className="text-3xl font-black mb-2">Twoje Punkty</h3>
-        <div className="text-6xl font-black bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent mb-4">
+        <div className="text-6xl font-black bg-linear-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent mb-4">
           {points}
         </div>
         <p className="text-gray-600">Poziom: {level}</p>
@@ -346,7 +346,7 @@ function ChallengesTab({ user }: any) {
       <div className="bg-white rounded-3xl shadow-xl p-8 text-center">
         <div className="text-7xl mb-4">🔥</div>
         <h3 className="text-3xl font-black mb-2">Twoja Seria</h3>
-        <div className="text-6xl font-black bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-4">
+        <div className="text-6xl font-black bg-linear-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-4">
           {streak} dni
         </div>
         <p className="text-gray-600">Nie przerywaj serii - wróć jutro!</p>
@@ -405,7 +405,7 @@ function StatsTab({ user }: any) {
             expHistory.map((entry: any, i: number) => (
               <div
                 key={i}
-                className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-200"
+                className="p-4 bg-linear-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-200"
               >
                 <div className="flex justify-between items-start">
                   <div>
@@ -444,7 +444,7 @@ function RewardsTab({ user }: any) {
             claimedRewards.reverse().slice(0, 20).map((reward: any, i: number) => (
               <div
                 key={i}
-                className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl border border-yellow-200"
+                className="p-4 bg-linear-to-r from-yellow-50 to-orange-50 rounded-xl border border-yellow-200"
               >
                 <div className="flex justify-between items-center">
                   <div>
@@ -570,7 +570,7 @@ function SettingsTab({ user }: any) {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             type="submit"
-            className="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl font-bold shadow-lg"
+            className="w-full py-4 bg-linear-to-r from-blue-500 to-purple-500 text-white rounded-xl font-bold shadow-lg"
           >
             Zmień hasło
           </motion.button>
@@ -646,7 +646,7 @@ function UrwisHunterTab({ user }: any) {
       <div className="bg-white rounded-3xl shadow-xl p-8 text-center">
         <div className="text-7xl mb-4">🧸</div>
         <h3 className="text-3xl font-black mb-2">Łowca Urwisa</h3>
-        <div className="text-6xl font-black bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent mb-4">
+        <div className="text-6xl font-black bg-linear-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent mb-4">
           {urwisFindsCount}
         </div>
         <p className="text-gray-600">
@@ -702,7 +702,7 @@ function UrwisHunterTab({ user }: any) {
             urwisHistory.map((entry, i) => (
               <div
                 key={i}
-                className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl border border-yellow-200"
+                className="p-4 bg-linear-to-r from-yellow-50 to-orange-50 rounded-xl border border-yellow-200"
               >
                 <div className="flex justify-between items-center">
                   <div>
@@ -754,7 +754,7 @@ function UrwisHunterTab({ user }: any) {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-full font-bold"
+                  className="px-6 py-3 bg-linear-to-r from-yellow-500 to-orange-500 text-white rounded-full font-bold"
                 >
                   Zacznij szukać! 🔎
                 </motion.button>

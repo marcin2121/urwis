@@ -110,14 +110,14 @@ export default function LoadingScreen({ onComplete }: { onComplete: () => void }
               <div className="relative w-full h-4 bg-gray-200 rounded-full overflow-hidden shadow-inner">
                 {/* Main Bar */}
                 <motion.div
-                  className="absolute inset-y-0 left-0 bg-gradient-to-r from-red-600 via-orange-500 to-yellow-500 rounded-full"
+                  className="absolute inset-y-0 left-0 bg-linear-to-r from-red-600 via-orange-500 to-yellow-500 rounded-full"
                   style={{ width: `${progress}%` }}
                   transition={{ duration: 0.1 }}
                 />
 
                 {/* Shine Effect */}
                 <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+                  className="absolute inset-0 bg-linear-to-r from-transparent via-white/40 to-transparent"
                   initial={{ x: '-100%' }}
                   animate={{ x: '200%' }}
                   transition={{
