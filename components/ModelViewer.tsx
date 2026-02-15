@@ -1,7 +1,7 @@
 import { FC, Suspense, useRef, useLayoutEffect, useEffect, useMemo } from 'react';
 import { Canvas, useFrame, useLoader, useThree, invalidate } from '@react-three/fiber';
 import { OrbitControls, useGLTF, useFBX, useProgress, Html, Environment, ContactShadows } from '@react-three/drei';
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import * as THREE from 'three';
 
 export interface ViewerProps {
@@ -459,24 +459,24 @@ const ModelViewer: FC<ViewerProps> = ({
         </button>
       )}
 
-<Canvas
-  shadows
-  frameloop="demand"
-  gl={{ 
-    preserveDrawingBuffer: true,
-    alpha: true, // ← Dodaj transparentność
-  }}
-  onCreated={({ gl, scene, camera }) => {
-    rendererRef.current = gl;
-    sceneRef.current = scene;
-    cameraRef.current = camera;
-    gl.toneMapping = THREE.ACESFilmicToneMapping;
-    gl.outputColorSpace = THREE.SRGBColorSpace;
-    scene.background = null; // ← Usuń białe tło
-  }}
-  camera={{ fov: 50, position: [0, 0, camZ], near: 0.01, far: 100 }}
-  style={{ touchAction: 'pan-y pinch-zoom', background: 'transparent' }} // ← Dodaj transparent
->
+      <Canvas
+        shadows
+        frameloop="demand"
+        gl={{
+          preserveDrawingBuffer: true,
+          alpha: true, // ← Dodaj transparentność
+        }}
+        onCreated={({ gl, scene, camera }) => {
+          rendererRef.current = gl;
+          sceneRef.current = scene;
+          cameraRef.current = camera;
+          gl.toneMapping = THREE.ACESFilmicToneMapping;
+          gl.outputColorSpace = THREE.SRGBColorSpace;
+          scene.background = null; // ← Usuń białe tło
+        }}
+        camera={{ fov: 50, position: [0, 0, camZ], near: 0.01, far: 100 }}
+        style={{ touchAction: 'pan-y pinch-zoom', background: 'transparent' }} // ← Dodaj transparent
+      >
 
         {environmentPreset !== 'none' && <Environment preset={environmentPreset as any} background={false} />}
 
@@ -485,15 +485,15 @@ const ModelViewer: FC<ViewerProps> = ({
         <directionalLight position={[-5, 2, 5]} intensity={fillLightIntensity} />
         <directionalLight position={[0, 4, -5]} intensity={rimLightIntensity} />
 
-        <ContactShadows 
-  ref={contactRef as any} 
-  position={[0, -0.5, 0]} 
-  opacity={0.15} 
-  scale={10} 
-  blur={3}
-  color="#000000"
-  // Bardziej subtelny cień
-/>
+        <ContactShadows
+          ref={contactRef as any}
+          position={[0, -0.5, 0]}
+          opacity={0.15}
+          scale={10}
+          blur={3}
+          color="#000000"
+        // Bardziej subtelny cień
+        />
 
 
         <Suspense fallback={<Loader placeholderSrc={placeholderSrc} />}>
