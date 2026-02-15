@@ -21,7 +21,7 @@ interface Achievement {
 }
 
 export default function AchievementsPanel() {
-  const { user, addExp } = useSupabaseAuth();
+  const { user, profile, addExp } = useSupabaseAuth();
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [unlockedAchievements, setUnlockedAchievements] = useState<Set<string>>(new Set());
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
