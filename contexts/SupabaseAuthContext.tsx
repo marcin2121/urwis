@@ -93,8 +93,14 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
 
   const fetchProfile = async (userId: string) => {
     console.log('🔍 Fetching profile for:', userId)
+
     try {
-      const { data, error } = await supabase
+      // DODAJ TO NA POCZĄTKU:
+      console.log('🧪 Supabase client:', !!supabaseClient)
+      console.log('🧪 NEXT_PUBLIC_SUPABASE_URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
+      console.log('🧪 NEXT_PUBLIC_SUPABASE_ANON_KEY:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.slice(0, 20))
+
+      const { data, error } = await supabaseClient
         .from('profiles')
         .select('*')
         .eq('id', userId)
