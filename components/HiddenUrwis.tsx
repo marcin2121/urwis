@@ -13,31 +13,35 @@ export default function HiddenUrwis() {
   const [position, setPosition] = useState({ top: '50%', left: '50%' });
 
   useEffect(() => {
-    // Sprawdź czy dzisiaj jest wyzwanie "find"
+    // ❌ USUŃ TYMCZASOWE ZAWSZE POKAZYWANIE
     const today = new Date().toDateString();
     const dayOfYear = Math.floor(
       (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24)
     );
 
-    // Tymczasowo: zawsze pokazuj (później zmienimy na logikę challenge)
-    // const challengeIndex = dayOfYear % 20; // liczba challenges
-    // const isFindDay = challengeIndex === 14; // indeks wyzwania "find"
+    const challengeIndex = dayOfYear % 20;
+    const isFindDay = challengeIndex === 14; // Prawdziwa logika!
 
-    const isFindDay = true; // TYMCZASOWO dla testów
-
-    if (!isFindDay) return;
-
-    // Sprawdź czy już znalazł dzisiaj
-    if (user) {
-      const found = localStorage.getItem(`urwis_hidden_found_${user.id}_${today}`);
-      if (found) {
-        setShouldShow(false);
-        return;
-      }
+    if (!isFindDay) {
+      console.log('❌ Dzisiaj nie ma wyzwania "find Urwisa"');
+      return;
     }
 
-    // Losowa pozycja (unikaj skrajnych brzegów)
-    const randomTop = Math.random() * 60 + 20; // 20-80%
+    // ✅ NIE POKAZUJJ BEZ LOGOWANIA
+    if (!user || !isAuthenticated) {
+      console.log('🔒 HiddenUrwis: Niezalogowany - nie pokazuję');
+      return;
+    }
+
+    // Sprawdź czy już znalazł dzisiaj
+    const found = localStorage.getItem(`urwis_hidden_found_${user.id}_${today}`);
+    if (found) {
+      console.log('✅ Już znalazłeś dzisiaj!');
+      return;
+    }
+
+    // Losowa pozycja (unikaj intro/header)
+    const randomTop = Math.random() * 40 + 50; // 50-90% (dół strony)
     const randomLeft = Math.random() * 60 + 20; // 20-80%
 
     setPosition({
@@ -46,7 +50,8 @@ export default function HiddenUrwis() {
     });
 
     setShouldShow(true);
-  }, [user]);
+    console.log('🦸‍♂️ HiddenUrwis pokazany!');
+  }, [user, isAuthenticated]);
 
   const handleClick = () => {
     if (!isAuthenticated || !user) {
@@ -64,7 +69,7 @@ export default function HiddenUrwis() {
 
   return (
     <>
-      {/* Ukryta Ikonka Urwisa */}
+      {/* Ukryta Ikonka Urwisa - NIŻSZY zIndex */}
       <motion.div
         onClick={handleClick}
         initial={{ scale: 0, rotate: -360, opacity: 0 }}
@@ -86,29 +91,22 @@ export default function HiddenUrwis() {
         style={{
           top: position.top,
           left: position.left,
-          zIndex: 9999,
+          zIndex: 50,  // ✅ ZMNIEJSZONY z 9999 na 50 (pod intro)
           transform: 'translate(-50%, -50%)'
         }}
         title="Ukryty Urwis! Kliknij mnie!"
       >
-        {/* Świecący efekt */}
+        {/* reszta bez zmian */}
         <div className="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-60 animate-pulse" />
-
-        {/* Ikonka Urwisa */}
         <div className="relative w-full h-full bg-white rounded-full shadow-2xl border-4 border-yellow-400 flex items-center justify-center overflow-hidden">
-          {/* Zastąp tym swoją ikonkę: */}
           <Image
-            src="/urwis-icon.svg" // ← Twoja ikonka
+            src="/urwis-icon.svg"
             alt="Schowany Urwis"
             width={80}
             height={80}
             className="w-16 h-16 object-contain"
           />
-          {/* LUB użyj emoji jeśli nie masz jeszcze ikonki: */}
-          {/* <span className="text-4xl">🧸</span> */}
         </div>
-
-        {/* Błyszczący pierścień */}
         <motion.div
           className="absolute inset-0 rounded-full border-4 border-yellow-400"
           animate={{
