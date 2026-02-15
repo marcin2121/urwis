@@ -16,7 +16,8 @@ interface Reward {
 
 export default function DailyRewards() {
   const { addPoints } = useSupabaseLoyalty();
-  const { profile: user, session, addExp } = useSupabaseAuth();
+  const { profile: user, session } = useSupabaseAuth();
+  const { addExp } = useSupabaseLoyalty();
   const isAuthenticated = !!session;
   const [streak, setStreak] = useState(0);
   const [lastVisit, setLastVisit] = useState<string | null>(null);

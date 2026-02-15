@@ -5,8 +5,8 @@ import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useSupabaseLoyalty } from '@/contexts/SupabaseLoyaltyContext';
 
 export default function DailyCalendar() {
-  const { user, addExp } = useSupabaseAuth();
-  const { addPoints } = useSupabaseLoyalty();
+  const { user } = useSupabaseAuth();
+  const { addPoints, addExp } = useSupabaseLoyalty();
   const [isOpen, setIsOpen] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
@@ -157,12 +157,12 @@ export default function DailyCalendar() {
           onClick={() => isToday && !isClaimed && claimDailyReward(day)}
           disabled={!isToday || isClaimed}
           className={`aspect-square rounded-xl flex flex-col items-center justify-center font-bold text-sm relative transition-all ${isClaimed
-              ? 'bg-gradient-to-br from-green-400 to-emerald-500 text-white shadow-lg'
-              : isToday
-                ? 'bg-gradient-to-br from-yellow-400 to-orange-500 text-white shadow-xl animate-pulse cursor-pointer'
-                : isPast
-                  ? 'bg-gray-100 text-gray-400'
-                  : 'bg-gray-50 text-gray-300'
+            ? 'bg-gradient-to-br from-green-400 to-emerald-500 text-white shadow-lg'
+            : isToday
+              ? 'bg-gradient-to-br from-yellow-400 to-orange-500 text-white shadow-xl animate-pulse cursor-pointer'
+              : isPast
+                ? 'bg-gray-100 text-gray-400'
+                : 'bg-gray-50 text-gray-300'
             }`}
         >
           <span className="text-lg">{day}</span>
