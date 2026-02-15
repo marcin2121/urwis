@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '@/contexts/AuthContext';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -10,7 +10,7 @@ interface AuthModalProps {
 }
 
 export default function AuthModal({ isOpen, onClose, defaultMode = 'login' }: AuthModalProps) {
-  const { login, register } = useAuth();
+  const { login, register } = useSupabaseAuth();
   const [mode, setMode] = useState<'login' | 'register'>(defaultMode);
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
@@ -100,7 +100,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'login' }: Au
               {mode === 'login' ? '👋' : '🎉'}
             </div>
             <p className="text-gray-600">
-              {mode === 'login' 
+              {mode === 'login'
                 ? 'Witaj z powrotem w Klubie Urwisa!'
                 : 'Dołącz do Klubu Urwisa i zdobywaj nagrody!'}
             </p>
@@ -178,8 +178,8 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'login' }: Au
               disabled={isLoading}
               className="w-full py-4 bg-linear-to-r from-blue-500 to-red-500 text-white rounded-xl font-bold text-lg shadow-lg disabled:opacity-50"
             >
-              {isLoading 
-                ? '⏳ Przetwarzanie...' 
+              {isLoading
+                ? '⏳ Przetwarzanie...'
                 : mode === 'login' ? '🔓 Zaloguj się' : '🎉 Zarejestruj się'}
             </motion.button>
           </form>

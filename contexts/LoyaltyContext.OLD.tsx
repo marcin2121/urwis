@@ -1,6 +1,6 @@
 'use client'
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useAuth } from './AuthContext'; // ← DODAJ
+import { useSupabaseAuth } from './AuthContext'; // ← DODAJ
 
 interface LoyaltyContextType {
   points: number;
@@ -22,7 +22,7 @@ interface PointsHistory {
 const LoyaltyContext = createContext<LoyaltyContextType | undefined>(undefined);
 
 export function LoyaltyProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth(); // ← DODAJ
+  const { user } = useSupabaseAuth(); // ← DODAJ
   const [points, setPoints] = useState(0);
   const [pointsHistory, setPointsHistory] = useState<PointsHistory[]>([]);
   const [badges, setBadges] = useState<string[]>([]);
@@ -47,7 +47,7 @@ export function LoyaltyProvider({ children }: { children: ReactNode }) {
 
   const addPoints = (amount: number, reason: string) => {
     setPoints(prev => prev + amount);
-    
+
     const newEntry: PointsHistory = {
       id: Date.now(),
       amount,
@@ -55,7 +55,7 @@ export function LoyaltyProvider({ children }: { children: ReactNode }) {
       date: new Date(),
       type: 'earned'
     };
-    
+
     setPointsHistory(prev => [newEntry, ...prev]);
     checkForNewBadges(points + amount);
 
@@ -67,7 +67,7 @@ export function LoyaltyProvider({ children }: { children: ReactNode }) {
       localStorage.setItem(dailyPointsKey, (currentDailyPoints + amount).toString());
 
       console.log('💰 Points earned today:', currentDailyPoints + amount);
-      
+
       // Trigger mission check
       window.dispatchEvent(new CustomEvent('missionProgress', {
         detail: { type: 'weekly_points', value: currentDailyPoints + amount }
@@ -77,9 +77,9 @@ export function LoyaltyProvider({ children }: { children: ReactNode }) {
 
   const redeemPoints = (amount: number): boolean => {
     if (points < amount) return false;
-    
+
     setPoints(prev => prev - amount);
-    
+
     const newEntry: PointsHistory = {
       id: Date.now(),
       amount: -amount,
@@ -87,14 +87,14 @@ export function LoyaltyProvider({ children }: { children: ReactNode }) {
       date: new Date(),
       type: 'redeemed'
     };
-    
+
     setPointsHistory(prev => [newEntry, ...prev]);
     return true;
   };
 
   const checkForNewBadges = (currentPoints: number) => {
     const newBadges = [...badges];
-    
+
     if (currentPoints >= 100 && !badges.includes('first_100')) {
       newBadges.push('first_100');
     }
@@ -107,7 +107,7 @@ export function LoyaltyProvider({ children }: { children: ReactNode }) {
     if (pointsHistory.length >= 10 && !badges.includes('regular')) {
       newBadges.push('regular');
     }
-    
+
     if (newBadges.length > badges.length) {
       setBadges(newBadges);
     }
@@ -135,10 +135,10 @@ export function LoyaltyProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useLoyalty() {
+export function useSupabaseLoyalty() {
   const context = useContext(LoyaltyContext);
   if (!context) {
-    throw new Error('useLoyalty must be used within LoyaltyProvider');
+    throw new Error('useSupabaseLoyalty must be used within LoyaltyProvider');
   }
   return context;
 }

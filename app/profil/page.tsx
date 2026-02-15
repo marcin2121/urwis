@@ -1,14 +1,14 @@
 'use client'
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '@/contexts/AuthContext';
-import { useLoyalty } from '@/contexts/LoyaltyContext';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
+import { useSupabaseLoyalty } from '@/contexts/SupabaseLoyaltyContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function ProfilePage() {
-  const { user, isAuthenticated, logout, updateAvatar } = useAuth();
-  const { points, level, badges, pointsHistory } = useLoyalty();
+  const { user, isAuthenticated, logout, updateAvatar } = useSupabaseAuth();
+  const { points, level, badges, pointsHistory } = useSupabaseLoyalty();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('profile');
 
@@ -20,21 +20,21 @@ export default function ProfilePage() {
 
   if (!user) return null;
 
-const tabs = [
-  { id: 'profile', name: 'Profil', icon: '👤' },
-  { id: 'loyalty', name: 'Program Lojalnościowy', icon: '🏆' },
-  { id: 'challenges', name: 'Wyzwania', icon: '🎯' },
-  { id: 'stats', name: 'Statystyki', icon: '📊' },
-  { id: 'urwis-hunter', name: 'Łowca Urwisa', icon: '🧸' }, // 🆕 NOWY TAB
-  { id: 'rewards', name: 'Nagrody', icon: '🎁' },
-  { id: 'games', name: 'Historia Gier', icon: '🎮' },
-  { id: 'settings', name: 'Ustawienia', icon: '⚙️' },
-];
+  const tabs = [
+    { id: 'profile', name: 'Profil', icon: '👤' },
+    { id: 'loyalty', name: 'Program Lojalnościowy', icon: '🏆' },
+    { id: 'challenges', name: 'Wyzwania', icon: '🎯' },
+    { id: 'stats', name: 'Statystyki', icon: '📊' },
+    { id: 'urwis-hunter', name: 'Łowca Urwisa', icon: '🧸' }, // 🆕 NOWY TAB
+    { id: 'rewards', name: 'Nagrody', icon: '🎁' },
+    { id: 'games', name: 'Historia Gier', icon: '🎮' },
+    { id: 'settings', name: 'Ustawienia', icon: '⚙️' },
+  ];
 
 
   return (
     <div className="min-h-screen bg-linear-to-b from-gray-50 to-white">
-      
+
       <div className="container mx-auto px-6 pt-32 pb-12">
         {/* Header */}
         <motion.div
@@ -67,11 +67,10 @@ const tabs = [
                     whileHover={{ scale: 1.02, x: 5 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-left transition-all ${
-                      activeTab === tab.id
-                        ? 'bg-linear-to-r from-blue-500 to-purple-500 text-white shadow-lg'
-                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-                    }`}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-left transition-all ${activeTab === tab.id
+                      ? 'bg-linear-to-r from-blue-500 to-purple-500 text-white shadow-lg'
+                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                      }`}
                   >
                     <span className="text-2xl">{tab.icon}</span>
                     <span className="text-sm">{tab.name}</span>
@@ -109,7 +108,7 @@ const tabs = [
                 {activeTab === 'rewards' && <RewardsTab user={user} />}
                 {activeTab === 'games' && <GamesTab user={user} />}
                 {activeTab === 'settings' && <SettingsTab user={user} />}
-                
+
               </motion.div>
             </AnimatePresence>
           </div>
@@ -150,7 +149,7 @@ function ProfileTab({ user, updateAvatar }: any) {
           <div className="text-center md:text-left flex-1">
             <h2 className="text-4xl font-black text-gray-900 mb-2">{user.username}</h2>
             <p className="text-gray-600 mb-4">{user.email}</p>
-            
+
             <div className="flex flex-wrap gap-3 justify-center md:justify-start">
               <div className="px-4 py-2 bg-linear-to-r from-yellow-100 to-orange-100 rounded-full border-2 border-yellow-300">
                 <span className="text-sm font-bold text-orange-700">⭐ Poziom {user.level}</span>
@@ -188,11 +187,10 @@ function ProfileTab({ user, updateAvatar }: any) {
                       updateAvatar(avatar);
                       setShowAvatarPicker(false);
                     }}
-                    className={`text-4xl p-4 rounded-2xl transition-all ${
-                      user.avatar === avatar
-                        ? 'bg-linear-to-br from-blue-400 to-purple-500 ring-4 ring-blue-400 shadow-xl'
-                        : 'bg-white hover:bg-gray-100 shadow-md hover:shadow-lg'
-                    }`}
+                    className={`text-4xl p-4 rounded-2xl transition-all ${user.avatar === avatar
+                      ? 'bg-linear-to-br from-blue-400 to-purple-500 ring-4 ring-blue-400 shadow-xl'
+                      : 'bg-white hover:bg-gray-100 shadow-md hover:shadow-lg'
+                      }`}
                   >
                     {avatar}
                   </motion.button>
@@ -242,13 +240,13 @@ function ProfileTab({ user, updateAvatar }: any) {
             <div className="text-2xl font-black text-orange-600">{user.level}</div>
             <div className="text-xs text-gray-600">Poziom</div>
           </div>
-          
+
           <div className="p-4 bg-linear-to-br from-blue-50 to-cyan-50 rounded-xl border-2 border-blue-200 text-center">
             <div className="text-3xl mb-2">⭐</div>
             <div className="text-2xl font-black text-blue-600">{user.exp}</div>
             <div className="text-xs text-gray-600">Doświadczenie</div>
           </div>
-          
+
           <div className="p-4 bg-linear-to-br from-purple-50 to-pink-50 rounded-xl border-2 border-purple-200 text-center">
             <div className="text-3xl mb-2">🏆</div>
             <div className="text-2xl font-black text-purple-600">
@@ -256,7 +254,7 @@ function ProfileTab({ user, updateAvatar }: any) {
             </div>
             <div className="text-xs text-gray-600">Seria dni</div>
           </div>
-          
+
           <div className="p-4 bg-linear-to-br from-green-50 to-emerald-50 rounded-xl border-2 border-green-200 text-center">
             <div className="text-3xl mb-2">📅</div>
             <div className="text-2xl font-black text-green-600">
@@ -315,11 +313,10 @@ function LoyaltyTab({ points, level, badges }: any) {
               <motion.div
                 key={badge.id}
                 whileHover={isUnlocked ? { scale: 1.05, rotate: 5 } : {}}
-                className={`p-6 rounded-2xl text-center transition-all ${
-                  isUnlocked 
-                    ? 'bg-linear-to-br from-yellow-100 to-orange-100 border-4 border-yellow-400 shadow-xl'
-                    : 'bg-gray-100 opacity-50 border-2 border-gray-300'
-                }`}
+                className={`p-6 rounded-2xl text-center transition-all ${isUnlocked
+                  ? 'bg-linear-to-br from-yellow-100 to-orange-100 border-4 border-yellow-400 shadow-xl'
+                  : 'bg-gray-100 opacity-50 border-2 border-gray-300'
+                  }`}
               >
                 <div className="text-5xl mb-3 filter"
                   style={{ filter: isUnlocked ? 'none' : 'grayscale(100%)' }}
@@ -343,7 +340,7 @@ function LoyaltyTab({ points, level, badges }: any) {
 // 3. Challenges Tab
 function ChallengesTab({ user }: any) {
   const streak = parseInt(localStorage.getItem(`urwis_streak_${user.id}`) || '0');
-  
+
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-3xl shadow-xl p-8 text-center">
@@ -366,11 +363,10 @@ function ChallengesTab({ user }: any) {
           ].map((milestone) => (
             <div
               key={milestone.days}
-              className={`p-4 rounded-xl border-2 ${
-                milestone.unlocked
-                  ? 'bg-green-50 border-green-400'
-                  : 'bg-gray-50 border-gray-300'
-              }`}
+              className={`p-4 rounded-xl border-2 ${milestone.unlocked
+                ? 'bg-green-50 border-green-400'
+                : 'bg-gray-50 border-gray-300'
+                }`}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -397,7 +393,7 @@ function ChallengesTab({ user }: any) {
 // 4. Stats Tab
 function StatsTab({ user }: any) {
   const expHistory = JSON.parse(localStorage.getItem(`urwis_exp_history_${user.id}`) || '[]');
-  
+
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-3xl shadow-xl p-8">
@@ -487,7 +483,7 @@ function SettingsTab({ user }: any) {
 
   const handleChangePassword = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (newPassword !== confirmPassword) {
       alert('Nowe hasła nie pasują do siebie!');
       return;
@@ -673,11 +669,10 @@ function UrwisHunterTab({ user }: any) {
               <motion.div
                 key={badge.id}
                 whileHover={isUnlocked ? { scale: 1.05, rotate: 5 } : {}}
-                className={`p-6 rounded-2xl text-center transition-all ${
-                  isUnlocked 
-                    ? 'bg-linear-to-br from-yellow-100 to-orange-100 border-4 border-yellow-400 shadow-xl'
-                    : 'bg-gray-100 opacity-50 border-2 border-gray-300'
-                }`}
+                className={`p-6 rounded-2xl text-center transition-all ${isUnlocked
+                  ? 'bg-linear-to-br from-yellow-100 to-orange-100 border-4 border-yellow-400 shadow-xl'
+                  : 'bg-gray-100 opacity-50 border-2 border-gray-300'
+                  }`}
               >
                 <div className="text-5xl mb-3 filter"
                   style={{ filter: isUnlocked ? 'none' : 'grayscale(100%)' }}
@@ -735,7 +730,7 @@ function UrwisHunterTab({ user }: any) {
         {(() => {
           const today = new Date().toDateString();
           const foundToday = localStorage.getItem(`urwis_hidden_found_${user.id}_${today}`);
-          
+
           return foundToday ? (
             <div>
               <div className="text-5xl mb-4">🎉</div>

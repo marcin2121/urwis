@@ -1,12 +1,12 @@
 'use client'
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '@/contexts/AuthContext';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
 export default function HiddenUrwis() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useSupabaseAuth();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [shouldShow, setShouldShow] = useState(false);
@@ -18,11 +18,11 @@ export default function HiddenUrwis() {
     const dayOfYear = Math.floor(
       (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24)
     );
-    
+
     // Tymczasowo: zawsze pokazuj (później zmienimy na logikę challenge)
     // const challengeIndex = dayOfYear % 20; // liczba challenges
     // const isFindDay = challengeIndex === 14; // indeks wyzwania "find"
-    
+
     const isFindDay = true; // TYMCZASOWO dla testów
 
     if (!isFindDay) return;
@@ -39,7 +39,7 @@ export default function HiddenUrwis() {
     // Losowa pozycja (unikaj skrajnych brzegów)
     const randomTop = Math.random() * 60 + 20; // 20-80%
     const randomLeft = Math.random() * 60 + 20; // 20-80%
-    
+
     setPosition({
       top: `${randomTop}%`,
       left: `${randomLeft}%`
@@ -68,7 +68,7 @@ export default function HiddenUrwis() {
       <motion.div
         onClick={handleClick}
         initial={{ scale: 0, rotate: -360, opacity: 0 }}
-        animate={{ 
+        animate={{
           scale: 1,
           rotate: 0,
           opacity: 1,
@@ -83,7 +83,7 @@ export default function HiddenUrwis() {
         whileHover={{ scale: 1.2, rotate: 15 }}
         whileTap={{ scale: 0.9 }}
         className="fixed w-24 h-24 cursor-pointer"
-        style={{ 
+        style={{
           top: position.top,
           left: position.left,
           zIndex: 9999,
@@ -93,11 +93,11 @@ export default function HiddenUrwis() {
       >
         {/* Świecący efekt */}
         <div className="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-60 animate-pulse" />
-        
+
         {/* Ikonka Urwisa */}
         <div className="relative w-full h-full bg-white rounded-full shadow-2xl border-4 border-yellow-400 flex items-center justify-center overflow-hidden">
           {/* Zastąp tym swoją ikonkę: */}
-          <Image 
+          <Image
             src="/urwis-icon.svg" // ← Twoja ikonka
             alt="Schowany Urwis"
             width={80}
@@ -141,9 +141,9 @@ export default function HiddenUrwis() {
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-3xl p-8 max-w-md text-center shadow-2xl"
             >
-              <motion.div 
+              <motion.div
                 className="text-7xl mb-4"
-                animate={{ 
+                animate={{
                   scale: [1, 1.2, 1],
                   rotate: [0, 10, -10, 0]
                 }}
@@ -155,12 +155,12 @@ export default function HiddenUrwis() {
                 Znalazłeś Urwisa!
               </h3>
               <p className="text-lg text-gray-700 mb-6">
-                Gratulacje! Znalazłeś ukrytego Urwisa! 🧸<br/>
+                Gratulacje! Znalazłeś ukrytego Urwisa! 🧸<br />
                 <span className="text-sm text-gray-600 mt-2 block">
                   Wróć do sekcji <strong>"Dzienne Wyzwania"</strong> i kliknij <strong>"Znalazłem!"</strong> aby odebrać nagrodę!
                 </span>
               </p>
-              
+
               <div className="flex gap-3 justify-center">
                 <Link href="/challenges">
                   <motion.button
@@ -210,7 +210,7 @@ export default function HiddenUrwis() {
               <p className="text-lg text-gray-700 mb-6">
                 Musisz być zalogowany, aby zbierać nagrody i uczestniczyć w wyzwaniach!
               </p>
-              
+
               <div className="flex gap-3 justify-center">
                 <Link href="/profil">
                   <motion.button

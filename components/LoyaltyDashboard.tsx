@@ -1,10 +1,10 @@
 'use client'
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLoyalty } from '@/contexts/LoyaltyContext';
+import { useSupabaseLoyalty } from '@/contexts/SupabaseLoyaltyContext';
 
 export default function LoyaltyDashboard() {
-  const { points, level, badges, addPoints, redeemPoints, pointsHistory } = useLoyalty();
+  const { points, level, badges, addPoints, redeemPoints, pointsHistory } = useSupabaseLoyalty();
   const [showRewards, setShowRewards] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
 
@@ -18,7 +18,7 @@ export default function LoyaltyDashboard() {
 
   const currentLevel = levels.find(l => l.name === level) || levels[0];
   const nextLevel = levels[levels.indexOf(currentLevel) + 1];
-  const progress = nextLevel 
+  const progress = nextLevel
     ? ((points - currentLevel.min) / (nextLevel.min - currentLevel.min)) * 100
     : 100;
 
@@ -67,13 +67,13 @@ export default function LoyaltyDashboard() {
             <span className="text-2xl">👑</span>
             <span className="font-bold text-purple-600">Program Lojalnościowy</span>
           </div>
-          
+
           <h2 className="text-5xl font-black mb-4">
             <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
               Klub Urwisa
             </span>
           </h2>
-          
+
           <p className="text-xl text-gray-600">
             Zbieraj punkty i wymieniaj na ekskluzywne nagrody!
           </p>
@@ -135,7 +135,7 @@ export default function LoyaltyDashboard() {
               className="bg-white rounded-3xl shadow-2xl p-8"
             >
               <h3 className="text-2xl font-black mb-6">Twoje Odznaki</h3>
-              
+
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {badgesList.map((badge) => {
                   const isUnlocked = badges.includes(badge.id);
@@ -143,11 +143,10 @@ export default function LoyaltyDashboard() {
                     <motion.div
                       key={badge.id}
                       whileHover={isUnlocked ? { scale: 1.05 } : {}}
-                      className={`p-4 rounded-2xl text-center ${
-                        isUnlocked 
-                          ? 'bg-gradient-to-br from-yellow-100 to-orange-100 border-2 border-yellow-400'
-                          : 'bg-gray-100 opacity-50'
-                      }`}
+                      className={`p-4 rounded-2xl text-center ${isUnlocked
+                        ? 'bg-gradient-to-br from-yellow-100 to-orange-100 border-2 border-yellow-400'
+                        : 'bg-gray-100 opacity-50'
+                        }`}
                     >
                       <div className="text-4xl mb-2 filter"
                         style={{ filter: isUnlocked ? 'none' : 'grayscale(100%)' }}
@@ -218,11 +217,10 @@ export default function LoyaltyDashboard() {
                     {rewards.map((reward) => (
                       <div
                         key={reward.id}
-                        className={`p-4 rounded-xl border-2 ${
-                          points >= reward.points
-                            ? 'border-green-400 bg-green-50'
-                            : 'border-gray-200 bg-gray-50'
-                        }`}
+                        className={`p-4 rounded-xl border-2 ${points >= reward.points
+                          ? 'border-green-400 bg-green-50'
+                          : 'border-gray-200 bg-gray-50'
+                          }`}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
@@ -232,17 +230,16 @@ export default function LoyaltyDashboard() {
                               <div className="text-xs text-gray-600">{reward.points} pkt</div>
                             </div>
                           </div>
-                          
+
                           <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => handleRedeem(reward)}
                             disabled={points < reward.points}
-                            className={`px-3 py-1 rounded-full text-xs font-bold ${
-                              points >= reward.points
-                                ? 'bg-green-500 text-white hover:bg-green-600'
-                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                            }`}
+                            className={`px-3 py-1 rounded-full text-xs font-bold ${points >= reward.points
+                              ? 'bg-green-500 text-white hover:bg-green-600'
+                              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                              }`}
                           >
                             Wymień
                           </motion.button>
@@ -297,9 +294,8 @@ export default function LoyaltyDashboard() {
                                 {new Date(entry.date).toLocaleDateString('pl-PL')}
                               </div>
                             </div>
-                            <div className={`font-black ${
-                              entry.type === 'earned' ? 'text-green-600' : 'text-red-600'
-                            }`}>
+                            <div className={`font-black ${entry.type === 'earned' ? 'text-green-600' : 'text-red-600'
+                              }`}>
                               {entry.type === 'earned' ? '+' : ''}{entry.amount}
                             </div>
                           </div>

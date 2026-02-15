@@ -1,11 +1,11 @@
 'use client'
 import { useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useNotifications } from '@/contexts/NotificationContext';
 import { usePathname } from 'next/navigation';
 
 export default function MissionTracker() {
-  const { user } = useAuth();
+  const { user } = useSupabaseAuth();
   const { checkMissionProgress } = useNotifications();
   const pathname = usePathname();
 
@@ -22,7 +22,7 @@ export default function MissionTracker() {
       visitedPages.push(pathname);
       trackingData.visited_pages = visitedPages;
       trackingData.pages_visited = visitedPages.length;
-      
+
       // Sprawdź misję
       checkMissionProgress('pages_visited', visitedPages.length);
     }
@@ -32,7 +32,7 @@ export default function MissionTracker() {
       trackingData.visit_home = 1;
       checkMissionProgress('visit_home', 1);
     }
-    
+
     if (pathname === '/profil') {
       trackingData.visit_profile = 1;
       checkMissionProgress('visit_profile', 1);
@@ -48,11 +48,11 @@ export default function MissionTracker() {
     const interval = setInterval(() => {
       const timeSpent = Math.floor((Date.now() - startTime) / 1000);
       trackingData.time_spent = (trackingData.time_spent || 0) + 1;
-      
+
       if (trackingData.time_spent >= 300) { // 5 minut
         checkMissionProgress('time_spent', trackingData.time_spent);
       }
-      
+
       localStorage.setItem(trackingKey, JSON.stringify(trackingData));
     }, 1000);
 
