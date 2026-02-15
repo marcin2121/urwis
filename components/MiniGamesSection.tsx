@@ -7,6 +7,7 @@ import MemoryGame from './games/MemoryGame';
 import SpinTheWheel from './games/SpinTheWheel';
 import ClickerGame from './games/ClickerGame';
 import PuzzleSlider from './games/PuzzleSlider';
+import TriviaGeneralGame from './games/TriviaGeneralGame';
 
 export default function MiniGamesSection() {
   const { profile: user } = useSupabaseAuth(); // ← DODAJ
