@@ -7,8 +7,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function ProfilePage() {
-  const { user, isAuthenticated, logout, updateAvatar } = useSupabaseAuth();
-  const { points, level, badges, pointsHistory } = useSupabaseLoyalty();
+  const { user, profile, isAuthenticated, signOut, updateProfile } = useSupabaseAuth();
+  const { points } = useSupabaseLoyalty();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('profile');
 
