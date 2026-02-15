@@ -11,6 +11,7 @@ interface LoyaltyContextType {
   totalExp: number
   badges: any[]
   userBadges: any[]
+  pointsHistory: any[]
   addPoints: (amount: number, reason: string) => Promise<void>
   addExp: (amount: number) => Promise<void>
   earnBadge: (badgeId: string) => Promise<void>
@@ -30,6 +31,7 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
   const [level, setLevel] = useState(1)
   const [badges, setBadges] = useState<any[]>([])
   const [userBadges, setUserBadges] = useState<any[]>([])
+  const [pointsHistory, setPointsHistory] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -43,6 +45,7 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
     const fetchProfile = async () => {
       try {
         setLoading(true)
+
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('*')
@@ -52,9 +55,24 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
         if (profileError) throw profileError
 
         setProfile(profileData)
-        setPoints(profileData.total_exp || 0)
-        setTotalExp(profileData.total_exp || 0)
-        setLevel(profileData.level || 1)
+        setPoints(profileData?.total_exp || 0)
+        setTotalExp(profileData?.total_exp || 0)
+        setLevel(profileData?.level || 1)
+
+        // Fetch points history
+        const { data: historyData, error: historyError } = await supabase
+          .from('loyalty_points')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(50)
+
+        if (historyError) {
+          console.error('Error fetching history:', historyError)
+        } else {
+          setPointsHistory(historyData || [])
+        }
+
       } catch (err: any) {
         setError(err.message)
       } finally {
@@ -63,7 +81,7 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
     }
 
     fetchProfile()
-  }, [user?.id])
+  }, [user?.id, supabase])
 
   // Subscribe to real-time profile updates
   useEffect(() => {
@@ -80,9 +98,10 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
           filter: `id=eq.${user.id}`,
         },
         (payload) => {
-          setProfile(payload.new)
-          setLevel(payload.new.level)
-          setTotalExp(payload.new.total_exp)
+          const newData = payload.new as any  // ← FIX: Type assertion
+          setProfile(newData)
+          setLevel(newData?.level || 1)
+          setTotalExp(newData?.total_exp || 0)
         }
       )
       .subscribe()
@@ -90,7 +109,33 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [user?.id])
+  }, [user?.id, supabase])
+
+  // Subscribe to real-time points history updates
+  useEffect(() => {
+    if (!user?.id) return
+
+    const channel = supabase
+      .channel(`loyalty-points-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'loyalty_points',
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          const newData = payload.new as any  // ← FIX: Type assertion
+          setPointsHistory(prev => [newData, ...prev])
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [user?.id, supabase])
 
   const addPoints = useCallback(
     async (amount: number, reason: string) => {
@@ -98,13 +143,22 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
 
       try {
         // Add to loyalty_points table
-        const { error: insertError } = await supabase.from('loyalty_points').insert({
-          user_id: user.id,
-          amount,
-          reason,
-        })
+        const { data: insertData, error: insertError } = await supabase
+          .from('loyalty_points')
+          .insert({
+            user_id: user.id,
+            amount,
+            reason,
+          })
+          .select()
+          .single()
 
         if (insertError) throw insertError
+
+        // Update local history immediately
+        if (insertData) {
+          setPointsHistory(prev => [insertData, ...prev])
+        }
 
         // Update profile total_exp
         const newTotal = (profile?.total_exp || 0) + amount
@@ -121,7 +175,7 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
         setError(err.message)
       }
     },
-    [user?.id, profile]
+    [user?.id, profile, supabase]
   )
 
   const addExp = useCallback(
@@ -142,7 +196,7 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
         setError(err.message)
       }
     },
-    [user?.id, profile]
+    [user?.id, profile, supabase]
   )
 
   const earnBadge = useCallback(
@@ -160,7 +214,7 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
         setError(err.message)
       }
     },
-    [user?.id]
+    [user?.id, supabase]
   )
 
   return (
@@ -172,6 +226,7 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
         totalExp,
         badges,
         userBadges,
+        pointsHistory,
         addPoints,
         addExp,
         earnBadge,
