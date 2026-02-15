@@ -19,6 +19,10 @@ export const metadata: Metadata = {
   description: "Twój lokalny sklep w Białobrzegach",
 };
 
+export const viewport = {
+  colorScheme: 'light',
+};
+
 export default function RootLayout({
   children,
 }: {

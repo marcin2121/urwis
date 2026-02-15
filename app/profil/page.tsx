@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useSupabaseLoyalty } from '@/contexts/SupabaseLoyaltyContext';
@@ -7,16 +7,22 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function ProfilePage() {
-  const { user, profile, isAuthenticated, signOut, updateProfile } = useSupabaseAuth();
+  const { user, profile, isLoading, signOut, updateProfile } = useSupabaseAuth();
   const { points } = useSupabaseLoyalty();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('profile');
+  const [mounted, setMounted] = useState(false);
 
-  // Redirect jeśli nie zalogowany
-  if (typeof window !== 'undefined' && !isAuthenticated) {
-    router.push('/');
-    return null;
-  }
+  // Handle auth check and redirect on client side only
+  useEffect(() => {
+    setMounted(true);
+    if (!isLoading && !user) {
+      router.push('/');
+    }
+  }, [user, isLoading, router]);
+
+  // Don't render until mounted and auth is loaded
+  if (!mounted || isLoading || !user) return null;
 
   if (!profile) return null;
 
