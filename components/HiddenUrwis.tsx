@@ -151,7 +151,7 @@ export default function HiddenUrwis() {
               >
                 🎉
               </motion.div>
-              <h3 className="text-3xl font-black mb-4 bg-linear-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
+              <h3 className="text-3xl font-black mb-4 bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
                 Znalazłeś Urwisa!
               </h3>
               <p className="text-lg text-gray-700 mb-6">
@@ -166,7 +166,7 @@ export default function HiddenUrwis() {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="px-6 py-3 bg-linear-to-r from-yellow-500 to-orange-500 text-white rounded-full font-bold shadow-lg"
+                    className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-full font-bold shadow-lg"
                   >
                     Odbierz Nagrodę! 🎁
                   </motion.button>
@@ -204,7 +204,7 @@ export default function HiddenUrwis() {
               className="bg-white rounded-3xl p-8 max-w-md text-center shadow-2xl"
             >
               <div className="text-7xl mb-4">🔒</div>
-              <h3 className="text-3xl font-black mb-4 bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <h3 className="text-3xl font-black mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 Zaloguj się
               </h3>
               <p className="text-lg text-gray-700 mb-6">
@@ -216,7 +216,7 @@ export default function HiddenUrwis() {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="px-6 py-3 bg-linear-to-r from-blue-500 to-purple-500 text-white rounded-full font-bold shadow-lg"
+                    className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full font-bold shadow-lg"
                   >
                     Zaloguj się 👤
                   </motion.button>

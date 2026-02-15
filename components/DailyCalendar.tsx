@@ -174,7 +174,7 @@ export default function DailyCalendar() {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(true)}
-        className="w-full py-4 bg-linear-to-r from-yellow-500 to-orange-500 text-white rounded-2xl font-bold text-lg shadow-xl"
+        className="w-full py-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-2xl font-bold text-lg shadow-xl"
       >
         📅 Kalendarz Nagród
       </motion.button>
@@ -200,7 +200,7 @@ export default function DailyCalendar() {
                 {/* Header */}
                 <div className="flex justify-between items-center mb-6">
                   <div>
-                    <h2 className="text-3xl font-black bg-linear-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
+                    <h2 className="text-3xl font-black bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
                       Kalendarz Nagród
                     </h2>
                     <p className="text-gray-600 text-sm mt-1">
@@ -284,7 +284,7 @@ export default function DailyCalendar() {
                 </div>
 
                 {/* Milestones */}
-                <div className="mt-6 p-4 bg-linear-to-r from-yellow-50 to-orange-50 rounded-xl border-2 border-yellow-200">
+                <div className="mt-6 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl border-2 border-yellow-200">
                   <h4 className="font-bold text-gray-900 mb-3">🏆 Nagrody Milestone:</h4>
                   <div className="space-y-2 text-sm">
                     <div className={claimedDays.size >= 7 ? 'text-green-600 font-bold' : 'text-gray-600'}>
@@ -352,7 +352,7 @@ export default function DailyCalendar() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setShowRewardModal(false)}
-                className="px-8 py-3 bg-linear-to-r from-yellow-500 to-orange-500 text-white rounded-full font-bold"
+                className="px-8 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-full font-bold"
               >
                 Super! 🎊
               </motion.button>

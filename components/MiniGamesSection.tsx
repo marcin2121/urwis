@@ -78,15 +78,15 @@ export default function MiniGamesSection() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-linear-to-r from-purple-100 to-pink-100 mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-100 to-pink-100 mb-4">
             <span className="text-2xl">🎮</span>
             <span className="font-bold text-purple-600">Strefa Rozrywki</span>
           </div>
-          
-          <h2 className="text-5xl font-black mb-4 bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+
+          <h2 className="text-5xl font-black mb-4 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
             Zagraj i Wygraj!
           </h2>
-          
+
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Wybierz swoją ulubioną grę, pobaw się i zdobądź ekskluzywne kupony rabatowe
           </p>
@@ -109,30 +109,30 @@ export default function MiniGamesSection() {
                 <div className="relative bg-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all border-2 border-transparent hover:border-purple-300 overflow-hidden group">
                   {/* Gradient background */}
                   <div className={`absolute inset-0 bg-linear-to-br ${game.color} opacity-0 group-hover:opacity-10 transition-opacity`} />
-                  
+
                   {/* Content */}
                   <div className="relative z-10">
                     <div className="text-6xl mb-4 transform group-hover:scale-110 transition-transform">
                       {game.icon}
                     </div>
-                    
+
                     <h3 className="text-xl font-bold mb-2 text-gray-800">
                       {game.title}
                     </h3>
-                    
+
                     <p className="text-gray-600 text-sm mb-4">
                       {game.description}
                     </p>
-                    
+
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-semibold px-3 py-1 rounded-full bg-gray-100 text-gray-600">
                         {game.difficulty}
                       </span>
-                      
+
                       <motion.button
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
-                        className={`px-4 py-2 rounded-full bg-linear-to-r ${game.color} text-white font-bold text-sm shadow-lg`}
+                        className={`px-4 py-2 rounded-full bg-gradient-to-r ${game.color} text-white font-bold text-sm shadow-lg`}
                       >
                         Graj →
                       </motion.button>
@@ -168,7 +168,7 @@ export default function MiniGamesSection() {
                   <h3 className="text-3xl font-bold">
                     {games.find(g => g.id === selectedGame)?.title}
                   </h3>
-                  
+
                   <motion.button
                     whileHover={{ scale: 1.1, rotate: 90 }}
                     whileTap={{ scale: 0.9 }}

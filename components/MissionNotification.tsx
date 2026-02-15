@@ -33,7 +33,7 @@ export default function MissionNotification({ mission, onClose, onClaim }: Props
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={onClaim}
-              className="px-4 py-2 bg-linear-to-r from-yellow-500 to-orange-500 text-white rounded-lg font-bold text-sm shadow-lg"
+              className="px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-lg font-bold text-sm shadow-lg"
             >
               🎁 Odbierz
             </motion.button>

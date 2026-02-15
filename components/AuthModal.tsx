@@ -176,7 +176,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'login' }: Au
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={isLoading}
-              className="w-full py-4 bg-linear-to-r from-blue-500 to-red-500 text-white rounded-xl font-bold text-lg shadow-lg disabled:opacity-50"
+              className="w-full py-4 bg-gradient-to-r from-blue-500 to-red-500 text-white rounded-xl font-bold text-lg shadow-lg disabled:opacity-50"
             >
               {isLoading
                 ? '⏳ Przetwarzanie...'
@@ -200,7 +200,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'login' }: Au
 
           {/* Benefits (tylko dla rejestracji) */}
           {mode === 'register' && (
-            <div className="mt-6 p-4 bg-linear-to-r from-blue-50 to-red-50 rounded-xl">
+            <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-red-50 rounded-xl">
               <h4 className="font-bold text-sm mb-2 text-center">Co zyskujesz?</h4>
               <ul className="text-sm space-y-1 text-gray-700">
                 <li>✅ Codzienne nagrody i bonusy</li>
