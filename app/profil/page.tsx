@@ -7,8 +7,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function ProfilePage() {
-  const { user, isAuthenticated, logout, updateAvatar } = useSupabaseAuth();
-  const { points, level, badges, pointsHistory } = useSupabaseLoyalty();
+  const { user, profile, isAuthenticated, signOut, updateProfile } = useSupabaseAuth();
+  const { points } = useSupabaseLoyalty();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('profile');
 
@@ -18,7 +18,7 @@ export default function ProfilePage() {
     return null;
   }
 
-  if (!user) return null;
+  if (!profile) return null;
 
   const tabs = [
     { id: 'profile', name: 'Profil', icon: '👤' },
@@ -48,7 +48,7 @@ export default function ProfilePage() {
             </span>
           </h1>
           <p className="text-gray-600 text-lg">
-            Witaj z powrotem, <span className="font-bold text-gray-900">{user.username}</span>! 👋
+            Witaj z powrotem, <span className="font-bold text-gray-900">{profile.username}</span>! 👋
           </p>
         </motion.div>
 
@@ -82,7 +82,7 @@ export default function ProfilePage() {
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={logout}
+                onClick={signOut}
                 className="w-full mt-6 px-4 py-3 bg-red-50 text-red-600 rounded-xl font-semibold hover:bg-red-100 transition-colors"
               >
                 🚪 Wyloguj się
@@ -100,14 +100,14 @@ export default function ProfilePage() {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                {activeTab === 'profile' && <ProfileTab user={user} updateAvatar={updateAvatar} />}
-                {activeTab === 'loyalty' && <LoyaltyTab points={points} level={level} badges={badges} />}
-                {activeTab === 'challenges' && <ChallengesTab user={user} />}
-                {activeTab === 'stats' && <StatsTab user={user} />}
-                {activeTab === 'urwis-hunter' && <UrwisHunterTab user={user} />} {/* ← DODAJ */}
-                {activeTab === 'rewards' && <RewardsTab user={user} />}
-                {activeTab === 'games' && <GamesTab user={user} />}
-                {activeTab === 'settings' && <SettingsTab user={user} />}
+                {activeTab === 'profile' && <ProfileTab user={profile} updateAvatar={updateProfile} />}
+                {activeTab === 'loyalty' && <LoyaltyTab points={points} level={profile.level} badges={[]} />}
+                {activeTab === 'challenges' && <ChallengesTab user={profile} />}
+                {activeTab === 'stats' && <StatsTab user={profile} />}
+                {activeTab === 'urwis-hunter' && <UrwisHunterTab user={profile} />}
+                {activeTab === 'rewards' && <RewardsTab user={profile} />}
+                {activeTab === 'games' && <GamesTab user={profile} />}
+                {activeTab === 'settings' && <SettingsTab user={profile} />}
 
               </motion.div>
             </AnimatePresence>
