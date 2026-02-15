@@ -16,7 +16,7 @@ interface Reward {
 
 export default function DailyRewards() {
   const { addPoints } = useSupabaseLoyalty();
-  const { profile: user, session } = useSupabaseAuth();
+  const { profile: user, session, addExp } = useSupabaseAuth();
   const isAuthenticated = !!session;
   const [streak, setStreak] = useState(0);
   const [lastVisit, setLastVisit] = useState<string | null>(null);
@@ -170,7 +170,7 @@ export default function DailyRewards() {
 
   }, [isAuthenticated, user]);
 
-  const claimDailyReward = () => {
+  const claimDailyReward = async () => {
     if (!isAuthenticated || !user) {
       setShowAuthModal(true);
       return;
