@@ -200,7 +200,7 @@ export const TRIVIA_QUESTIONS: TriviaQuestion[] = [
   },
   {
     question: "Jaka rzeka płynie przez Kraków?",
-    options: ["Wisła", "Odra", "Warta", "Bug"],
+    options: ["Wisła", "Odra", "Warta", "Pilica"],
     correct: 0,
     exp: 15,
     category: "🗺️ Geografia"
