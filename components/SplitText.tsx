@@ -155,7 +155,7 @@ const SplitText: React.FC<SplitTextProps> = ({
     }
   );
 
-  const renderTag = () => {
+  const renderTag = (): React.ReactElement => {
     const style: React.CSSProperties = {
       textAlign,
       wordWrap: 'break-word',
@@ -174,4 +174,7 @@ const SplitText: React.FC<SplitTextProps> = ({
     );
   };
 
-  export default SplitText;
+  return renderTag(); // ← DODANE!
+};
+
+export default SplitText;
