@@ -16,12 +16,19 @@ export default function LoyaltyDashboard() {
     { name: 'Diamentowy', min: 2000, max: 9999, color: 'from-purple-400 to-pink-600', icon: '👑' },
   ];
 
+  // ✅ Oblicz level z punktów
   const currentLevel = levels.find(l => points >= l.min && points <= l.max) || levels[0];
   const nextLevel = levels[levels.indexOf(currentLevel) + 1];
   const progress = nextLevel
     ? ((points - currentLevel.min) / (nextLevel.min - currentLevel.min)) * 100
     : 100;
 
+  // ✅ Oblicz badges z punktów
+  const badges: string[] = [];
+  if (points >= 100) badges.push('first_100');
+  if (points >= 500) badges.push('collector');
+  if (points >= 1000) badges.push('master');
+  // TODO: dodaj logikę dla 'regular' (10 transakcji) - pobierz z localStorage lub Supabase
   const rewards = [
     { id: 1, name: '10% Rabatu', points: 100, code: 'LOYALTY10', icon: '🎁' },
     { id: 2, name: '15% Rabatu', points: 250, code: 'LOYALTY15', icon: '🎉' },
