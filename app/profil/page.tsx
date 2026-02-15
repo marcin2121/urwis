@@ -145,7 +145,7 @@ function ProfileTab({ user, updateAvatar }: any) {
             onClick={() => setShowAvatarPicker(!showAvatarPicker)}
             className="w-32 h-32 rounded-full bg-linear-to-br from-blue-400 to-purple-500 flex items-center justify-center text-7xl cursor-pointer hover:shadow-2xl transition-shadow relative"
           >
-            {user.avatar}
+            {user.avatar_url}
             <div className="absolute bottom-0 right-0 w-10 h-10 bg-white rounded-full flex items-center justify-center text-xl shadow-lg">
               ✏️
             </div>
@@ -193,7 +193,7 @@ function ProfileTab({ user, updateAvatar }: any) {
                       updateAvatar({ avatar_url: avatar });
                       setShowAvatarPicker(false);
                     }}
-                    className={`text-4xl p-4 rounded-2xl transition-all ${user.avatar === avatar
+                    className={`text-4xl p-4 rounded-2xl transition-all ${user.avatar_url === avatar
                       ? 'bg-linear-to-br from-blue-400 to-purple-500 ring-4 ring-blue-400 shadow-xl'
                       : 'bg-white hover:bg-gray-100 shadow-md hover:shadow-lg'
                       }`}
