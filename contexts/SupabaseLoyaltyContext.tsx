@@ -11,6 +11,7 @@ interface LoyaltyContextType {
   totalExp: number
   badges: any[]
   userBadges: any[]
+  pointsHistory: any[];
   addPoints: (amount: number, reason: string) => Promise<void>
   addExp: (amount: number) => Promise<void>
   earnBadge: (badgeId: string) => Promise<void>
