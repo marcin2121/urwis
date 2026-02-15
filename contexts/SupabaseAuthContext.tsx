@@ -2,9 +2,7 @@
 import { createContext, useContext, useEffect, useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { User, Session } from '@supabase/supabase-js'
-
-// ✅ DODAJ typ UserRole
-export type UserRole = 'user' | 'admin' | 'moderator';
+import type { Profile, UserRole } from '@/types/database';
 
 interface Profile {
   id: string
