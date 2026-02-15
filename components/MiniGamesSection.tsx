@@ -32,7 +32,7 @@ export default function MiniGamesSection() {
       icon: '🧠',
       color: 'from-indigo-500 to-purple-600',
       component: TriviaGeneralGame,
-      difficulty: 'Endless 🌍'
+      difficulty: 'Kategorie 🌍'
     }
     {
       id: 'memory',
