@@ -11,7 +11,7 @@ interface LoyaltyContextType {
   totalExp: number
   badges: any[]
   userBadges: any[]
-  pointsHistory: any[]  // ✅ Jest w interfejsie
+  pointsHistory: any[]
   addPoints: (amount: number, reason: string) => Promise<void>
   addExp: (amount: number) => Promise<void>
   earnBadge: (badgeId: string) => Promise<void>
@@ -31,7 +31,7 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
   const [level, setLevel] = useState(1)
   const [badges, setBadges] = useState<any[]>([])
   const [userBadges, setUserBadges] = useState<any[]>([])
-  const [pointsHistory, setPointsHistory] = useState<any[]>([])  // ← DODAJ STATE
+  const [pointsHistory, setPointsHistory] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -46,7 +46,6 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
       try {
         setLoading(true)
 
-        // Fetch profile
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('*')
@@ -60,7 +59,7 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
         setTotalExp(profileData?.total_exp || 0)
         setLevel(profileData?.level || 1)
 
-        // ← DODAJ: Fetch points history
+        // Fetch points history
         const { data: historyData, error: historyError } = await supabase
           .from('loyalty_points')
           .select('*')
@@ -82,7 +81,7 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
     }
 
     fetchProfile()
-  }, [user?.id])
+  }, [user?.id, supabase])
 
   // Subscribe to real-time profile updates
   useEffect(() => {
@@ -99,9 +98,10 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
           filter: `id=eq.${user.id}`,
         },
         (payload) => {
-          setProfile(payload.new)
-          setLevel(payload.new?.level || 1)
-          setTotalExp(payload.new?.total_exp || 0)
+          const newData = payload.new as any  // ← FIX: Type assertion
+          setProfile(newData)
+          setLevel(newData?.level || 1)
+          setTotalExp(newData?.total_exp || 0)
         }
       )
       .subscribe()
@@ -109,9 +109,9 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [user?.id])
+  }, [user?.id, supabase])
 
-  // ← DODAJ: Subscribe to real-time points history updates
+  // Subscribe to real-time points history updates
   useEffect(() => {
     if (!user?.id) return
 
@@ -126,7 +126,8 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
           filter: `user_id=eq.${user.id}`,
         },
         (payload) => {
-          setPointsHistory(prev => [payload.new, ...prev])
+          const newData = payload.new as any  // ← FIX: Type assertion
+          setPointsHistory(prev => [newData, ...prev])
         }
       )
       .subscribe()
@@ -134,7 +135,7 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [user?.id])
+  }, [user?.id, supabase])
 
   const addPoints = useCallback(
     async (amount: number, reason: string) => {
@@ -154,7 +155,7 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
 
         if (insertError) throw insertError
 
-        // ← DODAJ: Update local history immediately
+        // Update local history immediately
         if (insertData) {
           setPointsHistory(prev => [insertData, ...prev])
         }
@@ -225,7 +226,7 @@ export function SupabaseLoyaltyProvider({ children }: { children: ReactNode }) {
         totalExp,
         badges,
         userBadges,
-        pointsHistory,  // ← DODAJ DO VALUE
+        pointsHistory,
         addPoints,
         addExp,
         earnBadge,
