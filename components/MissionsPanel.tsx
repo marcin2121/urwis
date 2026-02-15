@@ -9,7 +9,7 @@ import { getMissionProgress } from '@/utils/missionProgress';
 
 export default function MissionsPanel() {
   const { user, addExp } = useSupabaseAuth();
-  const { addPoints, addExp } = useSupabaseLoyalty();
+  const { addPoints } = useSupabaseLoyalty();
   const [activeTab, setActiveTab] = useState<'daily' | 'weekly'>('daily');
   const [missions, setMissions] = useState<Mission[]>([]);
   const [completedMissions, setCompletedMissions] = useState<Set<string>>(new Set());
