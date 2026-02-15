@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useSupabaseLoyalty } from '@/contexts/SupabaseLoyaltyContext';
 
 export default function LoyaltyDashboard() {
-  const { points, level, badges, addPoints, redeemPoints, pointsHistory } = useSupabaseLoyalty();
+  const { points, pointsHistory } = useSupabaseLoyalty();
   const [showRewards, setShowRewards] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
 
