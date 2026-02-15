@@ -22,7 +22,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pl" suppressHydrationWarning>
-      <body suppressHydrationWarning>
+      <body suppressHydrationWarning className="relative">
         <AuthProvider>
           <LoyaltyProvider>
             <NotificationProvider>
