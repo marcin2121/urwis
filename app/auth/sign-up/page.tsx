@@ -19,6 +19,7 @@ export default function Page() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [repeatPassword, setRepeatPassword] = useState('')
+  const [username, setUsername] = useState('')  // ← DODANE!
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
@@ -36,15 +37,17 @@ export default function Page() {
     }
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo:
-            process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ||
-            `${window.location.origin}/protected`,
+          data: {
+            username,
+          },
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
-      })
+      });
+
       if (error) throw error
       router.push('/auth/sign-up-success')
     } catch (error: unknown) {
@@ -66,6 +69,21 @@ export default function Page() {
             <CardContent>
               <form onSubmit={handleSignUp}>
                 <div className="flex flex-col gap-6">
+
+                  {/* ← DODANY USERNAME INPUT */}
+                  <div className="grid gap-2">
+                    <Label htmlFor="username">Username</Label>
+                    <Input
+                      id="username"
+                      type="text"
+                      placeholder="your_username"
+                      required
+                      minLength={3}
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                    />
+                  </div>
+
                   <div className="grid gap-2">
                     <Label htmlFor="email">Email</Label>
                     <Input
@@ -77,6 +95,7 @@ export default function Page() {
                       onChange={(e) => setEmail(e.target.value)}
                     />
                   </div>
+
                   <div className="grid gap-2">
                     <div className="flex items-center">
                       <Label htmlFor="password">Password</Label>
@@ -85,10 +104,12 @@ export default function Page() {
                       id="password"
                       type="password"
                       required
+                      minLength={6}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
                   </div>
+
                   <div className="grid gap-2">
                     <div className="flex items-center">
                       <Label htmlFor="repeat-password">Repeat Password</Label>
@@ -101,11 +122,14 @@ export default function Page() {
                       onChange={(e) => setRepeatPassword(e.target.value)}
                     />
                   </div>
+
                   {error && <p className="text-sm text-red-500">{error}</p>}
+
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? 'Creating an account...' : 'Sign up'}
                   </Button>
                 </div>
+
                 <div className="mt-4 text-center text-sm">
                   Already have an account?{' '}
                   <Link
