@@ -19,7 +19,7 @@ export async function getCategories(): Promise<string[]> {
   return [...new Set((data || []).map((q: any) => q.category))]
 }
 
-export async function getRandomQuestions(category?: string, count = 10): Promise<TriviaQuestion[]> {
+export async function getRandomQuestions(category?: string, count = 20): Promise<TriviaQuestion[]> {
   const supabase = await createClient()
   let query = supabase
     .from('trivia_questions')
