@@ -32,7 +32,6 @@ export default function Navbar() {
           <div className="bg-white/95 backdrop-blur-3xl rounded-3xl p-3 shadow-inner">
             <nav className="flex items-center justify-between px-6">
 
-              {/* LOGO */}
               <Link href="/" className="flex items-center gap-3 group p-2 -m-2 rounded-2xl hover:bg-white/50 transition-all">
                 <motion.div
                   whileHover={{ scale: 1.15, rotate: 360 }}
@@ -52,7 +51,6 @@ export default function Navbar() {
                 </div>
               </Link>
 
-              {/* DESKTOP NAV */}
               <div className="hidden lg:flex items-center gap-1">
                 {navItems.map((item, idx) => (
                   <Link
@@ -67,96 +65,93 @@ export default function Navbar() {
                     />
                   </Link>
                 ))}
-              </div>
 
-              {/* USER ACTIONS */}
-              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2">
 
-                {/* Notifications */}
-                <motion.div
-                  className="relative p-3 rounded-2xl bg-gradient-to-br from-[#FFBE0B] to-orange-500 text-white shadow-xl hover:shadow-2xl hover:scale-110 transition-all cursor-pointer"
-                  whileHover={{ rotate: 360 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <span className="text-2xl z-10 relative block">🔔</span>
-                  <motion.span
-                    className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-xs font-black flex items-center justify-center shadow-lg"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
+                  <motion.div
+                    className="relative p-3 rounded-2xl bg-gradient-to-br from-[#FFBE0B] to-orange-500 text-white shadow-xl hover:shadow-2xl hover:scale-110 transition-all cursor-pointer"
+                    whileHover={{ rotate: 360 }}
+                    whileTap={{ scale: 0.95 }}
                   >
-                    3
-                  </motion.span>
-                </motion.div>
+                    <span className="text-2xl z-10 relative block">🔔</span>
+                    <motion.span
+                      className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-xs font-black flex items-center justify-center shadow-lg"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                    >
+                      3
+                    </motion.span>
+                  </motion.div>
 
 
-                {isAuthenticated && profile ? (
-                  <>
-                    {/* Profil */}
-                    <Link href="/profil">
-                      <motion.div
+                  {isAuthenticated && profile ? (
+                    <>
+
+                      <Link href="/profil">
+                        <motion.div
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#E94444] to-[#1473E6] text-white font-black shadow-xl hover:shadow-2xl transition-all flex items-center gap-2.5"
+                        >
+                          <span className="text-xl">👤</span>
+                          <div className="hidden sm:block">
+                            <div className="text-sm font-bold leading-tight">{profile.username}</div>
+                            <div className="text-xs opacity-90">Lv.{profile.level}</div>
+                          </div>
+                        </motion.div>
+                      </Link>
+
+
+                      <motion.button
+                        onClick={signOut}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#E94444] to-[#1473E6] text-white font-black shadow-xl hover:shadow-2xl transition-all flex items-center gap-2.5"
+                        className="px-6 py-3 rounded-2xl bg-gradient-to-r from-red-500 to-red-600 text-white font-black shadow-xl hover:shadow-2xl hover:from-red-600 hover:to-red-700 transition-all"
                       >
-                        <span className="text-xl">👤</span>
-                        <div className="hidden sm:block">
-                          <div className="text-sm font-bold leading-tight">{profile.username}</div>
-                          <div className="text-xs opacity-90">Lv.{profile.level}</div>
-                        </div>
-                      </motion.div>
-                    </Link>
-
+                        🚪
+                      </motion.button>
+                    </>
+                  ) : (
 
                     <motion.button
-                      onClick={signOut}
+                      onClick={() => setShowAuthModal(true)}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className="px-6 py-3 rounded-2xl bg-gradient-to-r from-red-500 to-red-600 text-white font-black shadow-xl hover:shadow-2xl hover:from-red-600 hover:to-red-700 transition-all"
+                      className="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-black shadow-xl hover:shadow-2xl hover:from-emerald-600 hover:to-emerald-700 transition-all"
                     >
-                      🚪
+                      👤 Załóż konto
                     </motion.button>
-                  </>
-                ) : (
-
-                  <motion.button
-                    onClick={() => setShowAuthModal(true)}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-black shadow-xl hover:shadow-2xl hover:from-emerald-600 hover:to-emerald-700 transition-all"
-                  >
-                    👤 Załóż konto
-                  </motion.button>
-                )}
-              </div>
+                  )}
+                </div>
 
 
-              <motion.button
-                onClick={() => setIsOpen(!isOpen)}
-                className="lg:hidden p-3 rounded-2xl bg-white/80 backdrop-blur shadow-lg hover:shadow-xl hover:bg-white/100"
-                whileTap={{ scale: 0.95 }}
-                whileHover={{ scale: 1.1 }}
-              >
-                <motion.div
-                  animate={{ rotate: isOpen ? 90 : 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="w-7 h-7 flex flex-col justify-center items-center gap-0.5"
+                <motion.button
+                  onClick={() => setIsOpen(!isOpen)}
+                  className="lg:hidden p-3 rounded-2xl bg-white/80 backdrop-blur shadow-lg hover:shadow-xl hover:bg-white/100"
+                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ scale: 1.1 }}
                 >
-                  <motion.span
-                    className="w-6 h-0.5 bg-gray-800 rounded-full origin-center"
-                    animate={{ rotate: isOpen ? 45 : 0, y: isOpen ? 1.5 : 0 }}
-                    transition={{ duration: 0.2 }}
-                  />
-                  <motion.span
-                    className="w-6 h-0.5 bg-gray-800 rounded-full origin-center"
-                    animate={{ opacity: isOpen ? 0 : 1 }}
-                  />
-                  <motion.span
-                    className="w-6 h-0.5 bg-gray-800 rounded-full origin-center"
-                    animate={{ rotate: isOpen ? -45 : 0, y: isOpen ? -1.5 : 0 }}
-                    transition={{ duration: 0.2 }}
-                  />
-                </motion.div>
-              </motion.button>
+                  <motion.div
+                    animate={{ rotate: isOpen ? 90 : 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="w-7 h-7 flex flex-col justify-center items-center gap-0.5"
+                  >
+                    <motion.span
+                      className="w-6 h-0.5 bg-gray-800 rounded-full origin-center"
+                      animate={{ rotate: isOpen ? 45 : 0, y: isOpen ? 1.5 : 0 }}
+                      transition={{ duration: 0.2 }}
+                    />
+                    <motion.span
+                      className="w-6 h-0.5 bg-gray-800 rounded-full origin-center"
+                      animate={{ opacity: isOpen ? 0 : 1 }}
+                    />
+                    <motion.span
+                      className="w-6 h-0.5 bg-gray-800 rounded-full origin-center"
+                      animate={{ rotate: isOpen ? -45 : 0, y: isOpen ? -1.5 : 0 }}
+                      transition={{ duration: 0.2 }}
+                    />
+                  </motion.div>
+                </motion.button>
             </nav>
           </div>
         </div>
