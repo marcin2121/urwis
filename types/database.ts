@@ -7,7 +7,7 @@ export interface Profile {
   level: number;
   total_exp: number;
   avatar_url: string | null;
-  role: UserRole;
+  role: 'user' | 'moderator' | 'admin'
   created_at?: string;
   updated_at?: string;
 }
