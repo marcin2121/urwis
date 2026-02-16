@@ -3,8 +3,8 @@ import { useState, useEffect, useCallback } from 'react'  // ✅ useEffect!
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { createClient } from '@supabase/supabase-js'  // ✅ Poprawny import!
-import { getRandomQuestions } from '@/lib/quiz'
-import type { TriviaQuestion } from '@/lib/quiz'
+import { getRandomQuestions } from '@/lib/quiz-server'
+import type { TriviaQuestion } from '@/lib/quiz-server'
 
 export default function SinglePlayerQuiz() {
   const supabase = createClient(  // ✅ Global client (anon key)
