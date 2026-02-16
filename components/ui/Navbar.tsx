@@ -21,12 +21,12 @@ type Session = {
 };
 
 const navItems: NavItem[] = [
-  { name: "🏠 Home", href: "/", icon: "🏠" },
-  { name: "📞 Kontakt", href: "/kontakt", icon: "📞" },
-  { name: "🎯 Misje", href: "/misje", icon: "🎯" },
-  { name: "🏆 Nagrody", href: "/nagrody", icon: "🏆" },
-  { name: "🎮 Gry", href: "/gry", icon: "🎮" },
-  { name: "🧠 Quiz", href: "/quiz", icon: "🧠" },
+  { name: "Home", href: "/", icon: "🏠" },
+  { name: "Kontakt", href: "/kontakt", icon: "📞" },
+  { name: "Misje", href: "/misje", icon: "🎯" },
+  { name: "Nagrody", href: "/nagrody", icon: "🏆" },
+  { name: "Gry", href: "/gry", icon: "🎮" },
+  { name: "Quiz", href: "/quiz", icon: "🧠" },
 ];
 
 const Navbar = memo(() => {
