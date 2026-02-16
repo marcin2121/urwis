@@ -1,11 +1,16 @@
 'use client';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createBrowserClient } from '@supabase/ssr';  // ✅ MAMASZ TO!
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 let client: SupabaseClient | undefined;
 
 export function createClient() {
   if (client) return client;
-  client = createClientComponentClient();
+
+  client = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
   return client;
 }
