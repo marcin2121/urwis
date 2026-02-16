@@ -171,7 +171,7 @@ export default function AboutSection() {
                 <div className="space-y-4 text-lg text-gray-600 font-body">
                   <p>
                     <span className="font-bold text-gray-900">Sklep Urwis</span> to nie algorytm. 
-                    To ludzie, którzy znają się na klockach lepiej niż na Excelu. 
+                    To ludzie, którzy znają się na zabawkach lepiej niż na Excelu. 
                   </p>
                   <p>
                     Wierzymy, że najlepsze zakupy to te, których można dotknąć. 
