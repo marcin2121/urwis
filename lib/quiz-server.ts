@@ -1,3 +1,4 @@
+// lib/quiz-server.ts – RSC ONLY (app/quiz/page.tsx)
 import { createClient } from '@/lib/supabase/server'
 
 export type TriviaQuestion = {
@@ -9,7 +10,7 @@ export type TriviaQuestion = {
   category: string
 }
 
-export async function getCategories() {
+export async function getCategories(): Promise<string[]> {
   const supabase = await createClient()
   const { data } = await supabase
     .from('trivia_questions')
@@ -19,12 +20,12 @@ export async function getCategories() {
   return [...new Set((data || []).map((q: any) => q.category))]
 }
 
-export async function getLeaderboard(limit = 10) {
+export async function getLeaderboard(limit = 20): Promise<{ user_id: string; total_exp: number }[]> {
   const supabase = await createClient()
   const { data } = await supabase
     .from('quiz_leaderboard')
     .select('user_id, total_exp')
     .order('total_exp', { ascending: false })
     .limit(limit)
-  return data as any || []
+  return data as { user_id: string; total_exp: number }[] || []
 }
