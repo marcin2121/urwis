@@ -13,303 +13,267 @@ export default function Navbar() {
   const isAuthenticated = !!session;
 
   const navItems = [
-    { name: "Strona główna", icon: "🏠", href: "/" },
-    { name: "Kontakt", icon: "📞", href: "/kontakt" },
-    { name: "Misje", icon: "🎯", href: "/misje" },
-    { name: "Nagrody", icon: "🏆", href: "/nagrody" },
-    { name: "Gry", icon: "🎮", href: "/gry" },
+    { name: "🏠 Strona główna", href: "/" },
+    { name: "📞 Kontakt", href: "/kontakt" },
+    { name: "🎯 Misje", href: "/misje" },
+    { name: "🏆 Nagrody", href: "/nagrody" },
+    { name: "🎮 Gry", href: "/gry" },
+    { name: "🧠 Quiz", href: "/quiz" },
   ];
 
   return (
     <>
-      {/* Ultra Frosted Glass Navbar */}
+      {/* FIXED TOP Navbar */}
       <motion.div
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="fixed top-8 left-1/2 -translate-x-1/2 w-[96%] max-w-6xl z-50"
+        transition={{ duration: 0.6, type: "spring" }}
+        className="fixed top-0 left-0 w-full z-50 shadow-2xl"
       >
-        <div
-          className="relative rounded-full border border-gray-200 shadow-[0_8px_40px_rgba(0,0,0,0.12)] px-8 py-5 overflow-hidden"
-          style={{
-            backdropFilter: 'blur(40px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-            backgroundColor: 'rgba(255, 255, 255, 0.85)',
-          }}
-        >
-          <nav className="relative flex justify-between items-center">
+        <div className="relative bg-gradient-to-r from-[#E94444] via-[#1473E6] to-[#FFBE0B] p-2 rounded-b-3xl mx-4 mt-2 shadow-[0_20px_40px_rgba(233,68,68,0.3)] backdrop-blur-xl">
+          <div className="bg-white/95 backdrop-blur-3xl rounded-3xl p-3 shadow-inner">
+            <nav className="flex items-center justify-between px-6">
 
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-3 group z-10">
-              <motion.div
-                whileHover={{ rotate: 360, scale: 1.1 }}
-                transition={{ duration: 0.6, type: "spring" }}
-                className="relative w-10 h-10"
-              >
-                <Image
-                  src="/logo.png"
-                  alt="Sklep Urwis"
-                  width={50}
-                  height={50}
-                  loading="eager"
-                  priority
-                  className="object-contain drop-shadow-lg"
-                />
-              </motion.div>
-            </Link>
-
-            {/* Desktop Menu */}
-            <div className="hidden md:flex items-center gap-8 z-10">
-              {navItems.map((item, idx) => (
-                <Link
-                  key={idx}
-                  href={item.href}
-                  className="relative text-base font-bold text-gray-900 hover:text-[#BF2024] transition-colors group"
+              {/* LOGO */}
+              <Link href="/" className="flex items-center gap-3 group p-2 -m-2 rounded-2xl hover:bg-white/50 transition-all">
+                <motion.div
+                  whileHover={{ scale: 1.15, rotate: 360 }}
+                  transition={{ duration: 0.6, type: "spring" }}
+                  className="relative"
                 >
-                  {item.name}
-                  <span
-                    className="absolute -bottom-1 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 rounded-full"
-                    style={{
-                      background: 'linear-gradient(90deg, #BF2024 0%, #0055ff 100%)',
-                    }}
-                  />
-                </Link>
-              ))}
-            </div>
+                  <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-orange-500 rounded-3xl shadow-2xl flex items-center justify-center border-4 border-white drop-shadow-xl">
+                    <span className="text-3xl">🦸‍♂️</span>
+                  </div>
+                  <span className="absolute -top-2 -right-2 w-6 h-6 bg-[#FFBE0B] rounded-full border-3 border-white shadow-lg flex items-center justify-center text-xs font-black">
+                    U
+                  </span>
+                </motion.div>
+                <div className="hidden sm:block">
+                  <div className="text-xl font-black text-gray-900 drop-shadow-sm">URWIS</div>
+                  <div className="text-xs font-bold text-gray-700 uppercase tracking-wider">Białobrzegi</div>
+                </div>
+              </Link>
 
-            {/* Right Side - User Profile or Login */}
-            <div className="hidden md:flex items-center gap-4 z-10">
-              {isAuthenticated && profile ? (
-                <>
-                  {/* User Profile Button */}
-                  <Link href="/profil">
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      className="flex items-center gap-3 px-4 py-2 rounded-full border-2 border-gray-200 hover:border-blue-300 transition-all cursor-pointer"
-                      style={{
-                        background: 'linear-gradient(135deg, rgba(191, 32, 36, 0.05), rgba(0, 85, 255, 0.05))',
-                      }}
-                    >
-                      <span className="text-2xl">{profile.avatar_url || '🦸‍♂️'}</span>
-                      <div className="text-left">
-                        <div className="text-sm font-bold text-gray-900">{profile.username}</div>
-                        <div className="text-xs text-gray-600">Poziom {profile.level}</div>
-                      </div>
-                    </motion.div>
+              {/* DESKTOP NAV */}
+              <div className="hidden lg:flex items-center gap-1">
+                {navItems.map((item, idx) => (
+                  <Link
+                    key={idx}
+                    href={item.href}
+                    className="relative px-4 py-3 text-sm font-black text-gray-800 hover:text-[#E94444] transition-all group rounded-2xl hover:bg-gradient-to-r hover:from-[#E94444]/10 hover:to-[#1473E6]/10"
+                  >
+                    <span className="flex items-center gap-2">
+                      <span>{item.icon}</span>
+                      <span className="hidden sm:inline">{item.name.split(' ')[1]}</span>
+                    </span>
                   </Link>
+                ))}
+              </div>
 
-                  {/* Logout Button */}
+              {/* 🔥 USER SECTION – JEDNOLITY STYL! */}
+              <div className="flex items-center gap-2">
+
+                {/* Notifications */}
+                <motion.div
+                  className="p-3 rounded-2xl bg-gradient-to-br from-[#FFBE0B] to-orange-500 shadow-xl cursor-pointer hover:shadow-2xl hover:scale-110 transition-all relative"
+                  whileHover={{ rotate: 360 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <span className="text-2xl z-10 relative">🔔</span>
+                  <motion.div
+                    className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 rounded-full text-xs text-white font-black flex items-center justify-center shadow-lg"
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ repeat: Infinity, duration: 1.5 }}
+                  >
+                    3
+                  </motion.div>
+                </motion.div>
+
+                {/* 🔥 LOGGED IN – JEDEN STYL! */}
+                {isAuthenticated && profile ? (
+                  <>
+                    {/* Profil Button */}
+                    <Link href="/profil">
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#E94444] to-[#1473E6] text-white font-black shadow-xl hover:shadow-2xl transition-all flex items-center gap-3"
+                      >
+                        <span className="text-2xl">{profile.avatar_url ? '👤' : '🦸‍♂️'}</span>
+                        <div className="hidden sm:block text-right">
+                          <div className="text-sm font-bold">{profile.username}</div>
+                          <div className="text-xs">Lv.{profile.level}</div>
+                        </div>
+                        <span className="sm:hidden text-lg">👤</span>
+                      </motion.div>
+                    </Link>
+
+                    {/* Wyloguj – TEN SAM STYL! */}
+                    <motion.button
+                      onClick={signOut}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="px-6 py-3 rounded-2xl bg-gradient-to-r from-red-500 to-red-600 text-white font-black shadow-xl hover:shadow-2xl hover:from-red-600 hover:to-red-700 transition-all"
+                    >
+                      🚪
+                    </motion.button>
+                  </>
+                ) : (
+                  /* 🔥 NIEZALOGOWANY – Załóż konto! */
                   <motion.button
+                    onClick={() => setShowAuthModal(true)}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={signOut}
-                    className="px-4 py-2 rounded-full bg-red-100 text-red-600 font-bold hover:bg-red-200 transition-colors"
+                    className="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-black shadow-xl hover:shadow-2xl hover:from-emerald-600 hover:to-emerald-700 transition-all"
                   >
-                    Wyloguj
+                    <span className="hidden sm:inline">Załóż konto</span>
+                    <span className="sm:hidden">👤</span>
                   </motion.button>
-                </>
-              ) : (
-                <motion.button
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setShowAuthModal(true)}
-                  className="px-6 py-3 rounded-full text-white text-base font-bold shadow-xl transition-all overflow-hidden"
-                  style={{
-                    background: 'linear-gradient(135deg, #BF2024 0%, #0055ff 100%)',
-                  }}
-                >
-                  <span className="flex items-center gap-2">
-                    <span>👤</span>
-                    <span>Zaloguj się</span>
-                  </span>
-                </motion.button>
-              )}
+                )}
+              </div>
 
-              {/* Call Button */}
-              <motion.a
-                href="tel:+48123456789"
-                className="flex items-center gap-2 px-6 py-3 rounded-full border-2 border-gray-200 text-gray-900 text-base font-bold hover:border-[#BF2024] hover:text-[#BF2024] transition-all"
-                whileHover={{ scale: 1.05, y: -2 }}
+              {/* MOBILE HAMBURGER */}
+              <motion.button
+                onClick={() => setIsOpen(!isOpen)}
+                className="lg:hidden p-2 rounded-2xl bg-white/80 backdrop-blur shadow-lg hover:shadow-xl"
                 whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.1 }}
               >
-                <span>📞</span>
-                <span>Zadzwoń</span>
-              </motion.a>
-            </div>
-
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="md:hidden relative w-12 h-12 flex flex-col justify-center items-center z-10"
-              aria-label="Toggle menu"
-            >
-              <motion.span
-                animate={isOpen ? { rotate: 45, y: 7 } : { rotate: 0, y: 0 }}
-                className="w-6 h-0.5 bg-gray-900 rounded-full"
-              />
-              <motion.span
-                animate={isOpen ? { opacity: 0 } : { opacity: 1 }}
-                className="w-6 h-0.5 bg-gray-900 rounded-full mt-2"
-              />
-              <motion.span
-                animate={isOpen ? { rotate: -45, y: -7 } : { rotate: 0, y: 0 }}
-                className="w-6 h-0.5 bg-gray-900 rounded-full mt-2"
-              />
-            </button>
-
-          </nav>
+                <motion.div
+                  animate={{ rotate: isOpen ? 90 : 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="w-8 h-8 flex flex-col justify-center items-center gap-1"
+                >
+                  <motion.span
+                    className="w-6 h-0.5 bg-gray-800 rounded-full origin-center"
+                    animate={{ rotate: isOpen ? 45 : 0, y: isOpen ? 2 : 0 }}
+                  />
+                  <motion.span
+                    className="w-6 h-0.5 bg-gray-800 rounded-full origin-center"
+                    animate={{ opacity: isOpen ? 0 : 1 }}
+                  />
+                  <motion.span
+                    className="w-6 h-0.5 bg-gray-800 rounded-full origin-center"
+                    animate={{ rotate: isOpen ? -45 : 0, y: isOpen ? -2 : 0 }}
+                  />
+                </motion.div>
+              </motion.button>
+            </nav>
+          </div>
         </div>
       </motion.div>
 
-      {/* Mobile Menu */}
+      {/* MOBILE MENU */}
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-30 md:hidden"
+              className="fixed inset-0 z-40 lg:hidden"
               style={{
-                backdropFilter: 'blur(20px) saturate(180%)',
-                WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-                backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                backdropFilter: 'blur(20px)',
+                backgroundColor: 'rgba(255,255,255,0.95)',
               }}
               onClick={() => setIsOpen(false)}
             />
-
-            {/* Menu Panel */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: -20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: -20 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="fixed top-28 left-1/2 -translate-x-1/2 w-[92%] max-w-lg z-40 md:hidden"
+              initial={{ scale: 0.9, opacity: 0, y: 50 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 50 }}
+              transition={{ type: "spring", damping: 20 }}
+              className="fixed bottom-6 left-1/2 -translate-x-1/2 w-11/12 max-w-md z-50 lg:hidden"
             >
-              <div
-                className="rounded-3xl border border-gray-200 shadow-2xl p-6 overflow-hidden"
-                style={{
-                  backdropFilter: 'blur(40px) saturate(180%)',
-                  WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-                  backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                }}
-              >
-                <div className="flex flex-col space-y-4">
-                  {/* User Profile (Mobile) */}
+              <div className="bg-white/95 backdrop-blur-xl rounded-3xl p-6 shadow-2xl border border-white/50 max-h-[70vh] overflow-y-auto">
+                <div className="space-y-4">
+
+                  {/* Profile Card */}
                   {isAuthenticated && profile && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="flex items-center gap-3 p-4 rounded-2xl mb-2"
-                      style={{
-                        background: 'linear-gradient(135deg, rgba(191, 32, 36, 0.1), rgba(0, 85, 255, 0.1))',
-                      }}
-                    >
-                      <span className="text-3xl">{profile.avatar_url || '🦸‍♂️'}</span>
-                      <div>
-                        <div className="font-bold text-gray-900">{profile.username}</div>
-                        <div className="text-sm text-gray-600">
-                          Poziom {profile.level} • {profile.total_exp ?? 0} EXP
+                    <Link href="/profil" onClick={() => setIsOpen(false)}>
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="p-6 bg-gradient-to-r from-[#E94444] to-[#1473E6] text-white rounded-3xl shadow-2xl cursor-pointer hover:shadow-3xl hover:scale-[1.02] transition-all flex items-center gap-4"
+                        whileHover={{ scale: 1.02 }}
+                      >
+                        <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center">
+                          <span className="text-3xl">🦸‍♂️</span>
                         </div>
-                      </div>
-                    </motion.div>
+                        <div>
+                          <div className="text-xl font-black">{profile.username}</div>
+                          <div className="text-lg font-bold">Lv. {profile.level}</div>
+                          <div className="text-sm opacity-90">{profile.total_exp ?? 0} EXP</div>
+                        </div>
+                      </motion.div>
+                    </Link>
                   )}
 
+                  {/* Nav */}
                   {navItems.map((item, idx) => (
-                    <Link
+                    <motion.div
                       key={idx}
-                      href={item.href}
-                      onClick={() => setIsOpen(false)}
-                      className="relative px-3 py-2 text-sm font-bold text-gray-900 hover:text-[#BF2024] transition-colors group whitespace-nowrap flex items-center gap-1"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.1 * idx }}
                     >
-                      <span>{item.icon}</span>
-                      <span>{item.name}</span>
-                      <span
-                        className="absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 rounded-full"
-                        style={{
-                          background: 'linear-gradient(90deg, #BF2024 0%, #0055ff 100%)',
-                        }}
-                      />
-                    </Link>
+                      <Link
+                        href={item.href}
+                        onClick={() => setIsOpen(false)}
+                        className="flex items-center gap-4 p-4 rounded-2xl text-xl font-black text-gray-800 hover:text-[#E94444] hover:bg-gradient-to-r hover:from-[#E94444]/10 hover:shadow-lg transition-all group"
+                      >
+                        <span className="text-2xl">{item.icon}</span>
+                        <span>{item.name}</span>
+                      </Link>
+                    </motion.div>
                   ))}
 
-                  {/* Mobile Login/Logout */}
-                  {isAuthenticated ? (
-                    <motion.button
-                      onClick={() => {
-                        signOut();
-                        setIsOpen(false);
-                      }}
-                      className="w-full px-7 py-5 rounded-2xl text-white text-base font-bold shadow-xl transition-all bg-red-500 hover:bg-red-600"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.4 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      Wyloguj się
-                    </motion.button>
-                  ) : (
-                    <motion.button
-                      onClick={() => {
-                        setShowAuthModal(true);
-                        setIsOpen(false);
-                      }}
-                      className="flex items-center justify-center gap-3 px-7 py-5 rounded-2xl text-white text-base font-bold shadow-xl transition-all overflow-hidden"
-                      style={{
-                        background: 'linear-gradient(135deg, #BF2024 0%, #0055ff 100%)',
-                      }}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.4 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <span className="text-2xl">👤</span>
-                      <span>Zaloguj się</span>
-                    </motion.button>
-                  )}
-
-                  {/* Mobile CTA */}
-                  <motion.a
-                    href="tel:+48123456789"
-                    onClick={() => setIsOpen(false)}
-                    className="flex items-center justify-center gap-3 px-7 py-5 rounded-2xl border-2 border-gray-200 text-gray-900 text-base font-bold hover:border-[#BF2024] transition-all"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <span className="text-2xl">📞</span>
-                    <span>Zadzwoń do nas</span>
-                  </motion.a>
-
-                  {/* Quick Info */}
-                  <div className="grid grid-cols-2 gap-3 pt-4 border-t border-gray-200">
-                    <div className="text-center p-4 rounded-xl border border-gray-200 bg-gray-50">
-                      <div className="text-3xl mb-2">📍</div>
-                      <div className="text-xs font-bold text-gray-900">
-                        ul. Reymonta 38A
-                      </div>
-                    </div>
-                    <div className="text-center p-4 rounded-xl border border-gray-200 bg-gray-50">
-                      <div className="text-3xl mb-2">🕐</div>
-                      <div className="text-xs font-bold text-gray-900">
-                        Pn-Pt 8:00-18:00
-                      </div>
-                    </div>
+                  {/* Buttons – JEDEN STYL! */}
+                  <div className="pt-6 space-y-3 border-t-4 border-[#FFBE0B]/50">
+                    {isAuthenticated ? (
+                      <>
+                        <Link href="/profil" onClick={() => setIsOpen(false)}>
+                          <motion.button
+                            className="w-full p-5 rounded-2xl bg-gradient-to-r from-[#E94444] to-[#1473E6] text-white font-black text-lg shadow-2xl hover:shadow-3xl hover:scale-[1.02] transition-all"
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                          >
+                            👤 Profil
+                          </motion.button>
+                        </Link>
+                        <motion.button
+                          onClick={() => {
+                            signOut()
+                            setIsOpen(false)
+                          }}
+                          className="w-full p-5 rounded-2xl bg-gradient-to-r from-red-500 to-red-600 text-white font-black text-lg shadow-2xl hover:shadow-3xl hover:scale-[1.02] hover:from-red-600 hover:to-red-700 transition-all"
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          🚪 Wyloguj
+                        </motion.button>
+                      </>
+                    ) : (
+                      <motion.button
+                        onClick={() => {
+                          setShowAuthModal(true)
+                          setIsOpen(false)
+                        }}
+                        className="w-full p-5 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-black text-lg shadow-2xl hover:shadow-3xl hover:scale-[1.02] transition-all"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        👤 Załóż konto
+                      </motion.button>
+                    )}
                   </div>
                 </div>
               </div>
             </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+          )}
+          </AnimatePresence>
 
-      {/* Auth Modal */}
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-      />
-    </>
-  );
+        <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
+      </>
+      );
 }
