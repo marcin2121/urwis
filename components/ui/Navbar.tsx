@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import AuthModal from '@/components/AuthModal';
-import { Database } from '@/types/supabase'; // Dostosuj ścieżkę do twoich typów
 
 type NavItem = {
   name: string;
@@ -12,344 +11,259 @@ type NavItem = {
   icon: string;
 };
 
-// Type-safe profile z Supabase
-type Profile = Database['public']['Tables']['profiles']['Row'] | null;
-
 const navItems: NavItem[] = [
-  { name: "🏠 Strona główna", href: "/", icon: "🏠" },
-  { name: "📞 Kontakt", href: "/kontakt", icon: "📞" },
-  { name: "🎯 Misje", href: "/misje", icon: "🎯" },
-  { name: "🏆 Nagrody", href: "/nagrody", icon: "🏆" },
-  { name: "🎮 Gry", href: "/gry", icon: "🎮" },
-  { name: "🧠 Quiz", href: "/quiz", icon: "🧠" },
+  { name: "Strona główna", href: "/", icon: "🏠" },
+  { name: "Kontakt", href: "/kontakt", icon: "📞" },
+  { name: "Misje", href: "/misje", icon: "🎯" },
+  { name: "Nagrody", href: "/nagrody", icon: "🏆" },
+  { name: "Gry", href: "/gry", icon: "🎮" },
+  { name: "Quiz", href: "/quiz", icon: "🧠" },
 ];
 
-interface ProfileButtonProps {
-  profile: Profile;
-  session: any;
-  onAuthClick: () => void;
-  onSignOut: () => Promise<void>;
-  className?: string;
-  isMobile?: boolean;
-}
-
-const ProfileButton = memo(({
-  profile,
-  session,
-  onAuthClick,
-  onSignOut,
-  className = "",
-  isMobile = false
-}: ProfileButtonProps) => {
-  const isLoading = session === undefined;
-  const baseClass = "flex items-center gap-2";
-  const mobileClass = isMobile
-    ? "flex-col gap-4 w-full [&>a]:w-full [&>button]:w-full text-lg"
-    : "";
-  const containerClass = `${baseClass} ${mobileClass} ${className}`;
-
-  if (isLoading) {
-    return (
-      <div className={containerClass}>
-        <div className="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 animate-pulse w-full h-12" />
-      </div>
-    );
-  }
-
-  if (session && profile) {
-    return (
-      <div className={containerClass}>
-        <Link
-          href="/profil"
-          className="flex items-center gap-2.5 px-6 py-3 rounded-2xl bg-gradient-to-r from-[#E94444] to-[#1473E6] text-white font-black shadow-xl hover:shadow-2xl transition-all flex-1 max-w-xs"
-        >
-          <span className="text-xl sm:hidden">👤</span>
-          <div className="hidden sm:block min-w-0">
-            <div className="text-sm font-bold leading-tight truncate" title={profile.username}>
-              {profile.username}
-            </div>
-            <div className="text-xs">Lv.{profile.level ?? 1}</div>
-          </div>
-        </Link>
-        <motion.button
-          onClick={onSignOut}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="px-3 py-3 rounded-2xl bg-gradient-to-r from-red-500 to-red-600 text-white font-black shadow-xl hover:shadow-2xl hover:from-red-600 hover:to-red-700 transition-all whitespace-nowrap"
-          aria-label="Wyloguj się"
-        >
-          🚪
-        </motion.button>
-      </div>
-    );
-  }
-
-  return (
-    <div className={containerClass}>
-      <motion.button
-        onClick={onAuthClick}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        className="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-black shadow-xl hover:shadow-2xl hover:from-emerald-600 hover:to-emerald-700 transition-all w-full sm:w-auto"
-        aria-label="Załóż konto lub zaloguj się"
-      >
-        👤 Konto
-      </motion.button>
-    </div>
-  );
-});
-
-ProfileButton.displayName = 'ProfileButton';
-
-interface NavbarProps { }
-
-const Navbar = memo(({ }: NavbarProps) => {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
-  const { profile, session, signOut } = useSupabaseAuth();
+const Navbar = memo(() => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const { profile, session } = useSupabaseAuth();
 
   const handleAuthClick = useCallback(() => {
     setShowAuthModal(true);
     setIsOpen(false);
   }, []);
 
-  const handleSignOut = useCallback(async (): Promise<void> => {
-    try {
-      if (signOut) {
-        await signOut();
-      }
-    } catch (error) {
-      console.error('Błąd wylogowania:', error);
-    }
-    setIsOpen(false);
-  }, [signOut]);
+  const closeMenu = useCallback(() => setIsOpen(false), []);
 
-  const closeMenu = useCallback(() => {
-    setIsOpen(false);
-  }, []);
-
-  const safeProfile = profile as Profile;
+  const toggleNotifications = useCallback(() => setNotificationsOpen(prev => !prev), []);
 
   return (
     <>
-      {/* DESKTOP NAVBAR */}
       <motion.div
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, type: "spring" }}
-        className="fixed top-0 left-0 w-full z-50 shadow-2xl"
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        className="fixed top-4 left-4 right-4 z-50"
       >
-        <div className="relative bg-gradient-to-r from-[#E94444] via-[#1473E6] to-[#FFBE0B] p-2 rounded-b-3xl mx-4 mt-2 shadow-[0_20px_40px_rgba(233,68,68,0.3)] backdrop-blur-xl">
-          <div className="bg-white/95 backdrop-blur-3xl rounded-3xl p-3 shadow-inner">
-            <nav className="flex items-center justify-between px-6" role="navigation">
+        <div className="bg-gradient-to-r from-[#E94444] via-[#1473E6] to-[#FFBE0B] rounded-3xl p-4 shadow-2xl backdrop-blur-xl border border-white/20">
+          <div className="bg-white/90 backdrop-blur-xl rounded-2xl p-4 shadow-inner">
+            <div className="flex items-center justify-between gap-4">
 
-              {/* LOGO */}
-              <Link
-                href="/"
-                className="flex items-center gap-3 group p-2 -m-2 rounded-2xl hover:bg-white/50 transition-all hover:scale-[1.02]"
-                aria-label="Urwis Białobrzegi - Strona główna"
-              >
+              <Link href="/" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/50 transition-all group flex-shrink-0">
                 <motion.div
-                  whileHover={{ scale: 1.15, rotate: 360 }}
-                  transition={{ duration: 0.6, type: "spring" }}
-                  className="relative w-14 h-14 flex-shrink-0"
-                  aria-hidden
+                  className="w-12 h-12 relative"
+                  whileHover={{ scale: 1.1, rotate: 10 }}
                 >
-                  <div className="w-full h-full bg-gradient-to-br from-red-500 to-orange-500 rounded-2xl shadow-2xl flex items-center justify-center border-4 border-white drop-shadow-2xl">
-                    <span className="text-3xl font-black">🦸</span>
+                  <div className="w-full h-full bg-gradient-to-br from-red-500 to-orange-500 rounded-xl shadow-2xl border-4 border-white flex items-center justify-center">
+                    <span className="text-2xl font-black">🦸</span>
                   </div>
-                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-[#FFBE0B] rounded-full border-3 border-white shadow-lg flex items-center justify-center text-xs font-black text-gray-900">
+                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-[#FFBE0B] rounded-full border-3 border-white shadow-lg text-xs font-black text-gray-900 flex items-center justify-center">
                     U
                   </div>
                 </motion.div>
-                <div className="hidden sm:block">
-                  <div className="text-xl font-black bg-gradient-to-r from-gray-900 to-gray-800 bg-clip-text leading-tight">URWIS</div>
-                  <div className="text-xs font-bold uppercase tracking-widest text-[#E94444]">Białobrzegi</div>
+                <div className="hidden md:block">
+                  <div className="text-xl font-black text-gray-900 tracking-tight">URWIS</div>
+                  <div className="text-xs font-bold text-[#E94444] uppercase tracking-wider">Białobrzegi</div>
                 </div>
               </Link>
 
-              {/* DESKTOP NAV + NOTIFICATIONS + PROFILE */}
-              <div className="hidden lg:flex items-center gap-4">
-                {/* Nav Links */}
-                <div className="flex items-center gap-1 flex-1 min-w-[450px]">
-                  {navItems.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className="group relative px-4 py-3 text-sm font-black text-gray-800 hover:text-[#E94444] transition-all rounded-xl hover:bg-gradient-to-r hover:from-[#E94444]/10 hover:to-[#1473E6]/10 hover:shadow-lg flex-1 text-center"
-                      aria-label={item.name}
-                    >
-                      <span className="flex items-center justify-center gap-1.5 min-w-0">
-                        <span className="text-lg">{item.icon}</span>
-                        <span className="truncate">{item.name}</span>
-                      </span>
-                      <motion.div
-                        className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#E94444] to-[#1473E6] opacity-0 group-hover:opacity-[0.15]"
-                        layoutId="nav-hover"
-                        aria-hidden
-                      />
-                    </Link>
-                  ))}
-                </div>
+              <div className="hidden xl:flex items-center gap-2 flex-1 justify-center max-w-2xl">
+                {navItems.map((item, index) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="group relative px-4 py-3 text-sm font-bold text-gray-800 rounded-xl hover:bg-gradient-to-r hover:from-red-100 hover:to-blue-100 hover:shadow-lg transition-all flex items-center gap-2 whitespace-nowrap"
+                  >
+                    <span aria-hidden>{item.icon}</span>
+                    <span>{item.name}</span>
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-[#E94444] to-[#1473E6] rounded-xl opacity-0 group-hover:opacity-10"
+                      layoutId={`nav-item-${index}`}
+                      aria-hidden
+                    />
+                  </Link>
+                ))}
+              </div>
 
-                {/* 🔔 Notifications */}
+              <div className="flex items-center gap-3 flex-shrink-0">
+
                 <motion.div
-                  className="relative p-3 rounded-2xl bg-gradient-to-br from-[#FFBE0B] to-orange-500 text-white shadow-xl hover:shadow-2xl hover:scale-110 transition-all cursor-pointer flex-shrink-0"
-                  whileHover={{ rotate: 360 }}
+                  className="relative p-3 rounded-xl bg-gradient-to-br from-[#FFBE0B] to-orange-500 text-white shadow-xl hover:shadow-2xl cursor-pointer transition-all"
+                  whileHover={{ scale: 1.05, rotate: 5 }}
                   whileTap={{ scale: 0.95 }}
-                  aria-label="Powiadomienia (3 nowe)"
+                  onClick={toggleNotifications}
                 >
-                  <span className="text-2xl z-10 relative block">🔔</span>
-                  <motion.span
-                    className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-xs font-black flex items-center justify-center shadow-lg"
+                  <span className="text-xl relative z-10">🔔</span>
+                  <motion.div
+                    className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 rounded-full border-3 border-white shadow-lg text-xs font-bold flex items-center justify-center"
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                   >
                     3
-                  </motion.span>
+                  </motion.div>
+
+                  <AnimatePresence>
+                    {notificationsOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                        className="absolute top-full right-0 mt-2 w-80 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-100 py-4 px-4 z-50"
+                      >
+                        <h3 className="font-black text-lg mb-4 flex items-center gap-2 text-gray-800 border-b border-gray-200 pb-3">
+                          🔔 Powiadomienia
+                          <span className="text-sm text-red-500 bg-red-100 px-2 py-1 rounded-full font-bold">(3 nowe)</span>
+                        </h3>
+                        <div className="space-y-3 max-h-64 overflow-y-auto">
+                          <div className="p-4 bg-blue-50 rounded-xl border-l-4 border-blue-500 hover:bg-blue-100 transition-colors">
+                            <div className="font-bold text-sm mb-1">🎯 Nowa misja "Super Sprzedawca"!</div>
+                            <div className="text-xs text-gray-600">5 minut temu</div>
+                          </div>
+                          <div className="p-4 bg-green-50 rounded-xl border-l-4 border-green-500 hover:bg-green-100 transition-colors">
+                            <div className="font-bold text-sm mb-1">🏆 Zdobyłeś odznakę "Punktarz"!</div>
+                            <div className="text-xs text-gray-600">2 godziny temu</div>
+                          </div>
+                          <div className="p-4 bg-yellow-50 rounded-xl border-l-4 border-yellow-500 hover:bg-yellow-100 transition-colors">
+                            <div className="font-bold text-sm mb-1">💎 Dzienna nagroda czeka!</div>
+                            <div className="text-xs text-gray-600 font-bold text-yellow-800">Zbierz teraz</div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </motion.div>
 
-                <ProfileButton
-                  profile={safeProfile}
-                  session={session}
-                  onAuthClick={handleAuthClick}
-                  onSignOut={handleSignOut}
-                />
+                {session && profile ? (
+                  <Link
+                    href="/profil"
+                    className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-[#E94444] to-[#1473E6] text-white shadow-xl hover:shadow-2xl transition-all group"
+                  >
+                    <div className="w-10 h-10 bg-white/30 rounded-xl flex items-center justify-center shadow-md">
+                      <span className="text-xl">🦸‍♂️</span>
+                    </div>
+                    <div className="hidden md:block min-w-0">
+                      <div className="font-bold text-sm truncate" title={profile.username || 'Profil'}>
+                        {profile.username || 'Gracz'}
+                      </div>
+                      <div className="text-xs opacity-90">Lv. {profile.level ?? 1}</div>
+                    </div>
+                  </Link>
+                ) : (
+                  <motion.button
+                    onClick={handleAuthClick}
+                    className="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold shadow-xl hover:shadow-2xl hover:from-emerald-600 hover:to-emerald-700 transition-all whitespace-nowrap"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    👤 Załóż konto
+                  </motion.button>
+                )}
               </div>
 
-              {/* ☰ MOBILE HAMBURGER */}
               <motion.button
-                onClick={() => setIsOpen((prev) => !prev)}
-                className="lg:hidden p-3 rounded-2xl bg-white/80 backdrop-blur shadow-lg hover:shadow-xl hover:bg-white transition-all flex-shrink-0"
+                className="xl:hidden p-3 rounded-xl bg-white/80 backdrop-blur shadow-lg hover:shadow-xl hover:bg-white transition-all"
+                onClick={() => setIsOpen(!isOpen)}
                 whileTap={{ scale: 0.95 }}
                 whileHover={{ scale: 1.1 }}
-                aria-label={isOpen ? "Zamknij menu" : "Otwórz menu"}
-                aria-expanded={isOpen}
+                aria-label="Menu"
               >
                 <motion.div
                   animate={{ rotate: isOpen ? 90 : 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="w-7 h-7 flex flex-col justify-center items-center gap-0.5"
-                  aria-hidden
+                  className="w-6 h-6 flex flex-col justify-center items-center gap-1"
                 >
-                  <motion.span
-                    className="w-6 h-0.5 bg-gray-800 rounded-full origin-center"
-                    animate={{ rotate: isOpen ? 45 : 0, y: isOpen ? 1.5 : 0 }}
-                    transition={{ duration: 0.2 }}
-                  />
-                  <motion.span
-                    className="w-6 h-0.5 bg-gray-800 rounded-full origin-center"
-                    animate={{ opacity: isOpen ? 0 : 1 }}
-                  />
-                  <motion.span
-                    className="w-6 h-0.5 bg-gray-800 rounded-full origin-center"
-                    animate={{ rotate: isOpen ? -45 : 0, y: isOpen ? -1.5 : 0 }}
-                    transition={{ duration: 0.2 }}
-                  />
+                  <motion.span className="w-full h-0.5 bg-gray-800 rounded origin-center" animate={{ rotate: isOpen ? 45 : 0, y: isOpen ? 1 : 0 }} transition={{ duration: 0.2 }} />
+                  <motion.span className="w-full h-0.5 bg-gray-800 rounded origin-center" animate={{ opacity: isOpen ? 0 : 1 }} />
+                  <motion.span className="w-full h-0.5 bg-gray-800 rounded origin-center" animate={{ rotate: isOpen ? -45 : 0, y: isOpen ? -1 : 0 }} transition={{ duration: 0.2 }} />
                 </motion.div>
               </motion.button>
-            </nav>
+            </div>
           </div>
         </div>
       </motion.div>
 
-      {/* 📱 MOBILE MENU */}
       <AnimatePresence>
         {isOpen && (
           <>
             <motion.div
+              className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm xl:hidden"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-40 lg:hidden bg-black/20 backdrop-blur-sm"
               onClick={closeMenu}
             />
             <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 50 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 50 }}
-              transition={{ type: "spring", damping: 20, stiffness: 300 }}
-              className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[95vw] max-w-md z-50 lg:hidden max-h-[80vh] overflow-hidden"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="fixed inset-0 z-50 xl:hidden flex items-end justify-center p-8"
             >
-              <div className="bg-white/95 backdrop-blur-xl rounded-3xl p-6 shadow-2xl border-4 border-white/50">
-                <div className="space-y-6 overflow-y-auto max-h-[60vh]">
+              <motion.div
+                initial={{ y: 100 }}
+                animate={{ y: 0 }}
+                exit={{ y: 100 }}
+                className="w-full max-w-md max-h-[85vh] overflow-hidden"
+              >
+                <div className="bg-white/95 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border-4 border-white/30 h-full flex flex-col">
 
-                  {/* 👤 MOBILE PROFILE (opcjonalne) */}
                   {session && profile && (
-                    <Link href="/profil" onClick={closeMenu} className="block">
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="p-6 bg-gradient-to-r from-[#E94444] to-[#1473E6] text-white rounded-3xl shadow-2xl cursor-pointer hover:shadow-3xl hover:scale-[1.02] transition-all flex items-center gap-4"
-                        whileHover={{ scale: 1.02 }}
-                      >
-                        <div className="w-16 h-16 bg-white/20 backdrop-blur-xl rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
-                          <span className="text-3xl">🦸‍♂️</span>
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-xl font-black truncate" title={profile.username}>
-                            {profile.username}
-                          </div>
-                          <div className="text-lg font-bold text-yellow-300">
-                            Lv. {profile.level ?? 1}
-                          </div>
-                          <div className="text-sm opacity-90">
-                            {profile.total_exp ?? 0} EXP
-                          </div>
-                        </div>
-                      </motion.div>
+                    <Link href="/profil" onClick={closeMenu} className="mb-8 p-6 bg-gradient-to-r from-[#E94444] to-[#1473E6] text-white rounded-2xl shadow-2xl hover:shadow-3xl transition-all flex items-center gap-4 group">
+                      <div className="w-16 h-16 bg-white/30 rounded-2xl flex items-center justify-center shadow-lg">
+                        <span className="text-2xl">🦸‍♂️</span>
+                      </div>
+                      <div>
+                        <div className="text-xl font-black">{profile.username || 'Gracz'}</div>
+                        <div className="text-lg font-bold text-yellow-400">Lv. {profile.level ?? 1}</div>
+                      </div>
                     </Link>
                   )}
 
-                  {/* 📋 NAV ITEMS - ZAWSZE */}
-                  {navItems.map((item, idx) => (
-                    <motion.div
-                      key={`${item.href}-${idx}`}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.05 * idx }}
-                    >
+                  <div className="space-y-4 flex-1 overflow-y-auto pb-8">
+                    {navItems.map((item, index) => (
                       <Link
+                        key={item.href}
                         href={item.href}
                         onClick={closeMenu}
-                        className="flex items-center gap-4 p-5 rounded-2xl text-xl font-black text-gray-800 hover:text-[#E94444] hover:bg-gradient-to-r hover:from-[#E94444]/20 hover:to-[#1473E6]/20 hover:shadow-xl transition-all shadow-md group"
-                        aria-label={item.name}
+                        className="flex items-center gap-4 p-6 rounded-2xl text-xl font-black text-gray-800 hover:bg-gradient-to-r hover:from-red-100 hover:to-blue-100 hover:shadow-xl transition-all shadow-md group border border-transparent hover:border-red-200"
                       >
-                        <span className="text-2xl flex-shrink-0">{item.icon}</span>
-                        <span className="flex-1 min-w-0">{item.name}</span>
-                        <motion.div
-                          className="w-2 h-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity ml-auto"
+                        <span className="text-3xl flex-shrink-0">{item.icon}</span>
+                        <span className="flex-1 font-bold">{item.name}</span>
+                        <motion.span
+                          className="w-3 h-3 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full ml-auto opacity-0 group-hover:opacity-100 shadow-lg"
+                          layoutId={`mobile-arrow-${index}`}
                           initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
+                          whileHover={{ scale: 1.3 }}
                         />
                       </Link>
-                    </motion.div>
-                  ))}
+                    ))}
+                  </div>
 
-                  {/* Konto/Wyloguj */}
-                  <div className="pt-6 space-y-4 border-t-4 border-[#FFBE0B]/50 rounded-xl p-4 bg-gradient-to-r from-yellow-50 to-orange-50">
-                    <ProfileButton
-                      profile={safeProfile}
-                      session={session}
-                      onAuthClick={handleAuthClick}
-                      onSignOut={handleSignOut}
-                      isMobile={true}
-                    />
+                  <div className="pt-8 mt-8 border-t-4 border-[#FFBE0B]/50 pt-6">
+                    {session && profile ? (
+                      <Link
+                        href="/profil"
+                        onClick={closeMenu}
+                        className="block w-full p-6 rounded-2xl bg-gradient-to-r from-[#E94444] to-[#1473E6] text-white font-black text-xl shadow-2xl hover:shadow-3xl hover:scale-[1.02] transition-all text-center border-4 border-transparent hover:border-white/50"
+                      >
+                        👤 Mój Profil
+                      </Link>
+                    ) : (
+                      <motion.button
+                        onClick={handleAuthClick}
+                        className="w-full p-6 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-black text-xl shadow-2xl hover:shadow-3xl hover:scale-[1.02] hover:from-emerald-600 hover:to-emerald-700 transition-all border-4 border-transparent hover:border-white/50"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        👤 Załóż konto GRATIS
+                      </motion.button>
+                    )}
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+          )}
+          </AnimatePresence>
 
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-      />
-    </>
-  );
+        <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
+      </>
+      );
 });
 
-Navbar.displayName = 'Navbar';
-export default Navbar;
+      Navbar.displayName = 'Navbar';
+      export default Navbar;
