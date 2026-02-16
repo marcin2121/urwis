@@ -104,5 +104,7 @@ export default function QuizDashboard({
             </motion.div>
           ))}
         </div>
-        )
+      </motion.div>
+    </div>
+  )
 }
