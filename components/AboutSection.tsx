@@ -1,40 +1,51 @@
 "use client";
-import React from "react";
+import React, { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
 import Image from "next/image";
+import { 
+  MapPin, 
+  Phone, 
+  Clock, 
+  Heart, 
+  PackageOpen, 
+  History, 
+  Navigation 
+} from "lucide-react";
 
 export default function AboutSection() {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.3 });
+  const isInView = useInView(ref, { once: true, amount: 0.2 });
+
+  // Obliczanie lat doświadczenia
+  const yearsOfExperience = new Date().getFullYear() - 2007;
 
   const features = [
     {
-      icon: "🎮",
-      title: "Ponad 1000 produktów",
-      description: "Zabawki, gry planszowe i karciane dla każdego",
-      color: "from-red-500 to-orange-500",
+      icon: PackageOpen,
+      title: "Magazyn Skarbów",
+      description: "Tysiące zabawek i gier dostępnych od ręki na półkach.",
+      color: "#BF2024", // Czerwony
       delay: 0.2
     },
     {
-      icon: "🎁",
-      title: "Doświadczenie od 2007",
-      description: `${new Date().getFullYear() - 2007} lat pasji i zaufania klientów`,
-      color: "from-orange-500 to-yellow-500",
+      icon: History,
+      title: `Działamy od ${yearsOfExperience} lat`,
+      description: "Lokalna firma z tradycjami i zaufaniem pokoleń.",
+      color: "#f59e0b", // Pomarańczowy
       delay: 0.3
     },
     {
-      icon: "⚡",
-      title: "Ekspresowa wysyłka",
-      description: "Zamówienie dzisiaj, zabawa jutro",
-      color: "from-blue-500 to-purple-500",
+      icon: Clock,
+      title: "Zabawa Natychmiast",
+      description: "Nie czekaj na kuriera. Wpadnij, wybierz i baw się dziś!",
+      color: "#0055ff", // Niebieski
       delay: 0.4
     },
     {
-      icon: "❤️",
-      title: "100% satysfakcji",
-      description: "Zadowoleni klienci to nasz priorytet",
-      color: "from-pink-500 to-red-500",
+      icon: Heart,
+      title: "Doradzamy z Sercem",
+      description: "Nie wiesz co wybrać? Pomożemy znaleźć prezent idealny.",
+      color: "#ec4899", // Różowy
       delay: 0.5
     }
   ];
@@ -43,244 +54,157 @@ export default function AboutSection() {
     <section
       id="o-nas"
       ref={ref}
-      className="relative py-32 overflow-hidden bg-linear-to-br from-orange-50 via-white to-red-50"
+      className="relative py-24 md:py-32 overflow-hidden bg-white"
     >
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {/* Tło dekoracyjne (subtelne) */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30">
         <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            rotate: [0, 90, 0],
-            opacity: [0.05, 0.1, 0.05]
-          }}
+          animate={{ scale: [1, 1.1, 1], rotate: [0, 45, 0] }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute top-20 left-10 w-96 h-96 bg-linear-to-br from-red-400 to-orange-400 rounded-full blur-3xl"
+          className="absolute -top-20 -left-20 w-[500px] h-[500px] bg-gradient-to-br from-red-100 to-orange-100 rounded-full blur-[100px]"
         />
         <motion.div
-          animate={{
-            scale: [1, 1.3, 1],
-            rotate: [0, -90, 0],
-            opacity: [0.05, 0.1, 0.05]
-          }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear", delay: 5 }}
-          className="absolute bottom-20 right-10 w-96 h-96 bg-linear-to-br from-blue-400 to-purple-400 rounded-full blur-3xl"
+          animate={{ scale: [1, 1.2, 1], rotate: [0, -45, 0] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear", delay: 2 }}
+          className="absolute top-1/2 -right-20 w-[400px] h-[400px] bg-gradient-to-br from-blue-100 to-purple-100 rounded-full blur-[100px]"
         />
       </div>
 
       <div className="container mx-auto px-6 relative z-10">
 
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-20"
-        >
+        {/* --- HEADER SEKCJI --- */}
+        <div className="text-center mb-20">
+          {/* Logo Animation */}
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
             animate={isInView ? { scale: 1, rotate: 0 } : {}}
             transition={{ duration: 0.8, type: "spring", bounce: 0.5 }}
-            className="inline-block mb-6"
+            className="inline-block mb-8 relative"
           >
-            <div className="relative">
+            <div className="relative z-10">
               <Image
                 src="/logo.png"
                 alt="Urwis Logo"
-                width={120}
-                height={120}
+                width={100}
+                height={100}
                 className="drop-shadow-2xl"
               />
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                className="absolute -inset-4 bg-linear-to-r from-red-500 via-orange-500 to-blue-500 rounded-full blur-xl opacity-30"
-              />
             </div>
+            {/* Glow za logo */}
+            <motion.div
+              animate={{ rotate: 360, scale: [1, 1.1, 1] }}
+              transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+              className="absolute inset-0 bg-gradient-to-r from-[#BF2024] to-[#0055ff] rounded-full blur-2xl opacity-40 -z-10"
+            />
           </motion.div>
 
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-5xl sm:text-6xl lg:text-7xl font-black mb-6"
-            style={{ paddingBottom: '0.1em' }}
+            className="text-5xl md:text-7xl font-black mb-6 font-heading text-gray-900"
           >
-            <span className="text-transparent bg-clip-text bg-linear-to-r from-red-600 via-orange-500 to-blue-600">
-              O nas
-            </span>
+            KIM SĄ <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0055ff] to-[#bf2024]">URWISY?</span>
           </motion.h2>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="text-xl sm:text-2xl text-gray-700 max-w-3xl mx-auto font-medium leading-relaxed"
-            style={{ paddingBottom: '0.2em' }}
+            transition={{ delay: 0.2 }}
+            className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto font-body leading-relaxed"
           >
-            Jesteśmy <span className="font-black text-red-600">lokalnym sklepem z pasją</span> do
-            dostarczania radości dzieciom i dorosłym w Białobrzegach i okolicach! 🎉
+            Jesteśmy <span className="font-bold text-gray-900">lokalną drużyną</span> z Białobrzegów. 
+            Od lat łączymy pokolenia przy wspólnej zabawie, dostarczając emocji małym i dużym!
           </motion.p>
-        </motion.div>
+        </div>
 
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
+        {/* --- FEATURES GRID (KAFELKI) --- */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-24">
           {features.map((feature, idx) => (
             <motion.div
               key={idx}
-              initial={{ opacity: 0, y: 50, scale: 0.8 }}
-              animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
-              transition={{
-                duration: 0.6,
-                delay: feature.delay,
-                type: "spring",
-                bounce: 0.4
-              }}
-              whileHover={{
-                scale: 1.05,
-                y: -10,
-                transition: { duration: 0.2 }
-              }}
-              className="relative group"
+              initial={{ opacity: 0, y: 30 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: feature.delay, duration: 0.5 }}
+              whileHover={{ y: -10 }}
+              className="group relative bg-white rounded-[2rem] p-8 border border-gray-100 shadow-xl hover:shadow-2xl transition-all duration-300"
             >
-              <div
-                className="relative h-full p-8 rounded-3xl backdrop-blur-xl border-2 border-white shadow-2xl overflow-hidden"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.7)',
-                }}
+              <div 
+                className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 text-white shadow-lg group-hover:scale-110 transition-transform duration-300"
+                style={{ backgroundColor: feature.color }}
               >
-                {/* Animated gradient background */}
-                <motion.div
-                  className={`absolute inset-0 bg-linear-to-br ${feature.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
-                />
-
-                {/* Floating icon */}
-                <motion.div
-                  animate={{
-                    y: [0, -10, 0],
-                    rotate: [0, 5, -5, 0]
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    delay: idx * 0.2
-                  }}
-                  className="text-7xl mb-6 relative z-10"
-                >
-                  {feature.icon}
-                </motion.div>
-
-                <h3 className="text-2xl font-black text-gray-900 mb-3 relative z-10" style={{ paddingBottom: '0.05em' }}>
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600 text-lg font-medium relative z-10" style={{ paddingBottom: '0.1em' }}>
-                  {feature.description}
-                </p>
-
-                {/* Shine effect */}
-                <motion.div
-                  className="absolute inset-0 bg-linear-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-30"
-                  animate={{ x: ['-100%', '100%'] }}
-                  transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 3 }}
-                />
+                <feature.icon size={32} strokeWidth={2.5} />
               </div>
+
+              <h3 className="text-xl font-black text-gray-900 mb-3 font-heading">
+                {feature.title}
+              </h3>
+              <p className="text-gray-500 font-body leading-relaxed">
+                {feature.description}
+              </p>
             </motion.div>
           ))}
         </div>
 
-        {/* Story Section */}
+        {/* --- STORY & CTA (DOLNA CZĘŚĆ) --- */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={{ opacity: 0, scale: 0.95 }}
           animate={isInView ? { opacity: 1, scale: 1 } : {}}
           transition={{ duration: 0.8, delay: 0.6 }}
           className="relative max-w-5xl mx-auto"
         >
-          <div
-            className="relative p-12 rounded-[3rem] backdrop-blur-xl border-2 border-white shadow-2xl overflow-hidden"
-            style={{
-              background: 'rgba(255, 255, 255, 0.8)',
-            }}
-          >
-            {/* Animated corner decorations */}
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-              className="absolute top-0 right-0 w-40 h-40 bg-linear-to-br from-red-500 to-orange-500 opacity-20 rounded-full blur-2xl"
-            />
-            <motion.div
-              animate={{ rotate: -360 }}
-              transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-              className="absolute bottom-0 left-0 w-40 h-40 bg-linear-to-br from-blue-500 to-purple-500 opacity-20 rounded-full blur-2xl"
-            />
+          <div className="relative p-8 md:p-12 rounded-[3rem] bg-white border border-gray-100 shadow-2xl overflow-hidden">
+            
+            {/* Tło gradientowe wewnątrz karty */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-[#BF2024]/10 to-orange-500/10 rounded-full blur-3xl -z-10" />
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-[#0055ff]/10 to-purple-500/10 rounded-full blur-3xl -z-10" />
 
-            <div className="relative z-10">
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={isInView ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.8, delay: 0.7 }}
-                className="mb-8"
-              >
-                <h3 className="text-4xl sm:text-5xl font-black text-gray-900 mb-6" style={{ paddingBottom: '0.1em' }}>
-                  Nasza <span className="text-transparent bg-clip-text bg-linear-to-r from-red-600 to-orange-500">Historia</span>
+            <div className="flex flex-col md:flex-row items-center gap-10 md:gap-16">
+              
+              {/* Lewa strona: Tekst */}
+              <div className="flex-1 space-y-6">
+                <h3 className="text-3xl md:text-4xl font-black text-gray-900 font-heading">
+                  Więcej niż sklep. <br />
+                  <span className="text-[#BF2024]">To Centrum Rozrywki.</span>
                 </h3>
-                <div className="w-24 h-2 bg-linear-to-r from-red-500 via-orange-500 to-blue-500 rounded-full" />
-              </motion.div>
+                <div className="w-20 h-2 bg-gradient-to-r from-[#BF2024] to-[#0055ff] rounded-full" />
+                
+                <div className="space-y-4 text-lg text-gray-600 font-body">
+                  <p>
+                    <span className="font-bold text-gray-900">Sklep Urwis</span> to nie algorytm. 
+                    To ludzie, którzy znają się na klockach lepiej niż na Excelu. 
+                  </p>
+                  <p>
+                    Wierzymy, że najlepsze zakupy to te, których można dotknąć. 
+                    Dlatego zapraszamy Cię do naszego świata w Białobrzegach – miejsca, 
+                    gdzie <span className="font-bold text-[#0055ff]">każdy czuje się jak dziecko</span> (nawet jeśli ma brodę).
+                  </p>
+                </div>
+              </div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.8, delay: 0.8 }}
-                className="space-y-6 text-lg sm:text-xl text-gray-700 leading-relaxed"
-                style={{ paddingBottom: '0.2em' }}
-              >
-                <p className="font-medium">
-                  <span className="text-2xl font-black text-red-600">Sklep Urwis</span> to <span className="font-bold">rodzinny biznes</span>,
-                  który powstał z <span className="font-bold text-orange-600">miłości do dziecięcej radości</span> i pasji do gier.
-                </p>
-                <p className="font-medium">
-                  Od <span className="font-black text-blue-600">2007 roku</span> dostarczamy najlepsze zabawki, gry planszowe i karciane
-                  mieszkańcom Białobrzegów i okolic. Nasza <span className="font-bold">lokalna obecność</span> to gwarancja
-                  <span className="font-bold text-red-600"> szybkiej obsługi</span> i <span className="font-bold text-orange-600">osobistego podejścia</span>.
-                </p>
-                <p className="font-medium">
-                  Każdy produkt wybieramy z <span className="font-black text-purple-600">dbałością o jakość</span> i
-                  <span className="font-bold"> bezpieczeństwo</span>. Wierzymy, że zabawa to nie tylko rozrywka,
-                  ale też <span className="font-bold text-blue-600">nauka i rozwój</span>! ✨
-                </p>
-              </motion.div>
-
-              {/* CTA Button */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.8, delay: 1 }}
-                className="mt-10 flex flex-wrap gap-6 justify-center sm:justify-start"
-              >
+              {/* Prawa strona: Przyciski CTA */}
+              <div className="flex flex-col gap-4 w-full md:w-auto shrink-0">
                 <motion.a
                   href="/kontakt"
-                  className="group relative px-10 py-5 rounded-full text-white text-lg font-black shadow-2xl overflow-hidden"
-                  style={{
-                    background: 'linear-gradient(135deg, #BF2024 0%, #0055ff 100%)',
-                  }}
-                  whileHover={{ scale: 1.05, y: -3 }}
+                  whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  className="group relative px-8 py-4 bg-gray-900 text-white rounded-2xl font-black text-center shadow-lg overflow-hidden flex items-center justify-center gap-3"
                 >
-                  <span className="relative z-10 flex items-center gap-3">
-                    📍 Odwiedź nas
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#BF2024] to-[#0055ff] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <span className="relative z-10 flex items-center gap-2">
+                    <Navigation size={20} /> Jak dojechać?
                   </span>
-                  <motion.div
-                    className="absolute inset-0 bg-linear-to-r from-orange-500 via-red-500 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  />
                 </motion.a>
 
                 <motion.a
                   href="tel:+48604208193"
-                  className="px-10 py-5 rounded-full text-gray-900 text-lg font-black border-4 border-gray-900 hover:bg-gray-900 hover:text-white transition-all shadow-xl"
-                  whileHover={{ scale: 1.05, y: -3 }}
+                  whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  className="px-8 py-4 bg-white text-gray-900 border-2 border-gray-200 rounded-2xl font-black text-center hover:border-gray-900 transition-all flex items-center justify-center gap-3"
                 >
-                  📞 Zadzwoń
+                  <Phone size={20} /> Zadzwoń do nas
                 </motion.a>
-              </motion.div>
+              </div>
+
             </div>
           </div>
         </motion.div>
