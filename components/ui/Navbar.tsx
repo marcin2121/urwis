@@ -1,315 +1,345 @@
 "use client";
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
-import AuthModal from '../AuthModal';
-import { Edu_SA_Beginner } from "next/font/google";
+import { usePathname } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Home,
+  Phone,
+  Target,
+  Trophy,
+  Gamepad2,
+  Brain,
+  Bell,
+  LogOut,
+  User,
+  PlusCircle,
+  LogIn
+} from "lucide-react";
+import { useSupabaseAuth } from "@/contexts/SupabaseAuthContext";
+import AuthModal from "@/components/AuthModal";
+import { cn } from "@/lib/utils"; // Zakładam, że masz util z shadcn, jeśli nie - użyj clsx/tailwind-merge ręcznie
+
+// --- KONFIGURACJA ---
+const NAV_ITEMS = [
+  { name: "Home", href: "/", icon: Home },
+  { name: "Kontakt", href: "/kontakt", icon: Phone },
+  { name: "Misje", href: "/misje", icon: Target },
+  { name: "Nagrody", href: "/nagrody", icon: Trophy },
+  { name: "Gry", href: "/gry", icon: Gamepad2 },
+  { name: "Quiz", href: "/quiz", icon: Brain },
+];
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const { user: profile, session, signOut } = useSupabaseAuth();
-  const isAuthenticated = !!session;
+  const pathname = usePathname();
+  const { user, profile, signOut, isAuthenticated } = useSupabaseAuth();
 
-  const navItems = [
-    { name: "Strona główna", icon: "🏠", href: "/" },
-    { name: "Kontakt", icon: "📞", href: "/kontakt" },
-    { name: "Misje", icon: "🎯", href: "/misje" },
-    { name: "Nagrody", icon: "🏆", href: "/nagrody" },
-    { name: "Gry", icon: "🎮", href: "/gry" },
- // NOWE
-  ];
-  
+  // Modal State
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  // Jeśli Twój AuthModal obsługuje tryb startowy (np. login vs register), możesz tu dodać stan:
+  // const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+
+  // Notification State
+  const [isNotifyOpen, setIsNotifyOpen] = useState(false);
+  const [hasUnread, setHasUnread] = useState(false); // Mock stanu powiadomień
+
+  // Mock sprawdzenia osiągnięć/powiadomień
+  useEffect(() => {
+    // Tutaj normalnie byłoby zapytanie do Supabase o nieodebrane nagrody
+    if (isAuthenticated) {
+      setHasUnread(true); // Symulacja: Użytkownik ma powiadomienie
+    }
+  }, [isAuthenticated]);
+
+  const handleLogout = async () => {
+    await signOut();
+    // Opcjonalnie: router.push('/')
+  };
 
   return (
     <>
-      {/* Ultra Frosted Glass Navbar */}
-      <motion.div
+      {/* ================= DESKTOP NAVBAR (Dynamic Island) ================= */}
+      <motion.header
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="fixed top-8 left-1/2 -translate-x-1/2 w-[96%] max-w-6xl z-50"
+        className="hidden md:flex fixed top-6 left-0 right-0 justify-center z-50 pointer-events-none"
       >
-        <div 
-          className="relative rounded-full border border-gray-200 shadow-[0_8px_40px_rgba(0,0,0,0.12)] px-8 py-5 overflow-hidden"
-          style={{
-            backdropFilter: 'blur(40px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-            backgroundColor: 'rgba(255, 255, 255, 0.85)',
-          }}
-        >
-          <nav className="relative flex justify-between items-center">
-            
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-3 group z-10">
-              <motion.div
-                whileHover={{ rotate: 360, scale: 1.1 }}
-                transition={{ duration: 0.6, type: "spring" }}
-                className="relative w-10 h-10"
-              >
-                <Image 
-                  src="/logo.png" 
-                  alt="Sklep Urwis"
-                  width={50}
-                  height={50}
-                  loading="eager"
-                  priority
-                  className="object-contain drop-shadow-lg"
-                />
-              </motion.div>
+        <div className="pointer-events-auto relative flex items-center gap-6 px-4 py-3 bg-white/70 backdrop-blur-xl border border-white/20 shadow-lg shadow-black/5 rounded-full ring-1 ring-black/5">
 
-            </Link>
+          {/* Logo */}
+          <Link href="/" className="relative flex-shrink-0 group">
+            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+              <Image
+                src="/logo.png"
+                alt="Logo"
+                width={42}
+                height={42}
+                className="object-contain"
+                priority
+              />
+            </motion.div>
+          </Link>
 
-            {/* Desktop Menu */}
-            <div className="hidden md:flex items-center gap-8 z-10">
-              {navItems.map((item, idx) => (
+          {/* Navigation Links */}
+          <nav className="flex items-center gap-1 bg-gray-100/50 p-1.5 rounded-full border border-black/5">
+            {NAV_ITEMS.map((item) => {
+              const isActive = pathname === item.href;
+              const Icon = item.icon;
+
+              return (
                 <Link
-                  key={idx}
+                  key={item.href}
                   href={item.href}
-                  className="relative text-base font-bold text-gray-900 hover:text-[#BF2024] transition-colors group"
+                  className={cn(
+                    "relative flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ease-out",
+                    isActive
+                      ? "text-white shadow-md"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-white"
+                  )}
                 >
-                  {item.name}
-                  <span 
-                    className="absolute -bottom-1 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 rounded-full"
-                    style={{
-                      background: 'linear-gradient(90deg, #BF2024 0%, #0055ff 100%)',
-                    }}
-                  />
+                  {isActive && (
+                    <motion.div
+                      layoutId="nav-pill"
+                      className="absolute inset-0 rounded-full bg-gradient-to-r from-[#E94444] to-[#1473E6]"
+                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    />
+                  )}
+                  <span className="relative z-10 flex items-center gap-2">
+                    <Icon size={16} />
+                    {item.name}
+                  </span>
                 </Link>
-              ))}
-            </div>
+              );
+            })}
+          </nav>
 
-            {/* Right Side - User Profile or Login */}
-            <div className="hidden md:flex items-center gap-4 z-10">
-              {isAuthenticated && profile ? (
-                <>
-                  {/* User Profile Button */}
-                  <Link href="/profil">
-  <motion.div
-    whileHover={{ scale: 1.05 }}
-    className="flex items-center gap-3 px-4 py-2 rounded-full border-2 border-gray-200 hover:border-blue-300 transition-all cursor-pointer"
-    style={{
-      background: 'linear-gradient(135deg, rgba(191, 32, 36, 0.05), rgba(0, 85, 255, 0.05))',
-    }}
-  >
-    <span className="text-2xl">{profile.avatar_url || '🧸'}</span>
-    <div className="text-left">
-      <div className="text-sm font-bold text-gray-900">{profile.username}</div>
-      <div className="text-xs text-gray-600">Poziom {profile.level}</div>
-    </div>
-  </motion.div>
-</Link>
-
-                  {/* Logout Button */}
+          {/* User & Actions Area */}
+          <div className="flex items-center gap-3 pl-2 border-l border-gray-200">
+            {isAuthenticated ? (
+              <>
+                {/* Notifications */}
+                <div className="relative">
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={signOut}
-                    className="px-4 py-2 rounded-full bg-red-100 text-red-600 font-bold hover:bg-red-200 transition-colors"
+                    onClick={() => setIsNotifyOpen(!isNotifyOpen)}
+                    className="p-2.5 rounded-full bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all text-gray-600 hover:text-[#E94444]"
                   >
-                    Wyloguj
+                    <Bell size={20} />
+                    {hasUnread && (
+                      <span className="absolute top-2 right-2.5 w-2 h-2 bg-[#E94444] rounded-full ring-2 ring-white animate-pulse" />
+                    )}
                   </motion.button>
-                </>
-              ) : (
-                <motion.button
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setShowAuthModal(true)}
-                  className="px-6 py-3 rounded-full text-white text-base font-bold shadow-xl transition-all overflow-hidden"
-                  style={{
-                    background: 'linear-gradient(135deg, #BF2024 0%, #0055ff 100%)',
-                  }}
-                >
-                  <span className="flex items-center gap-2">
-                    <span>👤</span>
-                    <span>Zaloguj się</span>
-                  </span>
-                </motion.button>
-              )}
 
-              {/* Call Button */}
-              <motion.a
-                href="tel:+48123456789"
-                className="flex items-center gap-2 px-6 py-3 rounded-full border-2 border-gray-200 text-gray-900 text-base font-bold hover:border-[#BF2024] hover:text-[#BF2024] transition-all"
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <span>📞</span>
-                <span>Zadzwoń</span>
-              </motion.a>
-            </div>
+                  {/* Custom Popover for Notifications */}
+                  <AnimatePresence>
+                    {isNotifyOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        className="absolute top-full right-0 mt-4 w-80 p-4 bg-white rounded-2xl shadow-xl border border-gray-100 ring-1 ring-black/5 z-50 origin-top-right"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-bold text-gray-900">Powiadomienia</h4>
+                          <span className="text-xs text-gray-500">Ostatnie</span>
+                        </div>
+                        <div className="space-y-2">
+                          {/* Mock powiadomienia */}
+                          <div className="flex items-start gap-3 p-3 rounded-xl bg-blue-50/50 hover:bg-blue-50 transition-colors cursor-pointer">
+                            <div className="p-2 bg-blue-100 text-[#1473E6] rounded-full">
+                              <Trophy size={16} />
+                            </div>
+                            <div>
+                              <p className="text-sm font-semibold text-gray-800">Odbierz nagrodę!</p>
+                              <p className="text-xs text-gray-500">Awansowałeś na poziom {profile?.level || 1}</p>
+                            </div>
+                          </div>
+                          {!hasUnread && <p className="text-center text-sm text-gray-400 py-4">Brak nowych powiadomień</p>}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
 
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="md:hidden relative w-12 h-12 flex flex-col justify-center items-center z-10"
-              aria-label="Toggle menu"
-            >
-              <motion.span
-                animate={isOpen ? { rotate: 45, y: 7 } : { rotate: 0, y: 0 }}
-                className="w-6 h-0.5 bg-gray-900 rounded-full"
-              />
-              <motion.span
-                animate={isOpen ? { opacity: 0 } : { opacity: 1 }}
-                className="w-6 h-0.5 bg-gray-900 rounded-full mt-2"
-              />
-              <motion.span
-                animate={isOpen ? { rotate: -45, y: -7 } : { rotate: 0, y: 0 }}
-                className="w-6 h-0.5 bg-gray-900 rounded-full mt-2"
-              />
-            </button>
-
-          </nav>
-        </div>
-      </motion.div>
-
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {isOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-30 md:hidden"
-              style={{
-                backdropFilter: 'blur(20px) saturate(180%)',
-                WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-                backgroundColor: 'rgba(0, 0, 0, 0.3)',
-              }}
-              onClick={() => setIsOpen(false)}
-            />
-
-            {/* Menu Panel */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: -20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: -20 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="fixed top-28 left-1/2 -translate-x-1/2 w-[92%] max-w-lg z-40 md:hidden"
-            >
-              <div 
-                className="rounded-3xl border border-gray-200 shadow-2xl p-6 overflow-hidden"
-                style={{
-                  backdropFilter: 'blur(40px) saturate(180%)',
-                  WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-                  backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                }}
-              >
-                <div className="flex flex-col space-y-4">
-                  {/* User Profile (Mobile) */}
-                  {isAuthenticated && profile && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="flex items-center gap-3 p-4 rounded-2xl mb-2"
-                      style={{
-                        background: 'linear-gradient(135deg, rgba(191, 32, 36, 0.1), rgba(0, 85, 255, 0.1))',
-                      }}
-                    >
-                      <span className="text-3xl">{profile.avatar_url || '🧸'}</span>
-                      <div>
-                        <div className="font-bold text-gray-900">{profile.username}</div>
-                        <div className="text-sm text-gray-600">Poziom {profile.level} • {profile.total_exp} EXP</div>
-                      </div>
-                    </motion.div>
-                  )}
-
-              {navItems.map((item, idx) => (
-  <Link
-    key={idx}
-    href={item.href}
-    className="relative px-3 py-2 text-sm font-bold text-gray-900 hover:text-[#BF2024] transition-colors group whitespace-nowrap flex items-center gap-1"
-  >
-    <span>{item.icon}</span>
-    <span>{item.name}</span>
-    <span 
-      className="absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 rounded-full"
-      style={{
-        background: 'linear-gradient(90deg, #BF2024 0%, #0055ff 100%)',
-      }}
-    />
-  </Link>
-))}
-                  
-                  {/* Mobile Login/Logout */}
-                  {isAuthenticated ? (
-                    <motion.button
-                      onClick={() => {
-                        signOut();
-                        setIsOpen(false);
-                      }}
-                      className="w-full px-7 py-5 rounded-2xl text-white text-base font-bold shadow-xl transition-all bg-red-500 hover:bg-red-600"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.4 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      Wyloguj się
-                    </motion.button>
-                  ) : (
-                    <motion.button
-                      onClick={() => {
-                        setShowAuthModal(true);
-                        setIsOpen(false);
-                      }}
-                      className="flex items-center justify-center gap-3 px-7 py-5 rounded-2xl text-white text-base font-bold shadow-xl transition-all overflow-hidden"
-                      style={{
-                        background: 'linear-gradient(135deg, #BF2024 0%, #0055ff 100%)',
-                      }}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.4 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <span className="text-2xl">👤</span>
-                      <span>Zaloguj się</span>
-                    </motion.button>
-                  )}
-
-                  {/* Mobile CTA */}
-                  <motion.a
-                    href="tel:+48123456789"
-                    onClick={() => setIsOpen(false)}
-                    className="flex items-center justify-center gap-3 px-7 py-5 rounded-2xl border-2 border-gray-200 text-gray-900 text-base font-bold hover:border-[#BF2024] transition-all"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
-                    whileTap={{ scale: 0.95 }}
+                {/* Profile Link */}
+                <Link href="/profil">
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    className="flex items-center gap-3 pr-1 pl-1 cursor-pointer"
                   >
-                    <span className="text-2xl">📞</span>
-                    <span>Zadzwoń do nas</span>
-                  </motion.a>
+                    <div className="flex flex-col items-end hidden lg:flex">
+                      <span className="text-sm font-bold text-gray-900 leading-none">
+                        {profile?.username || user?.email?.split('@')[0]}
+                      </span>
+                      <span className="text-[10px] text-[#1473E6] font-medium">
+                        Lvl {profile?.level || 1}
+                      </span>
+                    </div>
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#E94444] to-[#1473E6] p-[2px]">
+                      <div className="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden">
+                        {profile?.avatar_url ? (
+                          <Image src={profile.avatar_url} width={36} height={36} alt="Avatar" />
+                        ) : (
+                          <span className="text-lg">🦸‍♂️</span>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                </Link>
 
-                  {/* Quick Info */}
-                  <div className="grid grid-cols-2 gap-3 pt-4 border-t border-gray-200">
-                    <div className="text-center p-4 rounded-xl border border-gray-200 bg-gray-50">
-                      <div className="text-3xl mb-2">📍</div>
-                      <div className="text-xs font-bold text-gray-900">
-                        ul. Reymonta 38A
-                      </div>
-                    </div>
-                    <div className="text-center p-4 rounded-xl border border-gray-200 bg-gray-50">
-                      <div className="text-3xl mb-2">🕐</div>
-                      <div className="text-xs font-bold text-gray-900">
-                        Pn-Pt 8:00-18:00
-                      </div>
-                    </div>
+                {/* Logout */}
+                <button
+                  onClick={handleLogout}
+                  className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                  title="Wyloguj"
+                >
+                  <LogOut size={18} />
+                </button>
+              </>
+            ) : (
+              // Logged Out State
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowAuthModal(true)}
+                  className="px-5 py-2.5 rounded-full text-sm font-bold bg-gray-100 text-gray-900 hover:bg-gray-200 transition-all"
+                >
+                  Zaloguj
+                </button>
+                <button
+                  onClick={() => setShowAuthModal(true)}
+                  className="px-5 py-2.5 rounded-full text-sm font-bold text-white bg-gradient-to-r from-[#E94444] to-[#E94444]/80 hover:shadow-lg transition-all flex items-center gap-2"
+                >
+                  Załóż konto
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </motion.header>
+
+
+      {/* ================= MOBILE INTERFACE ================= */}
+
+      {/* 1. Mobile Top Bar (Logo + Auth/Profile Status) */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 px-4 py-3 flex justify-between items-center bg-white/80 backdrop-blur-lg border-b border-gray-100">
+        <Link href="/">
+          <Image src="/logo.png" width={40} height={40} alt="Logo" className="drop-shadow-sm" />
+        </Link>
+
+        <div className="flex items-center gap-3">
+          {isAuthenticated ? (
+            <>
+              {/* Mobile Notification */}
+              <button
+                onClick={() => setIsNotifyOpen(!isNotifyOpen)}
+                className="relative p-2 text-gray-700"
+              >
+                <Bell size={24} />
+                {hasUnread && <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-[#E94444] rounded-full border border-white" />}
+              </button>
+              {/* Mobile Profile Avatar -> Redirects to profile */}
+              <Link href="/profil">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-r from-[#E94444] to-[#1473E6] p-[2px]">
+                  <div className="w-full h-full rounded-full bg-white flex items-center justify-center text-lg overflow-hidden">
+                    {profile?.avatar_url ? (
+                      <Image src={profile.avatar_url} width={36} height={36} alt="Avatar" />
+                    ) : (
+                      '🦸'
+                    )}
                   </div>
                 </div>
+              </Link>
+            </>
+          ) : (
+            <button
+              onClick={() => setShowAuthModal(true)}
+              className="flex items-center gap-2 text-sm font-bold text-[#1473E6]"
+            >
+              <LogIn size={18} />
+              Zaloguj
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* 2. Mobile Bottom Navigation Bar */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-100 pb-safe pt-2 px-2 shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
+        <div className="flex justify-around items-center w-full max-w-md mx-auto">
+          {NAV_ITEMS.map((item) => {
+            const isActive = pathname === item.href;
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "flex flex-col items-center justify-center w-full py-2 transition-all duration-300",
+                  isActive ? "text-[#E94444]" : "text-gray-400"
+                )}
+              >
+                <div className={cn(
+                  "relative p-1.5 rounded-xl transition-all duration-300",
+                  isActive ? "bg-red-50 -translate-y-2 shadow-sm" : ""
+                )}>
+                  <Icon size={isActive ? 24 : 22} strokeWidth={isActive ? 2.5 : 2} />
+                </div>
+                <span className={cn(
+                  "text-[10px] font-medium transition-all duration-300",
+                  isActive ? "opacity-100 translate-y-[-4px]" : "opacity-0 h-0 hidden"
+                )}>
+                  {item.name}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
+
+      {/* Mobile Notification Popover (Full screen or bottom sheet simulation usually, but simple absolute here) */}
+      <AnimatePresence>
+        {isNotifyOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setIsNotifyOpen(false)}
+              className="fixed inset-0 bg-black/20 z-[60] backdrop-blur-sm md:hidden"
+            />
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              className="fixed bottom-0 left-0 right-0 bg-white z-[70] rounded-t-3xl p-6 shadow-2xl md:hidden"
+            >
+              <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6" />
+              <h3 className="text-xl font-bold mb-4">Powiadomienia</h3>
+              {/* Treść powiadomień mobilnych */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                  <div className="text-2xl">🏆</div>
+                  <div>
+                    <div className="font-bold text-gray-900">Nagroda czeka!</div>
+                    <div className="text-sm text-gray-500">Odbierz nagrodę za aktywność.</div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsNotifyOpen(false)}
+                  className="w-full py-4 mt-4 bg-gray-900 text-white font-bold rounded-xl"
+                >
+                  Zamknij
+                </button>
               </div>
             </motion.div>
           </>
         )}
       </AnimatePresence>
 
-      {/* Auth Modal */}
-      <AuthModal 
-        isOpen={showAuthModal} 
-        onClose={() => setShowAuthModal(false)} 
+      {/* Global Auth Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
       />
     </>
   );
