@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import type { TriviaQuestion } from '@/lib/triviaApi'
 
-export async function getTriviaQuestions(amount = 20): Promise<TriviaQuestion[]> {  // + Promise
+export async function getTriviaQuestions(amount = 20): Promise<TriviaQuestion[]> {
   const supabase = await createClient()
 
   const { data, error } = await supabase
