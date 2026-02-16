@@ -2,12 +2,12 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { usePathname } from 'next/navigation'; // ✅ Import do sprawdzania strony
+import { usePathname } from 'next/navigation'; 
 import Link from 'next/link';
 import Image from 'next/image';
 
 export default function HiddenUrwis() {
-  // 1. Poprawiony Auth: używamy 'session' zamiast nieistniejącego 'isAuthenticated'
+  // Poprawka: używamy session z Twojego SupabaseAuthContext
   const { user, session } = useSupabaseAuth(); 
   const pathname = usePathname();
   
@@ -17,7 +17,7 @@ export default function HiddenUrwis() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [position, setPosition] = useState({ top: '50%', left: '50%' });
 
-  // 2. Lista stron, na których Urwis MOŻE się pojawić
+  // Lista stron, na których Urwis może się schować
   const ELIGIBLE_ROUTES = useMemo(() => [
     '/',
     '/oferta',
@@ -30,9 +30,10 @@ export default function HiddenUrwis() {
     '/profil'
   ], []);
 
-  // 3. Logika "Strony Dnia" - losowana na podstawie daty (ten sam wynik dla każdego)
+  // Logika wybierania "Strony Dnia" na podstawie daty (ten sam wynik dla każdego)
   const targetRoute = useMemo(() => {
     const now = new Date();
+    // Prosty seed bazujący na dacie: YYYYMMDD
     const seed = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
     return ELIGIBLE_ROUTES[seed % ELIGIBLE_ROUTES.length];
   }, [ELIGIBLE_ROUTES]);
@@ -45,14 +46,15 @@ export default function HiddenUrwis() {
       return a & a;
     }, 0);
 
-    const top = 20 + (Math.abs(hash % 60)); // 20-80% (bezpieczny margines)
-    const left = 15 + (Math.abs((hash * 31) % 70)); // 15-85%
+    const top = 20 + (Math.abs(hash % 60)); // Zakres 20-80%
+    const left = 15 + (Math.abs((hash * 31) % 70)); // Zakres 15-85%
     return { top: `${top}%`, left: `${left}%` };
   }, []);
 
   useEffect(() => {
-    setMounted(true); // Zapobiega błędom hydracji
+    setMounted(true); // Zapobieganie błędom hydracji
     const todayKey = `urwis_hidden_${new Date().toDateString()}`;
+    
     if (localStorage.getItem(todayKey)) {
       setFoundToday(true);
     }
@@ -72,12 +74,9 @@ export default function HiddenUrwis() {
     setFoundToday(true);
   };
 
-  // --- STRAŻNICY RENDEROWANIA ---
-  // Jeśli komponent się jeszcze nie zamontował, nie renderuj nic (Hydration Fix)
+  // Strażnicy renderowania (Hydration Guard)
   if (!mounted) return null;
-  // Jeśli to NIE jest strona wylosowana na dzisiaj - ukryj komponent
-  if (pathname !== targetRoute) return null;
-  // Jeśli już znaleziony dzisiaj - ukryj
+  if (pathname !== targetRoute) return null; // Urwis pokazuje się tylko na wylosowanej stronie
   if (foundToday) return null;
 
   return (
@@ -85,11 +84,7 @@ export default function HiddenUrwis() {
       <motion.div
         onClick={handleClick}
         initial={{ opacity: 0, scale: 0.5 }}
-        animate={{
-          opacity: 0.9,
-          scale: 1,
-          rotate: [0, 5, -5, 0]
-        }}
+        animate={{ opacity: 0.9, scale: 1, rotate: [0, 5, -5, 0] }}
         transition={{
           opacity: { duration: 1, delay: 1 },
           scale: { duration: 1, delay: 1 },
@@ -120,14 +115,14 @@ export default function HiddenUrwis() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[10000]"
+            className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-9990 backdrop-blur-sm"
           >
             <motion.div className="bg-white rounded-3xl p-8 max-w-md text-center shadow-2xl">
               <div className="text-7xl mb-4">🎉</div>
               <h3 className="text-3xl font-black mb-4">Znalazłeś Urwisa!</h3>
               <p className="text-lg text-gray-700 mb-6">
-                Brawo! Dzisiejsza kryjówka odkryta. <br/>
-                Odbierz nagrodę w wyzwaniach!
+                Brawo! Kryjówka na dziś odkryta. <br/>
+                Odbierz nagrodę w sekcji misji!
               </p>
               <div className="flex gap-3 justify-center">
                 <Link href="/misje">
@@ -147,16 +142,14 @@ export default function HiddenUrwis() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-9998"
+            className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-9990 backdrop-blur-sm"
           >
             <motion.div className="bg-white rounded-3xl p-8 max-w-md text-center shadow-2xl">
               <div className="text-7xl mb-4">🔒</div>
               <h3 className="text-2xl font-black mb-4">Urwis ucieka!</h3>
-              <p className="text-gray-700 mb-6">Zaloguj się, aby móc zbierać nagrody za znalezienie Urwisa.</p>
+              <p className="text-gray-700 mb-6">Zaloguj się, aby zbierać nagrody za znalezienie Urwisa.</p>
               <div className="flex gap-3 justify-center">
-                <Link href="/profil">
-                  <button className="px-6 py-3 bg-blue-600 text-white rounded-full font-bold">Zaloguj się 👤</button>
-                </Link>
+                <button onClick={() => { setShowLoginModal(false); window.location.href='/profil' }} className="px-6 py-3 bg-blue-600 text-white rounded-full font-bold">Zaloguj się 👤</button>
                 <button onClick={() => setShowLoginModal(false)} className="px-6 py-3 bg-gray-200 rounded-full font-bold">Anuluj</button>
               </div>
             </motion.div>
