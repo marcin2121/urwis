@@ -61,3 +61,5 @@ export async function getRandomQuestions(category?: string, count = 10): Promise
     category: q.category
   }))
 }
+
+export type { TriviaQuestion }
