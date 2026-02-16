@@ -11,6 +11,8 @@ import { EventsProvider } from "@/contexts/EventsContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import HiddenUrwis from "@/components/HiddenUrwis";
 import MissionTracker from "@/components/MissionTracker";
+import UrwisNotifications from "@/components/ui/UrwisNotifications";
+import GamificationListener from "@/components/systems/GamificationListener";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -39,6 +41,8 @@ export default function RootLayout({
                   <EventsProvider>
                     <NotificationProvider>
                       <MissionTracker />
+                      <GamificationListener />
+                      <UrwisNotifications />
                       <Navbar />
                       {children}
                       <HiddenUrwis />
