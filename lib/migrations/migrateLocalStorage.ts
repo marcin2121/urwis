@@ -23,11 +23,12 @@ export async function migrateLocalStorageToSupabase(userId: string) {
       streakData: localStorage.getItem('urwis_streak_data') || '{}',
     }
 
-    const points = parseInt(localStorageData.points)
-    const badges = JSON.parse(localStorageData.badges) as string[]
-    const history = JSON.parse(localStorageData.history) as any[]
-    const missionProgress = JSON.parse(localStorageData.missionProgress) as Record<string, any>
-    const streakData = JSON.parse(localStorageData.streakData) as Record<string, any>
+    // FIX: Dodano fallbacki (|| '...') wewnątrz funkcji parsujących
+    const points = parseInt(localStorageData.points || '0')
+    const badges = JSON.parse(localStorageData.badges || '[]') as string[]
+    const history = JSON.parse(localStorageData.history || '[]') as any[]
+    const missionProgress = JSON.parse(localStorageData.missionProgress || '{}') as Record<string, any>
+    const streakData = JSON.parse(localStorageData.streakData || '{}') as Record<string, any>
 
     // 1. Update profile with total exp/points
     const { error: profileError } = await supabase
