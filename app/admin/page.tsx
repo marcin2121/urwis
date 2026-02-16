@@ -1,166 +1,224 @@
 'use client'
 
-import { useState } from 'react'
-// Importujemy hooka z naszego kontekstu (upewnij się, że ścieżka jest poprawna)
-import { useSupabaseAuth } from "@/contexts/SupabaseAuthContext"
-import { PlusCircle, Check, AlertCircle } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext'
+import { useRouter } from 'next/navigation'
+import { motion, AnimatePresence } from 'framer-motion'
+import { 
+  Users, ShieldCheck, Search, Plus, Minus, Star, 
+  Package, CheckCircle, Clock, ShoppingBag, RefreshCw, XCircle
+} from 'lucide-react'
 
-export default function AdminPage() {
-  // Używamy klienta z kontekstu, zamiast tworzyć nowego
-  const { supabase, session } = useSupabaseAuth()
+export default function AdminDashboard() {
+  const { profile, supabase, loading: authLoading } = useSupabaseAuth()
+  const router = useRouter()
+  const [mounted, setMounted] = useState(false)
+  const [activeTab, setActiveTab] = useState<'users' | 'orders'>('users')
   
-  const [loading, setLoading] = useState(false)
-  const [success, setSuccess] = useState(false)
-  const [errorMsg, setErrorMsg] = useState("")
+  // Stany dla danych
+  const [users, setUsers] = useState<any[]>([])
+  const [orders, setOrders] = useState<any[]>([])
+  const [loadingData, setLoadingData] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
 
-  const [formData, setFormData] = useState({
-    title: '',
-    old_price: '',
-    new_price: '',
-    badge: '',
-    category: 'Zabawki',
-    is_hero_highlight: false
-  })
+  useEffect(() => { setMounted(true) }, [])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setErrorMsg("")
-    
-    if (!session) {
-        setErrorMsg("Błąd sesji: Nie jesteś zalogowany.")
-        setLoading(false)
-        return
-    }
-
-    // Konwersja cen (zamiana przecinka na kropkę)
-    const oldPrice = parseFloat(formData.old_price.replace(',', '.'))
-    const newPrice = parseFloat(formData.new_price.replace(',', '.'))
-
-    if (isNaN(oldPrice) || isNaN(newPrice)) {
-        setErrorMsg("Cena musi być poprawną liczbą!")
-        setLoading(false)
-        return
-    }
-    
-    const { error } = await supabase
-      .from('promotions')
-      .insert([
-        { 
-          title: formData.title,
-          old_price: oldPrice,
-          new_price: newPrice,
-          badge: formData.badge,
-          category: formData.category,
-          is_hero_highlight: formData.is_hero_highlight
-        }
-      ])
-
-    setLoading(false)
-    if (!error) {
-      setSuccess(true)
-      setFormData({ title: '', old_price: '', new_price: '', badge: '', category: 'Zabawki', is_hero_highlight: false })
-      setTimeout(() => setSuccess(false), 3000)
+  const fetchData = async () => {
+    setLoadingData(true)
+    if (activeTab === 'users') {
+      const { data } = await supabase.from('profiles').select('*').order('points', { ascending: false })
+      if (data) setUsers(data)
     } else {
-      console.error(error)
-      setErrorMsg('Błąd zapisu: ' + error.message)
+      // Pobieramy zamówienia z dołączonymi danymi profilu i nagrody
+      const { data } = await supabase
+        .from('reward_claims')
+        .select(`
+          *,
+          profiles:user_id (username, avatar_url),
+          rewards:reward_id (name, image_url, cost)
+        `)
+        .order('created_at', { ascending: false })
+      if (data) setOrders(data)
+    }
+    setLoadingData(false)
+  }
+
+  useEffect(() => {
+    if (mounted && profile?.role === 'admin') {
+      fetchData()
+    } else if (mounted && !authLoading && profile?.role !== 'admin') {
+      router.push('/')
+    }
+  }, [mounted, profile, authLoading, activeTab])
+
+  // Funkcja zmiany punktów
+  const adjustPoints = async (userId: string, amount: number) => {
+    const user = users.find(u => u.id === userId)
+    const newPoints = Math.max(0, (user?.points || 0) + amount)
+    const { error } = await supabase.from('profiles').update({ points: newPoints }).eq('id', userId)
+    if (!error) setUsers(users.map(u => u.id === userId ? { ...u, points: newPoints } : u))
+  }
+
+  // Funkcja wydawania nagrody
+  const handleDeliver = async (orderId: string) => {
+    const { error } = await supabase
+      .from('reward_claims')
+      .update({ status: 'collected' })
+      .eq('id', orderId)
+    
+    if (!error) {
+      setOrders(orders.map(o => o.id === orderId ? { ...o, status: 'collected' } : o))
     }
   }
 
-  return (
-    <div className="min-h-screen bg-gray-100 pt-32 pb-16">
-      <div className="container mx-auto px-6 max-w-2xl">
-        <div className="bg-white rounded-[2.5rem] p-10 shadow-xl border-2 border-zinc-100">
-          <h1 className="text-3xl font-black font-heading mb-8 flex items-center gap-3">
-            <PlusCircle className="text-[#BF2024]" /> PANEL ADMINA
-          </h1>
+  if (!mounted || authLoading) return null
 
-          {errorMsg && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl flex items-center gap-2 text-red-600 font-bold text-sm">
-                <AlertCircle size={20} /> {errorMsg}
+  return (
+    <div className="min-h-screen bg-[#F4F7FE] pt-28 pb-12 px-6">
+      <div className="max-w-7xl mx-auto space-y-8">
+        
+        {/* NAGŁÓWEK */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <div className="bg-zinc-900 p-3 rounded-2xl text-white">
+               <ShieldCheck size={32} />
+            </div>
+            <div>
+              <h1 className="text-4xl font-black text-zinc-900">Admin Panel</h1>
+              <p className="text-zinc-400 font-bold uppercase tracking-widest text-[10px]">Zarządzanie Sklepem Urwis</p>
+            </div>
+          </div>
+
+          {/* PRZEŁĄCZNIK ZAKŁADEK */}
+          <div className="flex bg-white p-1.5 rounded-2xl shadow-sm border border-zinc-100">
+            <TabButton active={activeTab === 'users'} onClick={() => setActiveTab('users')} icon={<Users size={16}/>} label="Urwisy" />
+            <TabButton active={activeTab === 'orders'} onClick={() => setActiveTab('orders')} icon={<ShoppingBag size={16}/>} label="Zamówienia" />
+          </div>
+        </div>
+
+        {/* WYSZUKIWARKA */}
+        <div className="relative max-w-md">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
+          <input 
+            type="text"
+            placeholder={activeTab === 'users' ? "Szukaj urwisa..." : "Szukaj po kodzie lub nicku..."}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-12 pr-6 py-4 rounded-2xl border-none shadow-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all"
+          />
+        </div>
+
+        {/* TREŚĆ ZAKŁADEK */}
+        <div className="bg-white rounded-[2.5rem] shadow-sm border border-zinc-100 overflow-hidden min-h-[500px]">
+          {loadingData ? (
+            <div className="flex flex-col items-center justify-center h-[500px] gap-4">
+               <RefreshCw className="animate-spin text-blue-500" size={40} />
+               <p className="text-zinc-400 font-black uppercase tracking-widest text-xs">Pobieranie danych...</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              {activeTab === 'users' ? (
+                /* TABELA URWISÓW */
+                <table className="w-full text-left">
+                  <thead className="bg-zinc-50/50 border-b border-zinc-100">
+                    <tr>
+                      <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-zinc-400">Agent</th>
+                      <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-zinc-400">Punkty</th>
+                      <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-zinc-400 text-right">Akcje</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-50">
+                    {users.filter(u => u.username.toLowerCase().includes(searchQuery.toLowerCase())).map(u => (
+                      <tr key={u.id} className="hover:bg-zinc-50/50 transition-colors group">
+                        <td className="px-8 py-6">
+                          <div className="flex items-center gap-4">
+                            <span className="text-3xl not-italic">{u.avatar_url || '🐱'}</span>
+                            <span className="font-black text-zinc-900">{u.username}</span>
+                          </div>
+                        </td>
+                        <td className="px-8 py-6">
+                           <div className="flex items-center gap-2">
+                              <Star className="text-yellow-400" fill="currentColor" size={16} />
+                              <span className="font-black text-xl text-blue-600">{u.points}</span>
+                           </div>
+                        </td>
+                        <td className="px-8 py-6 text-right">
+                          <div className="flex justify-end gap-2">
+                            <button onClick={() => adjustPoints(u.id, -10)} className="p-2 bg-zinc-50 rounded-lg text-zinc-400 hover:text-red-500 transition-all"><Minus size={16}/></button>
+                            <button onClick={() => adjustPoints(u.id, 10)} className="p-2 bg-zinc-50 rounded-lg text-zinc-400 hover:text-green-500 transition-all"><Plus size={16}/></button>
+                            <button onClick={() => adjustPoints(u.id, 50)} className="px-4 py-2 bg-zinc-900 text-white rounded-xl font-black text-[10px] uppercase">+50</button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                /* TABELA ZAMÓWIEŃ */
+                <table className="w-full text-left">
+                  <thead className="bg-zinc-50/50 border-b border-zinc-100">
+                    <tr>
+                      <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-zinc-400">Kod / Status</th>
+                      <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-zinc-400">Urwis</th>
+                      <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-zinc-400">Nagroda</th>
+                      <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-zinc-400 text-right">Akcja</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-50">
+                    {orders.length === 0 ? (
+                      <tr><td colSpan={4} className="p-20 text-center text-zinc-300 font-bold">Brak zamówień do wyświetlenia.</td></tr>
+                    ) : orders.map(o => (
+                      <tr key={o.id} className="hover:bg-zinc-50/50 transition-colors">
+                        <td className="px-8 py-6">
+                          <div className="flex flex-col gap-1">
+                            <span className="font-black text-zinc-900 font-mono text-lg">{o.claim_code}</span>
+                            {o.status === 'pending' ? (
+                              <span className="flex items-center gap-1 text-[10px] font-black text-orange-500 uppercase"><Clock size={10}/> Oczekuje</span>
+                            ) : (
+                              <span className="flex items-center gap-1 text-[10px] font-black text-green-500 uppercase"><CheckCircle size={10}/> Wydano</span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-8 py-6 font-bold text-zinc-600">{o.profiles?.username}</td>
+                        <td className="px-8 py-6">
+                          <div className="flex items-center gap-2">
+                             <span className="not-italic text-xl">{o.rewards?.image_url}</span>
+                             <span className="font-bold text-zinc-900">{o.rewards?.name}</span>
+                          </div>
+                        </td>
+                        <td className="px-8 py-6 text-right">
+                          {o.status === 'pending' ? (
+                            <button 
+                              onClick={() => handleDeliver(o.id)}
+                              className="px-6 py-3 bg-blue-600 text-white rounded-xl font-black text-[10px] uppercase hover:bg-zinc-900 transition-all shadow-lg shadow-blue-100 flex items-center gap-2 ml-auto"
+                            >
+                              Wydaj Nagrodę <Package size={14} />
+                            </button>
+                          ) : (
+                            <span className="text-zinc-300 font-black text-[10px] uppercase">Zrealizowane</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </div>
           )}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-black mb-2 uppercase tracking-widest">Nazwa produktu</label>
-              <input 
-                required
-                className="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-[#0055ff] outline-none transition-all"
-                value={formData.title}
-                onChange={e => setFormData({...formData, title: e.target.value})}
-                placeholder="np. Klocki LEGO Technic"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-black mb-2 uppercase tracking-widest">Stara Cena</label>
-                <input 
-                  required type="text"
-                  className="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl outline-none"
-                  value={formData.old_price}
-                  onChange={e => setFormData({...formData, old_price: e.target.value})}
-                  placeholder="0.00"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-black mb-2 uppercase tracking-widest">Nowa Cena</label>
-                <input 
-                  required type="text"
-                  className="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl outline-none"
-                  value={formData.new_price}
-                  onChange={e => setFormData({...formData, new_price: e.target.value})}
-                  placeholder="0.00"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-black mb-2 uppercase tracking-widest">Badge (np. -20%)</label>
-                <input 
-                  className="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl outline-none"
-                  value={formData.badge}
-                  onChange={e => setFormData({...formData, badge: e.target.value})}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-black mb-2 uppercase tracking-widest">Kategoria</label>
-                <select 
-                  className="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl outline-none cursor-pointer"
-                  value={formData.category}
-                  onChange={e => setFormData({...formData, category: e.target.value})}
-                >
-                  <option>Zabawki</option>
-                  <option>Szkoła</option>
-                  <option>Imprezy</option>
-                  <option>Gry</option>
-                </select>
-              </div>
-            </div>
-
-            <label className="flex items-center gap-3 cursor-pointer p-4 bg-blue-50 rounded-2xl border-2 border-blue-100 hover:bg-blue-100 transition-colors">
-              <input 
-                type="checkbox" 
-                className="w-5 h-5 accent-[#0055ff]"
-                checked={formData.is_hero_highlight}
-                onChange={e => setFormData({...formData, is_hero_highlight: e.target.checked})}
-              />
-              <span className="font-bold text-blue-900">Pokaż na głównej stronie (Gorące Okazje)</span>
-            </label>
-
-            <button 
-              disabled={loading}
-              className={`w-full py-5 rounded-2xl font-black uppercase tracking-widest transition-all ${
-                success ? 'bg-green-500 text-white' : 'bg-zinc-900 hover:bg-[#BF2024] text-white shadow-lg cursor-pointer'
-              }`}
-            >
-              {loading ? 'Wysyłanie...' : success ? <span className="flex items-center justify-center gap-2"><Check /> Dodano pomyślnie!</span> : 'Opublikuj promocję'}
-            </button>
-          </form>
         </div>
       </div>
     </div>
+  )
+}
+
+function TabButton({ active, onClick, icon, label }: any) {
+  return (
+    <button 
+      onClick={onClick}
+      className={`flex items-center gap-2 px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all
+        ${active ? 'bg-zinc-900 text-white shadow-lg' : 'text-zinc-400 hover:bg-zinc-50'}`}
+    >
+      {icon} {label}
+    </button>
   )
 }
