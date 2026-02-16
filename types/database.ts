@@ -7,7 +7,7 @@ export interface Profile {
   level: number;
   total_exp: number;
   avatar_url: string | null;
-  role: 'user' | 'moderator' | 'admin'
+  role: UserRole;
   created_at?: string;
   updated_at?: string;
 }
@@ -60,6 +60,18 @@ export interface UserMission {
   claimed: boolean;
   completed_at?: string;
   created_at: string;
+}
+
+export interface QuizSession {
+  id: string
+  user_id: string
+  mode: 'single' | 'duel' | 'challenge' | 'party'
+  category: string
+  questions_count: number
+  score: number
+  accuracy: number
+  max_streak: number
+  completed_at: string
 }
 
 // Supabase Database schema
