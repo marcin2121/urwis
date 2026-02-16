@@ -5,8 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { User, Session } from '@supabase/supabase-js'
 import type { Profile } from '@/types/database'
 import { useRouter } from 'next/navigation'
-// Zakładam, że masz bibliotekę do powiadomień, np. sonner lub react-hot-toast
-// import { toast } from 'sonner' 
+import { GuestProgress } from '@/lib/guest-progress'
 
 interface AuthContextType {
   user: User | null
@@ -20,7 +19,7 @@ interface AuthContextType {
   register: (email: string, username: string, password: string) => Promise<boolean>
   updateProfile: (updates: Partial<Profile>) => Promise<boolean>
   signOut: () => Promise<void>
-  refreshProfile: () => Promise<void> // Nowa funkcja pomocnicza
+  refreshProfile: () => Promise<void>
 }
 
 const SupabaseAuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -33,7 +32,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
   const [loading, setLoading] = useState(true)
   const router = useRouter()
 
-  // Pobieranie profilu z bazy danych
+  // 1. Pobieranie profilu
   const fetchProfile = useCallback(async (userId: string) => {
     try {
       const { data, error } = await supabase
@@ -43,16 +42,13 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
         .single()
 
       if (error) {
-        // Jeśli profil nie istnieje (PGRST116), to normalne przy pierwszej rejestracji,
-        // zanim trigger zadziała. Nie tworzymy tu fake'owego profilu.
         if (error.code === 'PGRST116') {
-          console.warn('Profile not found yet (waiting for trigger or creation).')
+          // Profil jeszcze nie istnieje (np. trigger nie zadziałał), czekamy.
           setProfile(null)
           return
         }
         throw error
       }
-
       setProfile(data)
     } catch (err: any) {
       console.error('Error fetching profile:', err.message)
@@ -60,17 +56,39 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     }
   }, [])
 
-  // Inicjalizacja sesji
+  // 2. Synchronizacja XP Gościa (Nowość!)
+  const syncGuestProgress = async (userId: string) => {
+    const guestXP = GuestProgress.getXPForTransfer()
+
+    if (guestXP > 0) {
+      console.log(`Przenoszenie ${guestXP} XP z konta gościa...`)
+      try {
+        // Zakładamy, że masz funkcję RPC 'add_user_rewards' w bazie
+        const { error } = await supabase.rpc('add_user_rewards', {
+          p_user_id: userId,
+          p_points: Math.floor(guestXP / 2), // Np. połowa XP jako punkty (coins)
+          p_xp: guestXP
+        })
+
+        if (!error) {
+          GuestProgress.clear() // Wyczyść localStorage po sukcesie
+          await fetchProfile(userId) // Odśwież profil, żeby zobaczyć nowe XP
+          // Tutaj możesz dodać toast.success("Przeniesiono Twoje XP z gier!")
+        }
+      } catch (err) {
+        console.error('Błąd synchronizacji XP:', err)
+      }
+    }
+  }
+
+  // 3. Inicjalizacja i nasłuchiwanie
   useEffect(() => {
     let mounted = true
 
     const initAuth = async () => {
       try {
-        // Pobierz sesję początkową
         const { data: { session: currentSession }, error } = await supabase.auth.getSession()
-
         if (!mounted) return
-
         if (error) throw error
 
         setSession(currentSession)
@@ -88,24 +106,26 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
 
     initAuth()
 
-    // Nasłuchiwanie zmian w autoryzacji
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
       if (!mounted) return
-
-      // Ignoruj INITIAL_SESSION, bo obsłużyliśmy to w initAuth
       if (event === 'INITIAL_SESSION') return
 
       setSession(newSession)
       setUser(newSession?.user ?? null)
 
       if (newSession?.user && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
-        setLoading(true) // Pokaż loading podczas odświeżania profilu
+        // Przy zalogowaniu sprawdzamy czy user ma XP z bycia gościem
+        if (event === 'SIGNED_IN') {
+          await syncGuestProgress(newSession.user.id)
+        }
+
         await fetchProfile(newSession.user.id)
         if (mounted) setLoading(false)
+
       } else if (event === 'SIGNED_OUT') {
         setProfile(null)
         setLoading(false)
-        router.push('/') // Opcjonalnie: przekieruj na stronę główną
+        router.push('/')
       }
     })
 
@@ -115,6 +135,8 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     }
   }, [fetchProfile, router])
 
+  // --- Metody Publiczne ---
+
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       setLoading(true)
@@ -122,16 +144,12 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
         email: email.trim(),
         password,
       })
-
       if (error) {
-        // toast.error(error.message)
         console.error('Login error:', error.message)
         return false
       }
-
       return true
     } catch (err: any) {
-      console.error('Login exception:', err.message)
       return false
     } finally {
       setLoading(false)
@@ -145,23 +163,15 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
         email: email.trim(),
         password,
         options: {
-          data: {
-            username: username.trim(),
-            // Możemy tu dodać avatar_url itp.
-          },
+          data: { username: username.trim() },
         },
       })
-
       if (error) {
-        // toast.error(error.message)
         console.error('Register error:', error.message)
         return false
       }
-
-      // toast.success('Sprawdź email, aby potwierdzić konto!')
       return true
     } catch (err: any) {
-      console.error('Register exception:', err.message)
       return false
     } finally {
       setLoading(false)
@@ -170,7 +180,6 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
 
   const updateProfile = async (updates: Partial<Profile>): Promise<boolean> => {
     if (!user) return false
-
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -180,13 +189,10 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
         .single()
 
       if (error) throw error
-
       setProfile(data)
-      // toast.success('Profil zaktualizowany')
       return true
     } catch (err: any) {
       console.error('Update profile error:', err.message)
-      // toast.error('Błąd aktualizacji profilu')
       return false
     }
   }
@@ -195,9 +201,6 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     try {
       const { error } = await supabase.auth.signOut()
       if (error) throw error
-
-      // Stan wyczyści się automatycznie dzięki onAuthStateChange
-      // ale dla pewności przy nawigacji:
       setUser(null)
       setSession(null)
       setProfile(null)
@@ -208,30 +211,18 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
   }
 
   const refreshProfile = async () => {
-    if (user) {
-      await fetchProfile(user.id)
-    }
+    if (user) await fetchProfile(user.id)
   }
 
-  // Role
   const isAdmin = profile?.role === 'admin'
   const isModerator = profile?.role === 'moderator' || profile?.role === 'admin'
 
   return (
     <SupabaseAuthContext.Provider
       value={{
-        user,
-        session,
-        profile,
-        isAuthenticated: !!session,
-        isAdmin,
-        isModerator,
-        loading,
-        login,
-        register,
-        updateProfile,
-        signOut,
-        refreshProfile,
+        user, session, profile, isAuthenticated: !!session,
+        isAdmin, isModerator, loading,
+        login, register, updateProfile, signOut, refreshProfile,
       }}
     >
       {children}
