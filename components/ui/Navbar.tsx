@@ -4,12 +4,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import AuthModal from '@/components/AuthModal';
+import { Database } from '@/types/supabase'; // Dostosuj ścieżkę do twoich typów
 
 type NavItem = {
   name: string;
   href: string;
   icon: string;
 };
+
+// Type-safe profile z Supabase
+type Profile = Database['public']['Tables']['profiles']['Row'] | null;
 
 const navItems: NavItem[] = [
   { name: "🏠 Strona główna", href: "/", icon: "🏠" },
@@ -21,10 +25,10 @@ const navItems: NavItem[] = [
 ];
 
 interface ProfileButtonProps {
-  profile: any;
+  profile: Profile;
   session: any;
   onAuthClick: () => void;
-  onSignOut: () => void;
+  onSignOut: () => Promise<void>;
   className?: string;
   isMobile?: boolean;
 }
@@ -42,59 +46,66 @@ const ProfileButton = memo(({
   const mobileClass = isMobile
     ? "flex-col gap-4 w-full [&>a]:w-full [&>button]:w-full text-lg"
     : "";
+  const containerClass = `${baseClass} ${mobileClass} ${className}`;
 
   if (isLoading) {
     return (
-      <div className={`${baseClass} ${mobileClass} ${className}`}>
-        <div className="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 animate-pulse w-full" />
+      <div className={containerClass}>
+        <div className="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 animate-pulse w-full h-12" />
+      </div>
+    );
+  }
+
+  if (session && profile) {
+    return (
+      <div className={containerClass}>
+        <Link
+          href="/profil"
+          className="flex items-center gap-2.5 px-6 py-3 rounded-2xl bg-gradient-to-r from-[#E94444] to-[#1473E6] text-white font-black shadow-xl hover:shadow-2xl transition-all flex-1 max-w-xs"
+        >
+          <span className="text-xl sm:hidden">👤</span>
+          <div className="hidden sm:block min-w-0">
+            <div className="text-sm font-bold leading-tight truncate" title={profile.username}>
+              {profile.username}
+            </div>
+            <div className="text-xs">Lv.{profile.level ?? 1}</div>
+          </div>
+        </Link>
+        <motion.button
+          onClick={onSignOut}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="px-3 py-3 rounded-2xl bg-gradient-to-r from-red-500 to-red-600 text-white font-black shadow-xl hover:shadow-2xl hover:from-red-600 hover:to-red-700 transition-all whitespace-nowrap"
+          aria-label="Wyloguj się"
+        >
+          🚪
+        </motion.button>
       </div>
     );
   }
 
   return (
-    <div className={`${baseClass} ${mobileClass} ${className}`}>
-      {session && profile ? (
-        <>
-          <Link
-            href="/profil"
-            className="flex items-center gap-2.5 px-6 py-3 rounded-2xl bg-gradient-to-r from-[#E94444] to-[#1473E6] text-white font-black shadow-xl hover:shadow-2xl transition-all"
-          >
-            <span className="text-xl sm:hidden">👤</span>
-            <div className="hidden sm:block">
-              <div className="text-sm font-bold leading-tight">{profile.username}</div>
-              <div className="text-xs">Lv.{profile.level}</div>
-            </div>
-          </Link>
-          <motion.button
-            onClick={onSignOut}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-3 py-3 rounded-2xl bg-gradient-to-r from-red-500 to-red-600 text-white font-black shadow-xl hover:shadow-2xl hover:from-red-600 hover:to-red-700 transition-all"
-            aria-label="Wyloguj się"
-          >
-            🚪
-          </motion.button>
-        </>
-      ) : (
-        <motion.button
-          onClick={onAuthClick}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-black shadow-xl hover:shadow-2xl hover:from-emerald-600 hover:to-emerald-700 transition-all"
-          aria-label="Załóż konto lub zaloguj się"
-        >
-          👤 Konto
-        </motion.button>
-      )}
+    <div className={containerClass}>
+      <motion.button
+        onClick={onAuthClick}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-black shadow-xl hover:shadow-2xl hover:from-emerald-600 hover:to-emerald-700 transition-all w-full sm:w-auto"
+        aria-label="Załóż konto lub zaloguj się"
+      >
+        👤 Konto
+      </motion.button>
     </div>
   );
 });
 
 ProfileButton.displayName = 'ProfileButton';
 
-const Navbar = memo(() => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
+interface NavbarProps { }
+
+const Navbar = memo(({ }: NavbarProps) => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const { profile, session, signOut } = useSupabaseAuth();
 
   const handleAuthClick = useCallback(() => {
@@ -102,16 +113,22 @@ const Navbar = memo(() => {
     setIsOpen(false);
   }, []);
 
-  const handleSignOut = useCallback(async () => {
+  const handleSignOut = useCallback(async (): Promise<void> => {
     try {
-      await signOut();
+      if (signOut) {
+        await signOut();
+      }
     } catch (error) {
-      console.error('Wylogowanie nieudane:', error);
+      console.error('Błąd wylogowania:', error);
     }
     setIsOpen(false);
   }, [signOut]);
 
-  const closeMenu = useCallback(() => setIsOpen(false), []);
+  const closeMenu = useCallback(() => {
+    setIsOpen(false);
+  }, []);
+
+  const safeProfile = profile as Profile;
 
   return (
     <>
@@ -129,13 +146,14 @@ const Navbar = memo(() => {
               {/* LOGO */}
               <Link
                 href="/"
-                className="flex items-center gap-3 group p-2 -m-2 rounded-2xl hover:bg-white/50 transition-all"
-                aria-label="Urwis - Strona główna"
+                className="flex items-center gap-3 group p-2 -m-2 rounded-2xl hover:bg-white/50 transition-all hover:scale-[1.02]"
+                aria-label="Urwis Białobrzegi - Strona główna"
               >
                 <motion.div
                   whileHover={{ scale: 1.15, rotate: 360 }}
                   transition={{ duration: 0.6, type: "spring" }}
-                  className="relative w-14 h-14"
+                  className="relative w-14 h-14 flex-shrink-0"
+                  aria-hidden
                 >
                   <div className="w-full h-full bg-gradient-to-br from-red-500 to-orange-500 rounded-2xl shadow-2xl flex items-center justify-center border-4 border-white drop-shadow-2xl">
                     <span className="text-3xl font-black">🦸</span>
@@ -145,25 +163,30 @@ const Navbar = memo(() => {
                   </div>
                 </motion.div>
                 <div className="hidden sm:block">
-                  <div className="text-xl font-black bg-gradient-to-r from-gray-900 to-gray-800 bg-clip-text">URWIS</div>
+                  <div className="text-xl font-black bg-gradient-to-r from-gray-900 to-gray-800 bg-clip-text leading-tight">URWIS</div>
                   <div className="text-xs font-bold uppercase tracking-widest text-[#E94444]">Białobrzegi</div>
                 </div>
               </Link>
 
-              {/* DESKTOP MENU + NOTIFICATIONS */}
+              {/* DESKTOP NAV + NOTIFICATIONS + PROFILE */}
               <div className="hidden lg:flex items-center gap-4">
-                <div className="flex items-center gap-1 min-w-[400px]">
+                {/* Nav Links */}
+                <div className="flex items-center gap-1 flex-1 min-w-[450px]">
                   {navItems.map((item) => (
                     <Link
                       key={item.href}
                       href={item.href}
-                      className="group relative px-5 py-3 text-sm font-black text-gray-800 hover:text-[#E94444] transition-all rounded-xl hover:bg-gradient-to-r hover:from-[#E94444]/10 hover:to-[#1473E6]/10 hover:shadow-lg flex-1"
+                      className="group relative px-4 py-3 text-sm font-black text-gray-800 hover:text-[#E94444] transition-all rounded-xl hover:bg-gradient-to-r hover:from-[#E94444]/10 hover:to-[#1473E6]/10 hover:shadow-lg flex-1 text-center"
                       aria-label={item.name}
                     >
-                      <span className="flex items-center gap-1.5">{item.name}</span>
+                      <span className="flex items-center justify-center gap-1.5 min-w-0">
+                        <span className="text-lg">{item.icon}</span>
+                        <span className="truncate">{item.name}</span>
+                      </span>
                       <motion.div
                         className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#E94444] to-[#1473E6] opacity-0 group-hover:opacity-[0.15]"
                         layoutId="nav-hover"
+                        aria-hidden
                       />
                     </Link>
                   ))}
@@ -171,7 +194,7 @@ const Navbar = memo(() => {
 
                 {/* 🔔 Notifications */}
                 <motion.div
-                  className="relative p-3 rounded-2xl bg-gradient-to-br from-[#FFBE0B] to-orange-500 text-white shadow-xl hover:shadow-2xl hover:scale-110 transition-all cursor-pointer"
+                  className="relative p-3 rounded-2xl bg-gradient-to-br from-[#FFBE0B] to-orange-500 text-white shadow-xl hover:shadow-2xl hover:scale-110 transition-all cursor-pointer flex-shrink-0"
                   whileHover={{ rotate: 360 }}
                   whileTap={{ scale: 0.95 }}
                   aria-label="Powiadomienia (3 nowe)"
@@ -187,7 +210,7 @@ const Navbar = memo(() => {
                 </motion.div>
 
                 <ProfileButton
-                  profile={profile}
+                  profile={safeProfile}
                   session={session}
                   onAuthClick={handleAuthClick}
                   onSignOut={handleSignOut}
@@ -196,8 +219,8 @@ const Navbar = memo(() => {
 
               {/* ☰ MOBILE HAMBURGER */}
               <motion.button
-                onClick={() => setIsOpen(!isOpen)}
-                className="lg:hidden p-3 rounded-2xl bg-white/80 backdrop-blur shadow-lg hover:shadow-xl hover:bg-white transition-all"
+                onClick={() => setIsOpen((prev) => !prev)}
+                className="lg:hidden p-3 rounded-2xl bg-white/80 backdrop-blur shadow-lg hover:shadow-xl hover:bg-white transition-all flex-shrink-0"
                 whileTap={{ scale: 0.95 }}
                 whileHover={{ scale: 1.1 }}
                 aria-label={isOpen ? "Zamknij menu" : "Otwórz menu"}
@@ -207,6 +230,126 @@ const Navbar = memo(() => {
                   animate={{ rotate: isOpen ? 90 : 0 }}
                   transition={{ duration: 0.3 }}
                   className="w-7 h-7 flex flex-col justify-center items-center gap-0.5"
+                  aria-hidden
                 >
                   <motion.span
-                    className="w-6 h-0.5 bg-
+                    className="w-6 h-0.5 bg-gray-800 rounded-full origin-center"
+                    animate={{ rotate: isOpen ? 45 : 0, y: isOpen ? 1.5 : 0 }}
+                    transition={{ duration: 0.2 }}
+                  />
+                  <motion.span
+                    className="w-6 h-0.5 bg-gray-800 rounded-full origin-center"
+                    animate={{ opacity: isOpen ? 0 : 1 }}
+                  />
+                  <motion.span
+                    className="w-6 h-0.5 bg-gray-800 rounded-full origin-center"
+                    animate={{ rotate: isOpen ? -45 : 0, y: isOpen ? -1.5 : 0 }}
+                    transition={{ duration: 0.2 }}
+                  />
+                </motion.div>
+              </motion.button>
+            </nav>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* 📱 MOBILE MENU */}
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-40 lg:hidden bg-black/20 backdrop-blur-sm"
+              onClick={closeMenu}
+            />
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 50 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 50 }}
+              transition={{ type: "spring", damping: 20, stiffness: 300 }}
+              className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[95vw] max-w-md z-50 lg:hidden max-h-[80vh] overflow-hidden"
+            >
+              <div className="bg-white/95 backdrop-blur-xl rounded-3xl p-6 shadow-2xl border-4 border-white/50">
+                <div className="space-y-6 overflow-y-auto max-h-[60vh]">
+
+                  {/* 👤 MOBILE PROFILE (opcjonalne) */}
+                  {session && profile && (
+                    <Link href="/profil" onClick={closeMenu} className="block">
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="p-6 bg-gradient-to-r from-[#E94444] to-[#1473E6] text-white rounded-3xl shadow-2xl cursor-pointer hover:shadow-3xl hover:scale-[1.02] transition-all flex items-center gap-4"
+                        whileHover={{ scale: 1.02 }}
+                      >
+                        <div className="w-16 h-16 bg-white/20 backdrop-blur-xl rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
+                          <span className="text-3xl">🦸‍♂️</span>
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-xl font-black truncate" title={profile.username}>
+                            {profile.username}
+                          </div>
+                          <div className="text-lg font-bold text-yellow-300">
+                            Lv. {profile.level ?? 1}
+                          </div>
+                          <div className="text-sm opacity-90">
+                            {profile.total_exp ?? 0} EXP
+                          </div>
+                        </div>
+                      </motion.div>
+                    </Link>
+                  )}
+
+                  {/* 📋 NAV ITEMS - ZAWSZE */}
+                  {navItems.map((item, idx) => (
+                    <motion.div
+                      key={`${item.href}-${idx}`}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.05 * idx }}
+                    >
+                      <Link
+                        href={item.href}
+                        onClick={closeMenu}
+                        className="flex items-center gap-4 p-5 rounded-2xl text-xl font-black text-gray-800 hover:text-[#E94444] hover:bg-gradient-to-r hover:from-[#E94444]/20 hover:to-[#1473E6]/20 hover:shadow-xl transition-all shadow-md group"
+                        aria-label={item.name}
+                      >
+                        <span className="text-2xl flex-shrink-0">{item.icon}</span>
+                        <span className="flex-1 min-w-0">{item.name}</span>
+                        <motion.div
+                          className="w-2 h-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity ml-auto"
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                        />
+                      </Link>
+                    </motion.div>
+                  ))}
+
+                  {/* Konto/Wyloguj */}
+                  <div className="pt-6 space-y-4 border-t-4 border-[#FFBE0B]/50 rounded-xl p-4 bg-gradient-to-r from-yellow-50 to-orange-50">
+                    <ProfileButton
+                      profile={safeProfile}
+                      session={session}
+                      onAuthClick={handleAuthClick}
+                      onSignOut={handleSignOut}
+                      isMobile={true}
+                    />
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+      />
+    </>
+  );
+});
+
+Navbar.displayName = 'Navbar';
+export default Navbar;
