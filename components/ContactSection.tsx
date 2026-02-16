@@ -354,7 +354,7 @@ export default function ContactSection() {
             </div>
 
             {/* Google Maps Embed */}
-            <div className="relative h-[500px] w-full">
+            <div className="relative h-[700px] w-full">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d8413.861345556805!2d20.950292!3d51.645135!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4718fdfaefa939bb%3A0x70c667b47a29301c!2sSklep%20Urwis!5e1!3m2!1spl!2spl!4v1771091119479!5m2!1spl!2spl"
                 width="100%"
@@ -368,30 +368,8 @@ export default function ContactSection() {
               />
             </div>
 
-            {/* Quick Actions */}
-            <div className="p-6 grid grid-cols-2 gap-4">
-              <motion.a
-                href="https://maps.google.com/?cid=8112829577330745372"
-                target="_blank"
-                rel="noopener noreferrer"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex items-center justify-center gap-2 px-4 py-3 bg-linear-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-bold text-sm shadow-lg"
-              >
-                <span>🧭</span>
-                <span>Nawiguj</span>
-              </motion.a>
-
-              <motion.a
-                href="tel:+48604208183"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex items-center justify-center gap-2 px-4 py-3 bg-linear-to-r from-green-500 to-emerald-500 text-white rounded-xl font-bold text-sm shadow-lg"
-              >
-                <span>📞</span>
-                <span>Zadzwoń</span>
-              </motion.a>
-            </div>
+            
+            
           </motion.div>
         </div>
       </div>
