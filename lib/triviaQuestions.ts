@@ -466,84 +466,84 @@ export const TRIVIA_QUESTIONS: TriviaQuestion[] = [
     category: "🔢 Matematyka"
   },
   {
-    „question”: „Mokasyny to jaka część garderoby ?”,
+    question: „Mokasyny to jaka część garderoby?”,
     „options”: [„Spodnie”, „Buty”, „Skarpety”, „Rękawice”],
     „correct”: 2,
     „exp”: 15,
   category: „📚Język polski”
   },
 {
-    „question”: „Jaki jest największy organ w ciele człowieka ?”,
+  question: „Jaki jest największy organ w ciele człowieka ?”,
     „options”: [„Skóra”, „Jelito cienkie”, „Jelito grube”, „Noga”],
     „correct”: 1,
     „exp”: 15,
     category: „ 📚Biologia”
 },
 {
-    „question”: „Co wytwarza bednarz ?”,
+  question: „Co wytwarza bednarz ?”,
     „options”: [„Śrubki”, „Beczki”, „Pokrycia dachowe”, „Buty”],
     „correct”: 2,
     „exp”: 15,
     category: „📚 Zawody”
 },
 {
-    „question”: Uzupełnij brakujące słowo w przysłowiu „Kuć …, póki gorące”,
+  question: Uzupełnij brakujące słowo w przysłowiu „Kuć …, póki gorące”,
     „options”: [„Żelazo”, „Żeliwo”, „”Okazje, „Metale”],
     „correct”: 1,
     „exp”: 15,
     category: „📚Język polski”
 },
 {
-    „question”: „Słońce to”,
+  question: „Słońce to”,
     „options”: [„Planeta”, „Gwiazda”, „Ziemski satelita”, „Planeta karłowata”],
     „correct”: 2,
     „exp”: 15,
     category: „📚Astronomia”
 },
 {
-    „question”: „Który z podanych instrumentów należy do grupy instrumentów dętych ?”,
+  question: „Który z podanych instrumentów należy do grupy instrumentów dętych ?”,
     „options”: [„Harfa”, „Puzon”, „Marakasy”, „Skrzypce”],
     „correct”: 2,
     „exp”: 15,
     category: „📚Instrumenty”
 },
 {
-    „question”: „Jakiego składnika nie znajdziesz w przepisie na naleśniki ?”,
+  question: „Jakiego składnika nie znajdziesz w przepisie na naleśniki ?”,
     „options”: [„Mąka”, „Mleko”, „Jajko”, „Bułka tarta”],
     „correct”: 4,
     „exp”: 15,
     category: „📚Kulinaria”
 },
 {
-    „question”: „Mieszkaniec Maroka to”,
+  question: „Mieszkaniec Maroka to”,
     „options”: [„Marokanin”, „Makarończyk”, „Marokaniec”, „Marokańczyk”],
     „correct”: 4,
     „exp”: 15,
     category: „📚Język polski”
 },
 {
-    „question”: Uzupełnij brakujące słowo w przysłowiu „Kuć …, póki gorące”,
+  question: Uzupełnij brakujące słowo w przysłowiu „Kuć …, póki gorące”,
     „options”: [„Żelazo”, „Żeliwo”, „”Okazje, „Metale”],
     „correct”: 0,
     „exp”: 15,
     category: „📚Język polski”
 },
-  
-    „question”: „Na ile babka wróżyła ?”,
+
+question: „Na ile babka wróżyła ?”,
     „options”: [„Na jedno”, „Na dwoje”, „Na troje”, „Na czworo”],
     „correct”: 3,
     „exp”: 15,
   category: „📚 Miejsca”
   },
 {
-    „question”: „Wynik dzielenia to”,
+  question: „Wynik dzielenia to”,
     „options”: [„Suma”, „Różnica”, „Iloczyn”, „Iloraz”],
     „correct”: 3,
     „exp”: 15,
     category: „📚 Miejsca”
 },
 {
-    „question”: „Jaki jest najkrótszy miesiąc w roku ?”,
+  question: „Jaki jest najkrótszy miesiąc w roku ?”,
     „options”: [„Styczeń”, „Luty”, „
     Marzec”, „Kwiecień”],
     „correct”: 1,
