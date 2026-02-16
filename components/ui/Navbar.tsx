@@ -11,6 +11,15 @@ type NavItem = {
   icon: string;
 };
 
+type Profile = {
+  username: string;
+  level?: number;
+};
+
+type Session = {
+  // Dodaj typy dla sesji jeśli potrzebne
+};
+
 const navItems: NavItem[] = [
   { name: "🏠 Home", href: "/", icon: "🏠" },
   { name: "📞 Kontakt", href: "/kontakt", icon: "📞" },
@@ -21,19 +30,31 @@ const navItems: NavItem[] = [
 ];
 
 const Navbar = memo(() => {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const { profile, session, signOut, isLoading } = useSupabaseAuth();
+  const [mobileOpen, setMobileOpen] = useState<boolean>(false);
+  const [notificationsOpen, setNotificationsOpen] = useState<boolean>(false);
+  const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
+
+  const { profile, session, signOut, isLoading } = useSupabaseAuth() as {
+    profile: Profile | null;
+    session: Session | null;
+    signOut: () => void;
+    isLoading: boolean;
+  };
 
   const toggleMobile = useCallback(() => setMobileOpen(prev => !prev), []);
   const closeMobile = useCallback(() => setMobileOpen(false), []);
   const toggleNotifications = useCallback(() => setNotificationsOpen(prev => !prev), []);
+
+  const handleAuthClick = useCallback(() => {
+    setShowAuthModal(true);
+  }, []);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setMobileOpen(false);
         setNotificationsOpen(false);
+        setShowAuthModal(false);
       }
     };
     document.addEventListener('keydown', handleEscape);
@@ -49,7 +70,7 @@ const Navbar = memo(() => {
       >
         <div className="bg-white/90 dark:bg-gray-900/90 shadow-2xl border border-white/20 dark:border-gray-800/50 rounded-3xl p-4 md:p-6 max-w-7xl mx-auto">
           <div className="flex items-center justify-between gap-4">
-
+            {/* Logo */}
             <Link
               href="/"
               className="flex items-center gap-3 group p-3 -m-3 rounded-2xl hover:bg-gradient-to-r hover:from-red-500/10 hover:to-blue-500/10 transition-all duration-300 flex-shrink-0"
@@ -73,6 +94,7 @@ const Navbar = memo(() => {
               </div>
             </Link>
 
+            {/* Desktop Navigation */}
             <div className="hidden xl:flex items-center gap-3 flex-1 justify-center max-w-4xl">
               {navItems.map((item, idx) => (
                 <Link
@@ -91,8 +113,9 @@ const Navbar = memo(() => {
               ))}
             </div>
 
+            {/* Right side: Notifications, Profile, Mobile menu */}
             <div className="flex items-center gap-3">
-
+              {/* Notifications */}
               <motion.div
                 className="relative p-3 rounded-2xl bg-gradient-to-br from-[#FFBE0B] to-orange-500 text-white shadow-xl hover:shadow-2xl cursor-pointer transition-all duration-300"
                 whileHover={{ scale: 1.05 }}
@@ -119,6 +142,7 @@ const Navbar = memo(() => {
                       className="absolute top-full right-0 mt-3 w-96 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 py-4 px-5 z-50"
                       style={{ boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}
                     >
+                      {/* Notifications content - bez zmian */}
                       <div className="flex items-center gap-3 mb-4 pb-3 border-b border-gray-200/50 dark:border-gray-700/50">
                         <span className="text-2xl">🔔</span>
                         <div>
@@ -128,8 +152,8 @@ const Navbar = memo(() => {
                           </span>
                         </div>
                       </div>
-
                       <div className="space-y-3 max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
+                        {/* 3 przykładowe powiadomienia - bez zmian */}
                         <div className="group p-4 rounded-xl hover:bg-blue-50/50 dark:hover:bg-blue-900/20 border-l-4 border-blue-400 transition-all cursor-pointer">
                           <div className="flex items-start gap-3">
                             <span className="text-2xl flex-shrink-0 mt-0.5">🎯</span>
@@ -141,7 +165,6 @@ const Navbar = memo(() => {
                             </div>
                           </div>
                         </div>
-
                         <div className="group p-4 rounded-xl hover:bg-green-50/50 dark:hover:bg-green-900/20 border-l-4 border-green-400 transition-all cursor-pointer">
                           <div className="flex items-start gap-3">
                             <span className="text-2xl flex-shrink-0 mt-0.5">🏆</span>
@@ -153,7 +176,6 @@ const Navbar = memo(() => {
                             </div>
                           </div>
                         </div>
-
                         <div className="group p-4 rounded-xl hover:bg-yellow-50/50 dark:hover:bg-yellow-900/20 border-l-4 border-yellow-400 transition-all cursor-pointer">
                           <div className="flex items-start gap-3">
                             <span className="text-2xl flex-shrink-0 mt-0.5">💎</span>
@@ -171,6 +193,7 @@ const Navbar = memo(() => {
                 </AnimatePresence>
               </motion.div>
 
+              {/* Profile/Login button */}
               {isLoading ? (
                 <div className="w-12 h-12 bg-gray-200/50 dark:bg-gray-700/50 rounded-2xl animate-pulse shadow-lg" />
               ) : session && profile ? (
@@ -200,6 +223,7 @@ const Navbar = memo(() => {
                 </motion.button>
               )}
 
+              {/* Mobile menu button */}
               <motion.button
                 className="xl:hidden p-3 rounded-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur shadow-lg hover:shadow-xl transition-all duration-300"
                 onClick={toggleMobile}
@@ -233,6 +257,7 @@ const Navbar = memo(() => {
         </div>
       </motion.nav>
 
+      {/* Mobile menu */}
       <AnimatePresence>
         {mobileOpen && (
           <>
@@ -251,7 +276,7 @@ const Navbar = memo(() => {
               className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 xl:hidden w-[calc(100%-2rem)] max-w-md max-h-[85vh]"
             >
               <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 dark:border-gray-800/50 overflow-hidden flex flex-col h-full">
-
+                {/* Mobile profile section */}
                 {session && profile && !isLoading && (
                   <Link
                     href="/profil"
@@ -272,6 +297,7 @@ const Navbar = memo(() => {
                   </Link>
                 )}
 
+                {/* Mobile navigation items */}
                 <div className="flex-1 overflow-y-auto py-8 px-6 space-y-4">
                   {navItems.map((item, idx) => (
                     <Link
@@ -292,6 +318,7 @@ const Navbar = memo(() => {
                   ))}
                 </div>
 
+                {/* Mobile bottom CTA */}
                 <div className="p-8 pt-0 border-t border-gray-200/50 dark:border-gray-700/50">
                   {isLoading ? (
                     <div className="flex items-center gap-3 p-6 rounded-2xl bg-gray-100/50 dark:bg-gray-800/50 animate-pulse">
@@ -322,16 +349,18 @@ const Navbar = memo(() => {
                 </div>
               </div>
             </motion.div>
-          )}
-          </AnimatePresence>
+          </>
+        )}
+      </AnimatePresence>
 
-        <AuthModal
-          isOpen={showAuthModal}
-          onClose={() => setShowAuthModal(false)}
-        />
-      </>
-      );
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+      />
+    </>
+  );
 });
 
-      Navbar.displayName = 'Navbar';
-      export default Navbar;
+Navbar.displayName = 'Navbar';
+export default Navbar;
