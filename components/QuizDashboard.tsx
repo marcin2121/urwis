@@ -99,4 +99,11 @@ export default function QuizDashboard({
                     <div className="text-sm font-semibold text-gray-700">{player.name}</div>
                   </div>
                 </motion.div>
-              )) || <div className="text-center py-12 text-
+              )) || <div className="text-center py-12 text-gray-400 italic text-xl">Bądź pierwszy! 🥇</div>}
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  )
+}
