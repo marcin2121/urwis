@@ -1,6 +1,6 @@
 // app/quiz/page.tsx – Pure RSC!
 import QuizDashboard from '@/components/QuizDashboard'
-import { getCategories, getLeaderboard } from '@/lib/quiz-server'  // server only!
+import { getCategories, getLeaderboard } from '@/lib/quiz-server'
 
 interface LeaderboardPlayer {
   user_id: string
@@ -14,10 +14,12 @@ export default async function QuizPage() {
     getLeaderboard(20)
   ])
 
-  const initialLeaderboard: LeaderboardPlayer[] = leaderboardRaw.map((p: any, i: number) => ({
-    ...p,
-    rank: i + 1
-  }))
+  const initialLeaderboard: LeaderboardPlayer[] = leaderboardRaw.map(
+    (p: { user_id: string; total_exp: number }, i: number) => ({
+      ...p,
+      rank: i + 1
+    })
+  )
 
   return (
     <QuizDashboard
