@@ -1,18 +1,12 @@
-import { createBrowserClient } from '@supabase/ssr'
-import type { SupabaseClient } from '@supabase/supabase-js'
+'use client';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
-let client: SupabaseClient | undefined
+let client: SupabaseClient | undefined;
 
 export function createClient() {
-  // ✅ Zwracaj ten sam client (singleton)
-  if (client) {
-    return client
-  }
+  if (client) return client;
 
-  client = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
-
-  return client
+  client = createClientComponentClient();
+  return client;
 }
