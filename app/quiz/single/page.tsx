@@ -214,4 +214,152 @@ export default function SinglePlayerQuiz() {
                   <span className="text-emerald-600">
                     Seria: <span className="text-2xl">{streak}x</span> 🔥
                   </span>
-                </
+                </div>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-4">
+                <motion.div
+                  className="bg-gradient-to-r from-emerald-400 to-orange-500 h-4 rounded-full shadow-lg"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${((current + 1) / questions.length) * 100}%` }}
+                  transition={{ duration: 0.5 }}
+                />
+              </div>
+            </motion.div>
+
+            {/* Question */}
+            <motion.div
+              key={current}
+              initial={{ opacity: 0, scale: 0.95, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              className="p-12 bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl text-center border-4 border-white/50"
+            >
+              <motion.h2
+                className="text-3xl md:text-4xl lg:text-5xl font-black mb-8 leading-tight"
+                animate={{ scale: [1, 1.02, 1] }}
+                transition={{ duration: 1, repeat: Infinity }}
+              >
+                {q.question}
+              </motion.h2>
+              <div className="text-2xl font-bold px-6 py-3 bg-purple-100 text-purple-800 rounded-2xl inline-block">
+                {q.category}
+              </div>
+            </motion.div>
+
+            {/* Answers + FEEDBACK */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={feedback || 'answers'}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+              >
+                {q.options.map((option: string, i: number) => (
+                  <motion.button
+                    key={i}
+                    onClick={() => answer(i)}
+                    whileHover={{ scale: 1.02, y: -3 }}
+                    whileTap={{ scale: 0.98 }}
+                    disabled={nextDisabled}
+                    className={`
+                      group relative p-10 rounded-3xl font-bold text-xl shadow-2xl text-left min-h-[140px] flex items-center overflow-hidden transition-all duration-300
+                      ${feedback === null
+                        ? 'bg-gradient-to-r from-indigo-50 via-white to-purple-50 hover:from-indigo-100 hover:to-purple-100 border-4 border-indigo-200 hover:border-indigo-400 hover:shadow-3xl text-gray-800 hover:text-gray-900'
+                        : feedback === 'correct' && i === q.correct
+                          ? 'bg-gradient-to-r from-emerald-400 to-emerald-600 border-4 border-emerald-400 shadow-emerald-500/50 scale-105 shadow-3xl text-white animate-bounce'
+                          : feedback === 'wrong' && i === q.correct
+                            ? 'bg-gradient-to-r from-emerald-400/80 to-emerald-500/80 border-4 border-emerald-300 shadow-emerald-300/50 text-emerald-900 font-black scale-105'
+                            : feedback === 'wrong'
+                              ? 'bg-gradient-to-r from-red-100 to-rose-100 border-4 border-red-300 opacity-50 scale-[0.97]'
+                              : 'bg-gradient-to-r from-emerald-400/60 to-emerald-500/60 border-4 border-emerald-300 shadow-emerald-300/50 text-emerald-900 font-black scale-105'
+                      }
+                    `}
+                  >
+                    <span className="text-5xl font-black mr-8 z-10 group-hover:text-indigo-700">
+                      {String.fromCharCode(65 + i)}
+                    </span>
+                    <span className="relative z-10 leading-relaxed">{option}</span>
+
+                    {/* Shine effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 transform -translate-x-[100%] group-hover:translate-x-[100%] transition-transform duration-1000 opacity-0 group-hover:opacity-100" />
+                  </motion.button>
+                ))}
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Next Question Hint */}
+            {feedback && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center p-6 bg-gradient-to-r from-emerald-50 to-orange-50 border-4 border-emerald-200 rounded-3xl"
+              >
+                <div className={`text-6xl mb-4 ${feedback === 'correct' ? 'text-emerald-600 animate-bounce' : 'text-red-600'}`}>
+                  {feedback === 'correct' ? '✅' : '❌'}
+                </div>
+                <motion.div
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ duration: 0.5, repeat: Infinity }}
+                  className="text-2xl font-black"
+                >
+                  {feedback === 'correct' ? `+${questions[current].exp * Math.min(streak + 1, 3)} EXP!` : 'Spróbuj następnym razem!'}
+                </motion.div>
+              </motion.div>
+            )}
+          </div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="max-w-4xl mx-auto text-center py-24 space-y-12 pt-32"
+          >
+            <motion.div
+              animate={{ scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] }}
+              transition={{ duration: 1, repeat: 1 }}
+              className="text-9xl mb-8"
+            >
+              🏆
+            </motion.div>
+            <motion.h2
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              className="text-6xl lg:text-7xl font-black bg-gradient-to-r from-emerald-600 via-green-600 to-emerald-600 bg-clip-text text-transparent mb-8"
+            >
+              FENOMENALNIE!
+            </motion.h2>
+            <div className="space-y-8 text-center">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="text-7xl font-black text-emerald-600 drop-shadow-2xl mb-8"
+              >
+                {score} EXP
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-4xl text-yellow-500 font-bold"
+              >
+                Najlepsza seria: {streak}x 🔥
+              </motion.div>
+            </div>
+            <div className="flex flex-col lg:flex-row gap-6 justify-center pt-16 border-t-8 border-emerald-200/50">
+              <Link
+                href="/quiz"
+                className="px-16 py-8 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-3xl font-black text-2xl shadow-2xl hover:shadow-3xl hover:scale-105 transition-all"
+              >
+                🏠 Leaderboard
+              </Link>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-16 py-8 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-3xl font-black text-2xl shadow-2xl hover:shadow-3xl hover:scale-105 transition-all"
+              >
+                🔄 Nowa Gra!
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </div>
+    </>
+  )
+}
