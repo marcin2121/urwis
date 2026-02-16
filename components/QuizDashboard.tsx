@@ -1,59 +1,22 @@
 'use client'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { useEffect, useState } from 'react'
-import { getLeaderboard, getCategories } from '@/lib/quiz'  // ✅ FETCH Z LIB!
+import { useState } from 'react'
 
 interface LeaderboardPlayer {
-  user_id: string  // z quiz_leaderboard VIEW
+  user_id: string
   total_exp: number
   rank: number
 }
 
 export default function QuizDashboard({
-  initialCategoriesCount = 0
+  initialLeaderboard,
+  categoriesCount
 }: {
-  initialCategoriesCount?: number
+  initialLeaderboard: LeaderboardPlayer[]
+  categoriesCount: number
 }) {
-  const [leaderboard, setLeaderboard] = useState<LeaderboardPlayer[]>([])
-  const [categoriesCount, setCategoriesCount] = useState(initialCategoriesCount)
-  const [loading, setLoading] = useState(true)
-
-  // 🔄 FETCH LIVE DATA
-  useEffect(() => {
-    async function fetchData() {
-      setLoading(true)
-      try {
-        const [lbData, cats] = await Promise.all([
-          getLeaderboard(20),  // top 20 global
-          getCategories()
-        ])
-        setLeaderboard(lbData.map((p, i) => ({ ...p, rank: i + 1 })))
-        setCategoriesCount(cats.length)
-      } catch (error) {
-        console.error('Quiz fetch error:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchData()
-  }, [])
-
-  const modes = ['single', 'duel', 'challenge', 'party'] as const
-
-  if (loading) {
-    return (
-      <div className="max-w-6xl mx-auto p-12 flex items-center justify-center">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-          className="text-6xl"
-        >
-          ⚡
-        </motion.div>
-      </div>
-    )
-  }
+  const [leaderboard] = useState(initialLeaderboard)
 
   return (
     <div className="max-w-6xl mx-auto p-6 md:p-12 space-y-12">
@@ -61,7 +24,7 @@ export default function QuizDashboard({
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center py-20 bg-gradient-to-br from-[#E94444] via-[#1473E6] to-[#FFBE0B] rounded-3xl text-white shadow-2xl"
+        className="text-center py-20 bg-linear-to-br from-[#E94444] via-[#1473E6] to-[#FFBE0B] rounded-3xl text-white shadow-2xl"
       >
         <motion.div
           animate={{ scale: [1, 1.05, 1] }}
@@ -70,7 +33,7 @@ export default function QuizDashboard({
         >
           🧠
         </motion.div>
-        <h1 className="text-6xl md:text-7xl font-black mb-6 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+        <h1 className="text-6xl md:text-7xl font-black mb-6 bg-linear-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
           QUIZ URWIS
         </h1>
         <p className="text-2xl opacity-90 mb-8 max-w-2xl mx-auto">
@@ -78,7 +41,7 @@ export default function QuizDashboard({
         </p>
       </motion.div>
 
-      {/* 4 Tryby – Urwis Brand Colors */}
+      {/* 4 Tryby */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {[
           { href: '/quiz/single', emoji: '🎯', title: 'Single Player', desc: 'Spokojna gra solo', label: 'GRAJ TERAZ' },
@@ -92,7 +55,7 @@ export default function QuizDashboard({
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 * i }}
               whileHover={{ scale: 1.05, rotateY: 5 }}
-              className="h-64 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-[24px] p-8 text-white shadow-2xl group-hover:shadow-3xl cursor-pointer border-4 border-emerald-300/50 hover:border-emerald-200/50 hover:from-emerald-600 hover:to-teal-700 transition-all duration-300"
+              className="h-64 bg-linear-to-br from-emerald-500 to-teal-600 rounded-[24px] p-8 text-white shadow-2xl group-hover:shadow-3xl cursor-pointer border-4 border-emerald-300/50 hover:border-emerald-200/50 hover:from-emerald-600 hover:to-teal-700 transition-all duration-300"
             >
               <div className="text-6xl mb-6">{emoji}</div>
               <h3 className="text-3xl font-black mb-4">{title}</h3>
@@ -105,42 +68,42 @@ export default function QuizDashboard({
         ))}
       </div>
 
-      {/* Global Leaderboard – TOP gracze */}
+      {/* Global Leaderboard */}
       <motion.div
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         className="bg-white/80 backdrop-blur-xl rounded-3xl p-8 md:p-12 shadow-2xl border border-white/50"
       >
         <h2 className="text-4xl font-black mb-8 flex items-center justify-center">
-          🏆 GLOBAL LEADERBOARD
+          🏆 TOP GRACZE
         </h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {modes.map((mode, i) => (
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {['single', 'duel', 'challenge', 'party'].map((mode, i) => (
             <motion.div
               key={mode}
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 + 0.1 * i }}
-              className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md border"
+              className="bg-linear-to-br from-gray-50 to-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md border"
             >
               <h4 className="font-black text-xl mb-4 flex items-center capitalize">
                 {mode === 'single' ? '🎯' : mode === 'duel' ? '⚔️' : mode === 'challenge' ? '🥊' : '👑'}
                 <span className="ml-2">{mode.replace('_', ' ')}</span>
               </h4>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {leaderboard.slice(0, 5).map((player, j) => (
-                  <div key={player.user_id} className="flex justify-between items-center p-3 bg-white rounded-xl shadow-sm">
+                  <div key={player.user_id} className="flex justify-between items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md">
                     <div className="font-mono text-lg font-bold text-gray-800">#{j + 1}</div>
                     <div className="text-right">
                       <div className="font-black text-xl text-emerald-600">{player.total_exp.toLocaleString()} EXP</div>
-                      <div className="text-xs font-semibold text-gray-600 truncate max-w-[120px]">
-                        {player.user_id.slice(0, 8)}...
+                      <div className="text-sm font-semibold text-gray-600 truncate max-w-[120px]">
+                        ID: {player.user_id.slice(0, 8)}...
                       </div>
                     </div>
                   </div>
                 ))}
                 {leaderboard.length === 0 && (
-                  <div className="text-center py-8 text-gray-400 italic text-lg">Bądź pierwszy! 🥇</div>
+                  <div className="text-center py-12 text-gray-400 italic text-lg">Bądź pierwszy! 🥇</div>
                 )}
               </div>
             </motion.div>
