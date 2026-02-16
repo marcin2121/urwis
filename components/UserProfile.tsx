@@ -1,137 +1,102 @@
 'use client'
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
+
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext'
+import { motion } from 'framer-motion'
+import { LogOut, Trophy, Star, Shield, Calendar, Edit2, User as UserIcon } from 'lucide-react'
+import { useState } from 'react'
+import Image from 'next/image'
 
 export default function UserProfile() {
-  const { profile: user, signOut, updateProfile } = useSupabaseAuth();
-  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
+  const { user, profile, signOut } = useSupabaseAuth()
+  const [isHovered, setIsHovered] = useState(false)
 
-  const avatars = ['🧸', '🎮', '🎨', '⚽', '🎲', '🚀', '🦖', '🦄', '🐶', '🐱', '🦊', '🐼'];
+  if (!user || !profile) return null
 
-  if (!user) return null;
-
-  const progressPercent = (user.total_exp / (100 * user.level * 1.5)) * 100;
+  // Obliczanie procentu do następnego poziomu
+  // Zakładamy prosty system: level * 1000 XP
+  const nextLevelXp = profile.level * 1000
+  const progressPercent = Math.min(100, (profile.total_exp / nextLevelXp) * 100)
 
   return (
-    <div className="bg-white rounded-3xl shadow-2xl p-8">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          {/* Avatar */}
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={() => setShowAvatarPicker(!showAvatarPicker)}
-            className="w-20 h-20 rounded-full bg-linear-to-br from-blue-400 to-purple-500 flex items-center justify-center text-4xl cursor-pointer hover:shadow-xl transition-shadow"
+    <div className="w-full max-w-sm mx-auto bg-white rounded-3xl shadow-xl overflow-hidden border border-purple-100">
+      {/* Header z tłem */}
+      <div className="relative h-32 bg-linear-to-r from-purple-500 to-indigo-600">
+        <div className="absolute top-4 right-4">
+          <button
+            onClick={() => signOut()}
+            className="p-2 bg-white/20 hover:bg-white/40 backdrop-blur-xs rounded-full text-white transition-colors"
+            title="Wyloguj się"
           >
-            {user.avatar_url || '🧸'}
-          </motion.button>
-
-          {/* User Info */}
-          <div>
-            <h3 className="text-2xl font-black text-gray-800">{user.username}</h3>
-            <p className="text-gray-600">{user.email}</p>
-          </div>
-        </div>
-
-        {/* Logout */}
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={signOut}
-          className="px-4 py-2 bg-red-100 text-red-600 rounded-xl font-bold hover:bg-red-200 transition-colors"
-        >
-          Wyloguj
-        </motion.button>
-      </div>
-
-      {/* Avatar Picker */}
-      {showAvatarPicker && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          className="mb-6 p-4 bg-gray-50 rounded-2xl"
-        >
-          <p className="text-sm font-bold text-gray-700 mb-3">Wybierz avatar:</p>
-          <div className="grid grid-cols-6 gap-2">
-            {avatars.map((avatar) => (
-              <motion.button
-                key={avatar}
-                whileHover={{ scale: 1.2 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={async () => {
-                  await updateProfile({ avatar_url: avatar });
-                  setShowAvatarPicker(false);
-                }}
-                className={`text-3xl p-3 rounded-xl transition-all ${user.avatar_url === avatar
-                  ? 'bg-blue-200 ring-2 ring-blue-500'
-                  : 'bg-white hover:bg-gray-100'
-                  }`}
-              >
-                {avatar}
-              </motion.button>
-            ))}
-          </div>
-        </motion.div>
-      )}
-
-      {/* Level & EXP */}
-      <div className="mb-6">
-        <div className="flex justify-between items-center mb-2">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">⭐</span>
-            <span className="text-xl font-black text-gray-800">
-              Poziom {user.level}
-            </span>
-          </div>
-          <span className="text-sm font-semibold text-gray-600">
-            {user.total_exp} / {100 * user.level * 1.5} EXP
-          </span>
-        </div>
-
-        {/* Progress Bar */}
-        <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
-          <motion.div
-            className="h-full bg-linear-to-r from-blue-500 to-purple-500"
-            initial={{ width: 0 }}
-            animate={{ width: `${progressPercent}%` }}
-            transition={{ duration: 1, ease: 'easeOut' }}
-          />
-        </div>
-
-        <p className="text-xs text-gray-500 mt-1 text-center">
-          Jeszcze {100 * user.level * 1.5 - user.total_exp} EXP do poziomu {user.level + 1}!
-        </p>
-      </div>
-
-      {/* Level Benefits */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="p-4 bg-linear-to-br from-yellow-50 to-orange-50 rounded-xl border-2 border-yellow-200">
-          <div className="text-3xl mb-2">🏆</div>
-          <div className="font-bold text-sm text-gray-700">Poziom {user.level}</div>
-          <div className="text-xs text-gray-600">
-            {user.level < 5 && 'Nowicjusz'}
-            {user.level >= 5 && user.level < 10 && 'Doświadczony'}
-            {user.level >= 10 && user.level < 20 && 'Ekspert'}
-            {user.level >= 20 && user.level < 50 && 'Mistrz'}
-            {user.level >= 50 && 'Legenda'}
-          </div>
-        </div>
-
-        <div className="p-4 bg-linear-to-br from-blue-50 to-purple-50 rounded-xl border-2 border-blue-200">
-          <div className="text-3xl mb-2">🎁</div>
-          <div className="font-bold text-sm text-gray-700">Bonusy</div>
-          <div className="text-xs text-gray-600">
-            +{Math.floor(user.level / 5) * 5}% EXP
-          </div>
+            <LogOut size={18} />
+          </button>
         </div>
       </div>
 
-      {/* Member Since */}
-      <div className="mt-6 text-center text-xs text-gray-500">
-        Członek od: {new Date(user.created_at).toLocaleDateString('pl-PL')}
+      {/* Avatar i Info */}
+      <div className="relative px-6 pb-6">
+        <div className="relative -mt-12 mb-4 flex justify-center">
+          <div className="relative">
+            <div className="w-24 h-24 rounded-full border-4 border-white bg-gray-100 overflow-hidden shadow-md flex items-center justify-center">
+              {/* Placeholder Avatara lub obrazek jeśli jest */}
+              <span className="text-4xl">🧸</span>
+            </div>
+            {/* Badge poziomu */}
+            <div className="absolute -bottom-2 -right-2 bg-yellow-400 text-yellow-900 text-xs font-black px-2 py-1 rounded-full border-2 border-white shadow-xs">
+              Lvl {profile.level}
+            </div>
+          </div>
+        </div>
+
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-black text-gray-800 flex items-center justify-center gap-2">
+            {profile.username || user.email?.split('@')[0]}
+            {profile.role === 'admin' && <Shield size={16} className="text-blue-500" />}
+          </h2>
+          <p className="text-sm text-gray-500 font-medium">{user.email}</p>
+        </div>
+
+        {/* Statystyki */}
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="bg-purple-50 p-3 rounded-2xl border border-purple-100 text-center">
+            <div className="flex items-center justify-center gap-1 text-purple-600 mb-1">
+              <Star size={16} fill="currentColor" />
+              <span className="text-xs font-bold uppercase">XP</span>
+            </div>
+            <div className="text-xl font-black text-gray-800">{profile.total_exp}</div>
+          </div>
+          <div className="bg-blue-50 p-3 rounded-2xl border border-blue-100 text-center">
+            <div className="flex items-center justify-center gap-1 text-blue-600 mb-1">
+              <Trophy size={16} />
+              <span className="text-xs font-bold uppercase">Ranking</span>
+            </div>
+            <div className="text-xl font-black text-gray-800">#42</div>
+          </div>
+        </div>
+
+        {/* Pasek postępu */}
+        <div className="mb-6">
+          <div className="flex justify-between text-xs font-bold text-gray-500 mb-1">
+            <span>Postęp poziomu</span>
+            <span>{Math.floor(progressPercent)}%</span>
+          </div>
+          <div className="h-3 w-full bg-gray-100 rounded-full overflow-hidden">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${progressPercent}%` }}
+              className="h-full bg-linear-to-r from-yellow-400 to-orange-500 rounded-full"
+            />
+          </div>
+          <p className="text-xs text-center mt-1 text-gray-400">
+            {nextLevelXp - profile.total_exp} XP do następnego poziomu
+          </p>
+        </div>
+
+        {/* Member Since - POPRAWIONA LINIA */}
+        <div className="mt-6 text-center text-xs text-gray-500">
+          Członek od: {user.created_at ? new Date(user.created_at).toLocaleDateString('pl-PL') : '-'}
+        </div>
+
       </div>
     </div>
-  );
+  )
 }
