@@ -62,6 +62,18 @@ export interface UserMission {
   created_at: string;
 }
 
+export interface QuizSession {
+  id: string
+  user_id: string
+  mode: 'single' | 'duel' | 'challenge' | 'party'
+  category: string
+  questions_count: number
+  score: number
+  accuracy: number
+  max_streak: number
+  completed_at: string
+}
+
 // Supabase Database schema
 export interface Database {
   public: {

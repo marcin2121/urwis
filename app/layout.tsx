@@ -8,14 +8,14 @@ import { LeaderboardProvider } from "@/contexts/LeaderboardContext";
 import { AchievementsProvider } from "@/contexts/AchievementsContext";
 import { StreakProvider } from "@/contexts/StreakContext";
 import { EventsProvider } from "@/contexts/EventsContext";
-import { NotificationProvider } from "@/contexts/NotificationContext"; 
+import { NotificationProvider } from "@/contexts/NotificationContext";
 import HiddenUrwis from "@/components/HiddenUrwis";
 import MissionTracker from "@/components/MissionTracker";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Sklep Urwis",
+  title: "Sklep Urwis 🧸",
   description: "Twój lokalny sklep w Białobrzegach",
 };
 
@@ -30,7 +30,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pl" suppressHydrationWarning>
-      <body suppressHydrationWarning className="relative">
+      <body suppressHydrationWarning className={inter.className}>
         <SupabaseAuthProvider>
           <SupabaseLoyaltyProvider>
             <LeaderboardProvider>
@@ -38,7 +38,7 @@ export default function RootLayout({
                 <StreakProvider>
                   <EventsProvider>
                     <NotificationProvider>
-                      <MissionTracker /> {/* ← MUSI BYĆ TUTAJ! */}
+                      <MissionTracker />
                       <Navbar />
                       {children}
                       <HiddenUrwis />

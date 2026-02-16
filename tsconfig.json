@@ -1,12 +1,18 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "target": "ES2020", // ✅ Nowsze + perf
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": true,
+    "strict": true, // ✅ Urwis standard!
     "noEmit": true,
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true, // ✅ Supabase/Framer fix
+    "forceConsistentCasingInFileNames": true, // ✅ Case-sensitive
     "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
@@ -18,8 +24,11 @@
         "name": "next"
       }
     ],
+    "baseUrl": ".", // ✅ + paths
     "paths": {
-      "@/*": ["./*"]
+      "@/*": [
+        "./*"
+      ]
     }
   },
   "include": [
@@ -27,8 +36,11 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "contexts/AuthContext.OLD.tsx", "contexts/LoyaltyContext.OLD.tsx"]
+  "exclude": [
+    "node_modules",
+    "contexts/AuthContext.OLD.tsx",
+    "contexts/LoyaltyContext.OLD.tsx"
+  ]
 }

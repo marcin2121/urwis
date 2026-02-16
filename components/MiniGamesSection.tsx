@@ -7,7 +7,6 @@ import MemoryGame from './games/MemoryGame'
 import SpinTheWheel from './games/SpinTheWheel'
 import ClickerGame from './games/ClickerGame'
 import PuzzleSlider from './games/PuzzleSlider'
-import TriviaGeneralGame from './games/TriviaGeneralGame'
 
 // ✅ TYPE dla games array
 interface Game {
@@ -40,16 +39,6 @@ export default function MiniGamesSection() {
   }, [selectedGame, handleGameStart])
 
   const games: Game[] = [
-    // 🧠 QUIZ NA PIERWSZYM MIEJSCU!
-    {
-      id: 'trivia-api',
-      title: '🧠 Quiz Wiedzy 300K+',
-      description: 'Nieskończone pytania z API!',
-      icon: '🧠',
-      color: 'from-indigo-500 to-purple-600',
-      component: TriviaGeneralGame,
-      difficulty: '🌍 Endless'
-    },
     {
       id: 'memory',
       title: 'Memory - Zabawki',
