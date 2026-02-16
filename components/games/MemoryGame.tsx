@@ -284,4 +284,45 @@ export default function MemoryGame() {
 
               {/* PRZÓD KARTY */}
               <div
-                className={`absolute inset-0 backface-hidden rounded-xl shadow-lg flex items-center justify-center text-4xl md:text-5xl bg-white border-
+                className={`absolute inset-0 backface-hidden rounded-xl shadow-lg flex items-center justify-center text-4xl md:text-5xl bg-white border-2 ${card.isMatched ? 'border-green-400 bg-green-50' : 'border-purple-200'}`}
+                style={{ transform: 'rotateY(180deg)' }}
+              >
+                {card.emoji}
+              </div>
+            </motion.div>
+          </div>
+        ))}
+      </div>
+
+      {/* MODAL WYGRANEJ */}
+      <AnimatePresence>
+        {isGameWon && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              className="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-2xl relative overflow-hidden"
+            >
+              <div className="text-7xl mb-4">🏆</div>
+              <h3 className="text-3xl font-black text-gray-800 mb-2">Gratulacje!</h3>
+              <p className="text-gray-500 mb-6">Ukończono w {moves} ruchach</p>
+              <button
+                onClick={() => startGame(difficulty)}
+                className="w-full py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold shadow-lg transition-transform active:scale-95"
+              >
+                Zagraj jeszcze raz
+              </button>
+              <button onClick={() => setDifficulty(null)} className="mt-4 text-gray-500 hover:text-gray-800 font-semibold">
+                Menu
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
