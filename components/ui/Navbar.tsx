@@ -1,7 +1,8 @@
 "use client";
-import React, { useState, useCallback, memo, useEffect } from "react";
+import React, { useState, useCallback, memo, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import AuthModal from '@/components/AuthModal';
 
@@ -53,6 +54,9 @@ const Navbar = memo(() => {
     await signOut();
   }, [signOut]);
 
+  // Logo z alternatywnym tekstem dla accessibility
+  const logoAltText = useMemo(() => profile?.username ? `Urwis - ${profile.username}` : "Urwis - Strona główna", [profile]);
+
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -84,31 +88,42 @@ const Navbar = memo(() => {
 
         <div className="relative bg-white/95 dark:bg-gray-900/95 backdrop-blur-3xl shadow-2xl border border-white/30 dark:border-gray-800/40 rounded-3xl p-4 md:p-6 max-w-5xl w-full mx-4 xl:mx-0">
           <div className="flex items-center justify-between gap-4">
-            {/* Logo */}
+            {/* Logo z logo.png */}
             <Link
               href="/"
-              className="flex items-center gap-3 group p-3 -m-3 rounded-2xl hover:bg-gradient-to-r hover:from-red-500/10 hover:to-blue-500/10 transition-all duration-300 flex-shrink-0 flex-0"
-              aria-label="Urwis - Strona główna"
+              className="flex items-center gap-3 group p-3 -m-3 rounded-2xl hover:bg-gradient-to-r hover:from-red-500/10 hover:to-blue-500/10 transition-all duration-300 flex-shrink-0 flex-0 basis-auto"
+              aria-label={logoAltText}
             >
               <motion.div
                 className="relative w-14 h-14 flex-shrink-0"
                 whileHover={{ scale: 1.05, rotate: 5 }}
                 transition={{ type: "spring", stiffness: 400 }}
               >
-                <div className="w-full h-full bg-gradient-to-br from-[#E94444] to-[#1473E6] rounded-2xl shadow-xl border-4 border-white/80 dark:border-gray-200/50 flex items-center justify-center">
-                  <span className="text-3xl font-black drop-shadow-md">🦸</span>
-                </div>
-                <div className="absolute -top-1 -right-1 w-7 h-7 bg-[#FFBE0B] rounded-full border-4 border-white shadow-lg flex items-center justify-center text-xs font-black text-gray-900">
+                {/* Główne logo */}
+                <Image
+                  src="/logo.png"
+                  alt=""
+                  width={56}
+                  height={56}
+                  className="w-full h-full object-contain rounded-2xl shadow-xl border-4 border-white/80 dark:border-gray-200/50"
+                  priority
+                  placeholder="blur"
+                  blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
+                />
+
+                {/* Badge U */}
+                <div className="absolute -top-1 -right-1 w-7 h-7 bg-[#FFBE0B] rounded-full border-4 border-white shadow-lg flex items-center justify-center text-xs font-black text-gray-900 z-10">
                   U
                 </div>
               </motion.div>
+
               <div className="hidden lg:block">
                 <h1 className="text-2xl font-black bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text leading-tight">URWIS</h1>
                 <p className="text-xs font-bold uppercase tracking-widest text-[#E94444]">Białobrzegi</p>
               </div>
             </Link>
 
-            {/* Desktop Navigation - skraca się gdy mało miejsca */}
+            {/* Desktop Navigation - czyste nazwy bez emoji */}
             <div className="hidden xl:flex items-center gap-2 md:gap-3 flex-1 justify-center max-w-4xl min-w-0">
               {navItems.map((item, idx) => (
                 <Link
@@ -117,8 +132,10 @@ const Navbar = memo(() => {
                   className="group relative px-3 md:px-4 lg:px-6 py-3 text-sm lg:text-base font-bold text-gray-800 hover:text-[#E94444] rounded-2xl hover:bg-gradient-to-r hover:from-[#E94444]/5 hover:to-[#1473E6]/5 transition-all duration-300 flex items-center gap-2 md:gap-3 shadow-sm hover:shadow-md whitespace-nowrap flex-shrink-0"
                   aria-label={item.name}
                 >
-                  <span aria-hidden className="text-xl md:text-2xl opacity-75 group-hover:opacity-100 transition-opacity flex-shrink-0">{item.icon}</span>
-                  <span className="hidden xl:inline">{item.name}</span>
+                  <span aria-hidden className="text-xl md:text-2xl opacity-75 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                    {item.icon}
+                  </span>
+                  <span>{item.name}</span>
                   <motion.div
                     layoutId={`desktop-nav-${idx}`}
                     className="absolute inset-0 bg-gradient-to-r from-[#E94444]/10 to-[#1473E6]/10 rounded-2xl opacity-0 group-hover:opacity-100"
@@ -156,7 +173,6 @@ const Navbar = memo(() => {
                       className="absolute top-full right-0 mt-2 md:mt-3 w-80 md:w-96 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 py-4 px-5 z-50"
                       style={{ boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}
                     >
-                      {/* Zawartość powiadomień bez zmian */}
                       <div className="flex items-center gap-3 mb-4 pb-3 border-b border-gray-200/50 dark:border-gray-700/50">
                         <span className="text-2xl">🔔</span>
                         <div>
@@ -268,7 +284,7 @@ const Navbar = memo(() => {
         </div>
       </motion.nav>
 
-      {/* Mobile menu - bez zmian */}
+      {/* Mobile menu - czyste nazwy bez emoji */}
       <AnimatePresence>
         {mobileOpen && (
           <>
@@ -295,7 +311,13 @@ const Navbar = memo(() => {
                   >
                     <div className="flex items-center gap-4">
                       <div className="w-20 h-20 bg-gradient-to-br from-[#E94444] to-[#1473E6] rounded-2xl flex items-center justify-center shadow-2xl flex-shrink-0">
-                        <span className="text-3xl">🦸‍♂️</span>
+                        <Image
+                          src="/logo.png"
+                          alt=""
+                          width={80}
+                          height={80}
+                          className="w-full h-full object-contain rounded-2xl"
+                        />
                       </div>
                       <div>
                         <h2 className="text-2xl font-black text-gray-900 dark:text-white">{profile.username}</h2>
