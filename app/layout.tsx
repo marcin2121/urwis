@@ -11,18 +11,8 @@ import { EventsProvider } from "@/contexts/EventsContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import HiddenUrwis from "@/components/HiddenUrwis";
 import MissionTracker from "@/components/MissionTracker";
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 const inter = Inter({ subsets: ["latin"] });
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000,
-      retry: 1,
-    }
-  }
-})
 
 export const metadata: Metadata = {
   title: "Sklep Urwis 🧸",
@@ -41,26 +31,24 @@ export default function RootLayout({
   return (
     <html lang="pl" suppressHydrationWarning>
       <body suppressHydrationWarning className={inter.className}>
-        <QueryClientProvider client={queryClient}>
-          <SupabaseAuthProvider>
-            <SupabaseLoyaltyProvider>
-              <LeaderboardProvider>
-                <AchievementsProvider>
-                  <StreakProvider>
-                    <EventsProvider>
-                      <NotificationProvider>
-                        <MissionTracker />
-                        <Navbar />
-                        {children}
-                        <HiddenUrwis />
-                      </NotificationProvider>
-                    </EventsProvider>
-                  </StreakProvider>
-                </AchievementsProvider>
-              </LeaderboardProvider>
-            </SupabaseLoyaltyProvider>
-          </SupabaseAuthProvider>
-        </QueryClientProvider>
+        <SupabaseAuthProvider>
+          <SupabaseLoyaltyProvider>
+            <LeaderboardProvider>
+              <AchievementsProvider>
+                <StreakProvider>
+                  <EventsProvider>
+                    <NotificationProvider>
+                      <MissionTracker />
+                      <Navbar />
+                      {children}
+                      <HiddenUrwis />
+                    </NotificationProvider>
+                  </EventsProvider>
+                </StreakProvider>
+              </AchievementsProvider>
+            </LeaderboardProvider>
+          </SupabaseLoyaltyProvider>
+        </SupabaseAuthProvider>
       </body>
     </html>
   );
