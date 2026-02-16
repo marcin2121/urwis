@@ -40,29 +40,29 @@ export default function PromoSection() {
     <section className="py-16 bg-white overflow-hidden">
       <div className="container mx-auto px-6">
         
-        {/* --- NAGŁÓWEK SEKCJI --- */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="bg-red-100 text-[#BF2024] px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-2 animate-pulse">
-                <Flame size={14} fill="currentColor" /> Gorące strzały
-              </span>
-            </div>
-            <h2 className="text-4xl md:text-5xl font-black font-heading text-gray-900 tracking-tight leading-none">
-              OKAZJE <br className="md:hidden" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#BF2024] to-[#0055ff]">
-                TYGODNIA
-              </span>
-            </h2>
-          </div>
-          
-          <Link 
-            href="/oferta/promocje" 
-            className="group flex items-center gap-2 px-6 py-3 bg-gray-100 rounded-full text-sm font-black uppercase tracking-widest text-gray-600 hover:bg-black hover:text-white transition-all"
-          >
-            Zobacz wszystkie <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </div>
+       {/* --- NAGŁÓWEK SEKCJI --- */}
+<div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10 relative z-20">
+  <div>
+    <div className="flex items-center gap-2 mb-2">
+      <span className="bg-red-100 text-[#BF2024] px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-2 animate-pulse">
+        <Flame size={14} fill="currentColor" /> Gorące strzały
+      </span>
+    </div>
+    <h2 className="text-4xl md:text-5xl font-black font-heading text-gray-900 tracking-tight leading-none">
+      OKAZJE <br className="md:hidden" />
+      <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#BF2024] to-[#0055ff]">
+        TYGODNIA
+      </span>
+    </h2>
+  </div>
+  
+  <Link 
+    href="/oferta/promocje" // ✅ Poprawiono ścieżkę (zgodnie z folderem app/promocje)
+    className="group relative z-30 pointer-events-auto flex items-center gap-2 px-6 py-3 bg-gray-100 rounded-full text-sm font-black uppercase tracking-widest text-gray-600 hover:bg-black hover:text-white transition-all shadow-sm"
+  >
+    Zobacz wszystkie <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+  </Link>
+</div>
 
         {/* --- GRID KAFELKÓW --- */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
