@@ -6,9 +6,10 @@ import confetti from 'canvas-confetti'
 import { Timer, RotateCcw, Sparkles, Brain } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext'
+import { useRouter } from 'next/navigation'
+import { GuestProgress } from '@/lib/guest-progress'
 
 // --- KONFIGURACJA ---
-// Używamy krótkich, sztywnych czasów dla synchronizacji z dźwiękiem
 const ANIMATION_DURATION = 0.25
 const AUTO_CLOSE_DELAY = 1000
 
@@ -50,6 +51,7 @@ interface Card {
 
 export default function MemoryGame() {
   const { user } = useSupabaseAuth()
+  const router = useRouter()
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null)
   const [cards, setCards] = useState<Card[]>([])
   const [flippedIndices, setFlippedIndices] = useState<number[]>([])
@@ -59,7 +61,6 @@ export default function MemoryGame() {
   const [isGameWon, setIsGameWon] = useState(false)
   const [combo, setCombo] = useState(0)
 
-  // Ref do timeouta, aby móc go anulować przy szybkim klikaniu
   const mismatchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const playSound = (type: keyof typeof SOUNDS) => {
@@ -68,7 +69,6 @@ export default function MemoryGame() {
     audio.play().catch(() => { })
   }
 
-  // Timer gry
   useEffect(() => {
     let interval: NodeJS.Timeout
     if (isPlaying && !isGameWon) {
@@ -77,7 +77,6 @@ export default function MemoryGame() {
     return () => clearInterval(interval)
   }, [isPlaying, isGameWon])
 
-  // Cleanup timeouta przy odmontowaniu
   useEffect(() => {
     return () => {
       if (mismatchTimeoutRef.current) clearTimeout(mismatchTimeoutRef.current)
@@ -112,43 +111,38 @@ export default function MemoryGame() {
   }
 
   const handleCardClick = (index: number) => {
-    // 1. Walidacja podstawowa
     if (!isPlaying || cards[index].isMatched || cards[index].isFlipped) return
 
     playSound('flip')
 
-    // 2. Obsługa "Szybkiego Resetu" (gdy klikasz 3 kartę, a 2 poprzednie wiszą niepasujące)
+    // SZYBKI RESET: Jeśli klikasz 3cią kartę, gdy 2 są odkryte (niepasujące)
     if (flippedIndices.length === 2) {
-      // Anuluj oczekujący reset (ten z setTimeout)
       if (mismatchTimeoutRef.current) {
         clearTimeout(mismatchTimeoutRef.current)
         mismatchTimeoutRef.current = null
       }
 
-      // Natychmiast zakryj tamte dwie i odkryj nową
       const [idx1, idx2] = flippedIndices
       setCards(prev => prev.map((c, i) => {
-        if (i === index) return { ...c, isFlipped: true } // Odkryj nową (klikniętą)
-        if (i === idx1 || i === idx2) return { ...c, isFlipped: false } // Zakryj stare
+        if (i === index) return { ...c, isFlipped: true }
+        if (i === idx1 || i === idx2) return { ...c, isFlipped: false }
         return c
       }))
 
       setFlippedIndices([index])
-      return // Koniec, czekamy na drugą do pary
+      return
     }
 
-    // 3. Standardowe odkrywanie (pierwsza lub druga karta)
     setCards(prev => prev.map((c, i) => i === index ? { ...c, isFlipped: true } : c))
     const newFlipped = [...flippedIndices, index]
     setFlippedIndices(newFlipped)
 
-    // 4. Sprawdzenie pary (gdy odkryto drugą)
     if (newFlipped.length === 2) {
       setMoves(m => m + 1)
       const [firstIdx, secondIdx] = newFlipped
 
       if (cards[firstIdx].emoji === cards[index].emoji) {
-        // --- MATCH ---
+        // MATCH
         playSound('match')
         setCombo(c => c + 1)
         confetti({
@@ -158,23 +152,19 @@ export default function MemoryGame() {
           colors: ['#a855f7', '#ec4899']
         })
 
-        // Oznacz jako dopasowane
         setCards(prev => prev.map((c, i) =>
           i === firstIdx || i === index ? { ...c, isMatched: true, isFlipped: true } : c
         ))
         setFlippedIndices([])
 
-        // Sprawdź wygraną
-        const allMatched = cards.filter(c => !c.isMatched).length <= 2 // <= 2 bo właśnie dopasowaliśmy 2
+        const allMatched = cards.filter(c => !c.isMatched).length <= 2
         if (allMatched) handleWin()
 
       } else {
-        // --- MISMATCH ---
+        // MISMATCH
         playSound('error')
         setCombo(0)
 
-        // Ustawiamy timer na zakrycie, ALE jeśli użytkownik kliknie inną kartę, 
-        // to ten timer zostanie anulowany w bloku "Szybki Reset" wyżej.
         mismatchTimeoutRef.current = setTimeout(() => {
           setCards(prev => prev.map((c, i) =>
             i === firstIdx || i === index ? { ...c, isFlipped: false } : c
@@ -192,27 +182,33 @@ export default function MemoryGame() {
       setIsPlaying(false)
       playSound('win')
       confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } })
-      if (user && difficulty) saveScore()
+      saveScore()
     }, 300)
   }
 
   const saveScore = async () => {
-    if (!user || !difficulty) return
+    if (!difficulty) return
     const config = DIFFICULTIES[difficulty]
-    const supabase = createClient()
 
-    try {
-      await supabase.rpc('add_user_rewards', {
-        p_user_id: user.id,
-        p_points: config.points,
-        p_xp: config.xp
-      })
-    } catch (e) {
-      console.error("Błąd zapisu:", e)
+    if (user) {
+      // User zalogowany -> Baza Danych
+      const supabase = createClient()
+      try {
+        await supabase.rpc('add_user_rewards', {
+          p_user_id: user.id,
+          p_points: config.points,
+          p_xp: config.xp
+        })
+      } catch (e) {
+        console.error("Błąd zapisu:", e)
+      }
+    } else {
+      // Gość -> LocalStorage
+      GuestProgress.addXP(config.xp)
     }
   }
 
-  // --- MENU ---
+  // --- UI ---
   if (!difficulty) {
     return (
       <div className="w-full max-w-4xl mx-auto p-6">
@@ -274,15 +270,12 @@ export default function MemoryGame() {
               className="w-full h-full relative preserve-3d"
               initial={false}
               animate={{ rotateY: card.isFlipped ? 180 : 0 }}
-              transition={{ duration: ANIMATION_DURATION, ease: "easeInOut" }} // SZYBKA ANIMACJA
+              transition={{ duration: ANIMATION_DURATION, ease: "easeInOut" }}
               style={{ transformStyle: 'preserve-3d' }}
             >
-              {/* TYŁ KARTY */}
               <div className="absolute inset-0 backface-hidden bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl shadow-md border-b-4 border-indigo-800 flex items-center justify-center">
                 <span className="text-3xl opacity-50 text-white">?</span>
               </div>
-
-              {/* PRZÓD KARTY */}
               <div
                 className={`absolute inset-0 backface-hidden rounded-xl shadow-lg flex items-center justify-center text-4xl md:text-5xl bg-white border-2 ${card.isMatched ? 'border-green-400 bg-green-50' : 'border-purple-200'}`}
                 style={{ transform: 'rotateY(180deg)' }}
@@ -310,15 +303,43 @@ export default function MemoryGame() {
               <div className="text-7xl mb-4">🏆</div>
               <h3 className="text-3xl font-black text-gray-800 mb-2">Gratulacje!</h3>
               <p className="text-gray-500 mb-6">Ukończono w {moves} ruchach</p>
-              <button
-                onClick={() => startGame(difficulty)}
-                className="w-full py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold shadow-lg transition-transform active:scale-95"
-              >
-                Zagraj jeszcze raz
-              </button>
-              <button onClick={() => setDifficulty(null)} className="mt-4 text-gray-500 hover:text-gray-800 font-semibold">
-                Menu
-              </button>
+
+              <div className="bg-green-50 p-4 rounded-2xl mb-6">
+                <div className="text-xs text-green-500 font-bold uppercase">Nagroda</div>
+                <div className="text-2xl font-black text-green-700">+{config.xp} XP</div>
+                {!user && (
+                  <div className="mt-2 text-xs text-red-500 font-bold">
+                    ⚠️ Niezapisane na koncie
+                  </div>
+                )}
+              </div>
+
+              {!user && (
+                <div className="mb-6 p-4 border border-purple-100 rounded-xl bg-purple-50/50">
+                  <p className="text-sm text-gray-600 mb-3">Załóż konto, aby nie stracić tego wyniku!</p>
+                  <button
+                    onClick={() => router.push('/auth/sign-up')}
+                    className="w-full py-2 bg-purple-600 text-white rounded-lg font-bold text-sm hover:bg-purple-700"
+                  >
+                    Zarejestruj się i odbierz XP
+                  </button>
+                </div>
+              )}
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => startGame(difficulty)}
+                  className="flex-1 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-black"
+                >
+                  Zagraj
+                </button>
+                <button
+                  onClick={() => setDifficulty(null)}
+                  className="flex-1 py-3 text-gray-600 hover:bg-gray-100 rounded-xl font-bold"
+                >
+                  Menu
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}
