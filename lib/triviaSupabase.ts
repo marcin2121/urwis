@@ -1,11 +1,10 @@
-import { createClient } from '@/utils/supabase/server'
-import type { TriviaQuestion } from './triviaApi' // zachowaj TS
+import { createClient } from '@/lib/supabase/server'
+import type { TriviaQuestion } from '@/lib/triviaApi'
 
-// 🔥 Bezpośrednio z Twojej tabeli!
-export async function getTriviaQuestions(amount = 20) {
-  const supabase = createClient()
+export async function getTriviaQuestions(amount = 20): Promise<TriviaQuestion[]> {  // + Promise
+  const supabase = await createClient()  // ✅ AWAIT!
 
-  const { data, error } = await supabase
+  const { data, error } = await supabase  // ✅ + await tutaj
     .from('trivia_questions')
     .select('id,question,options,correct,exp,category')
     .eq('isactive', true)
@@ -14,9 +13,12 @@ export async function getTriviaQuestions(amount = 20) {
 
   if (error || !data?.length) return []
 
-  // Parse CSV options → array ["op1","op2","op3","op4"]
-  return data.map(q => ({
-    ...q,
-    options: q.options.split(',').map(o => o.trim())
+  return data.map((q: any) => ({
+    id: q.id,
+    question: q.question.trim(),
+    options: q.options.split(',').map((o: string) => o.trim()),
+    correct: q.correct,
+    exp: q.exp,
+    category: q.category.trim()
   })) as TriviaQuestion[]
 }
