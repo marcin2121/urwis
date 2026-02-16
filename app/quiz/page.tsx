@@ -1,6 +1,6 @@
-// app/quiz/page.tsx – PERFECT RSC
+// app/quiz/page.tsx – Pure RSC!
 import QuizDashboard from '@/components/QuizDashboard'
-import { getLeaderboard, getCategories } from '@/lib/quiz'
+import { getCategories, getLeaderboard } from '@/lib/quiz-server'  // server only!
 
 interface LeaderboardPlayer {
   user_id: string
@@ -9,21 +9,20 @@ interface LeaderboardPlayer {
 }
 
 export default async function QuizPage() {
-  const [leaderboardRaw, categories] = await Promise.all([
-    getLeaderboard(20),  // array<{ user_id, total_exp }>
-    getCategories()      // string[]
+  const [categories, leaderboardRaw] = await Promise.all([
+    getCategories(),
+    getLeaderboard(20)
   ])
 
-  // ✅ Type-safe map
-  const initialLeaderboard: LeaderboardPlayer[] = leaderboardRaw.map((p: { user_id: string; total_exp: number }, i: number) => ({
+  const initialLeaderboard: LeaderboardPlayer[] = leaderboardRaw.map((p: any, i: number) => ({
     ...p,
     rank: i + 1
   }))
 
   return (
     <QuizDashboard
-      initialCategoriesCount={categories.length}
-    // NIE ma initialLeaderboard – fetch w client!
+      initialLeaderboard={initialLeaderboard}
+      categoriesCount={categories.length}
     />
   )
 }
