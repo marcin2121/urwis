@@ -179,4 +179,86 @@ export default function SinglePlayerQuiz() {
               <option value="⚽ Sport">⚽ Sport</option>
               <option value="🔬 Nauka">🧪 Nauka</option>
               <option value="🎨 Sztuka">🎨 Sztuka</option>
-              <option value="📚 Literatura">📚 Literatura</opt
+              <option value="📚 Literatura">📚 Literatura</option>
+            </select>
+          </div>
+
+          {/* Progress */}
+          <div className="text-center p-6 bg-white/70 backdrop-blur rounded-3xl shadow-xl">
+            <div className="text-3xl font-black mb-2">
+              Pytanie {current + 1} / {questions.length}
+            </div>
+            <div className="text-2xl font-bold">
+              <span className="text-orange-600">{score} EXP</span>
+              {' • '}
+              <span className="text-emerald-600">Seria: {streak}x 🔥</span>
+            </div>
+          </div>
+
+          {/* Question */}
+          <motion.div
+            key={current}
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-12 bg-white/90 backdrop-blur rounded-3xl shadow-2xl text-center"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold mb-8 leading-relaxed">
+              {q.question}
+            </h2>
+            <div className="text-xl text-purple-700 font-semibold uppercase tracking-wide">
+              {q.category}
+            </div>
+          </motion.div>
+
+          {/* Answers */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {q.options.map((option: string, i: number) => (
+              <motion.button
+                key={i}
+                onClick={() => answer(i)}
+                whileHover={{ scale: 1.05, y: -4 }}
+                whileTap={{ scale: 0.98 }}
+                className="group p-10 rounded-3xl font-bold text-xl shadow-2xl bg-gradient-to-r from-indigo-50 via-white to-purple-50 hover:from-indigo-100 hover:to-purple-100 border-4 border-indigo-200 hover:border-indigo-400 text-left min-h-[140px] flex items-center relative overflow-hidden transition-all"
+              >
+                <span className="text-4xl font-black mr-6 text-indigo-600 group-hover:text-indigo-700 z-10">
+                  {String.fromCharCode(65 + i)}
+                </span>
+                <span className="relative z-10 leading-relaxed">{option}</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-400/20 to-purple-400/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl" />
+              </motion.button>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="max-w-2xl mx-auto text-center py-24 space-y-12">
+          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="text-9xl mb-8">
+            🏆
+          </motion.div>
+          <h2 className="text-6xl font-black bg-gradient-to-r from-emerald-600 via-green-600 to-emerald-600 bg-clip-text text-transparent mb-8">
+            FENOMENALNIE!
+          </h2>
+          <div className="space-y-6">
+            <div className="text-7xl font-black text-emerald-600 drop-shadow-2xl">
+              {score} EXP
+            </div>
+            <div className="text-4xl text-yellow-500 font-bold">Max Streak: {streak}x 🔥</div>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-6 justify-center pt-12 border-t-4 border-emerald-200/50">
+            <Link
+              href="/quiz"
+              className="px-16 py-8 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-3xl font-black text-2xl shadow-2xl hover:scale-105 transition-all"
+            >
+              🏠 Dashboard
+            </Link>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-16 py-8 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-3xl font-black text-2xl shadow-2xl hover:scale-105 transition-all"
+            >
+              🔄 Jeszcze raz!
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
