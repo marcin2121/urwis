@@ -6,7 +6,6 @@ let client: SupabaseClient | undefined;
 
 export function createClient() {
   if (client) return client;
-
   client = createClientComponentClient();
   return client;
 }
