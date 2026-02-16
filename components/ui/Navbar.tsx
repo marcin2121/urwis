@@ -22,7 +22,6 @@ export default function Navbar() {
 
   return (
     <>
-      {/* FIXED TOP Navbar */}
       <motion.div
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -89,7 +88,7 @@ export default function Navbar() {
                   </motion.span>
                 </motion.div>
 
-                {/* 🔥 LOGGED IN – IDENTYCZNY STYL! */}
+
                 {isAuthenticated && profile ? (
                   <>
                     {/* Profil */}
@@ -107,7 +106,7 @@ export default function Navbar() {
                       </motion.div>
                     </Link>
 
-                    {/* Wyloguj – TEN SAM GRADIENT! */}
+
                     <motion.button
                       onClick={signOut}
                       whileHover={{ scale: 1.05 }}
@@ -118,19 +117,19 @@ export default function Navbar() {
                     </motion.button>
                   </>
                 ) : (
-                  /* 🔥 NIEZALOGOWANY – Załóż konto! */}
-                <motion.button
-                  onClick={() => setShowAuthModal(true)}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-black shadow-xl hover:shadow-2xl hover:from-emerald-600 hover:to-emerald-700 transition-all"
-                >
-                  👤 Załóż konto
-                </motion.button>
+
+                  <motion.button
+                    onClick={() => setShowAuthModal(true)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-black shadow-xl hover:shadow-2xl hover:from-emerald-600 hover:to-emerald-700 transition-all"
+                  >
+                    👤 Załóż konto
+                  </motion.button>
                 )}
               </div>
 
-              {/* MOBILE HAMBURGER */}
+
               <motion.button
                 onClick={() => setIsOpen(!isOpen)}
                 className="lg:hidden p-3 rounded-2xl bg-white/80 backdrop-blur shadow-lg hover:shadow-xl hover:bg-white/100"
@@ -163,7 +162,7 @@ export default function Navbar() {
         </div>
       </motion.div>
 
-      {/* MOBILE MENU */}
+
       <AnimatePresence>
         {isOpen && (
           <>
@@ -184,7 +183,6 @@ export default function Navbar() {
               <div className="bg-white/95 backdrop-blur-xl rounded-3xl p-6 shadow-2xl border-4 border-white/50">
                 <div className="space-y-6 overflow-y-auto max-h-[60vh]">
 
-                  {/* Profile Card */}
                   {isAuthenticated && profile && (
                     <Link href="/profil" onClick={() => setIsOpen(false)}>
                       <motion.div
@@ -205,7 +203,7 @@ export default function Navbar() {
                     </Link>
                   )}
 
-                  {/* Nav Items */}
+
                   {navItems.map((item, idx) => (
                     <motion.div
                       key={idx}
@@ -230,7 +228,6 @@ export default function Navbar() {
                     </motion.div>
                   ))}
 
-                  {/* Action Buttons */}
                   <div className="pt-6 space-y-4 border-t-4 border-gradient-to-r border-[#FFBE0B]/50 from-[#FFBE0B] to-orange-500 rounded-xl p-4 bg-gradient-to-r from-yellow-50 to-orange-50">
                     {isAuthenticated ? (
                       <>
@@ -265,7 +262,7 @@ export default function Navbar() {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                       >
-                        👤 Załóż konto GRATIS
+                        👤 Załóż konto
                       </motion.button>
                     )}
                   </div>
@@ -275,7 +272,7 @@ export default function Navbar() {
           )}
           </AnimatePresence>
 
-        {/* Auth Modal */}
+
         <AuthModal
           isOpen={showAuthModal}
           onClose={() => setShowAuthModal(false)}
