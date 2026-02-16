@@ -78,38 +78,31 @@ export default function QuizDashboard({
           🏆 TOP GRACZE
         </h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {['single', 'duel', 'challenge', 'party'].map((mode, i) => (
+          {['single', 'duel', 'challenge', 'party'].map((mode) => (
             <motion.div
               key={mode}
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 + 0.1 * i }}
-              className="bg-linear-to-br from-gray-50 to-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md border"
+              className="bg-linear-to-br from-gray-50 to-gray-100 rounded-2xl p-6 shadow-lg"
             >
-              <h4 className="font-black text-xl mb-4 flex items-center capitalize">
+              <h4 className="font-black text-xl mb-4 capitalize flex items-center gap-2">
                 {mode === 'single' ? '🎯' : mode === 'duel' ? '⚔️' : mode === 'challenge' ? '🥊' : '👑'}
-                <span className="ml-2">{mode.replace('_', ' ')}</span>
+                {mode}
               </h4>
               <div className="space-y-3">
                 {leaderboard.slice(0, 5).map((player, j) => (
-                  <div key={player.user_id} className="flex justify-between items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md">
-                    <div className="font-mono text-lg font-bold text-gray-800">#{j + 1}</div>
+                  <div key={player.user_id} className="flex justify-between items-center p-3 bg-white rounded-xl">
+                    <div className="font-mono font-bold">#{j + 1}</div>
                     <div className="text-right">
-                      <div className="font-black text-xl text-emerald-600">{player.total_exp.toLocaleString()} EXP</div>
-                      <div className="text-sm font-semibold text-gray-600 truncate max-w-[120px]">
-                        ID: {player.user_id.slice(0, 8)}...
-                      </div>
+                      <div className="font-black text-emerald-600">{player.total_exp.toLocaleString()}</div>
+                      <div className="text-xs text-gray-500">ID: {player.user_id.slice(0, 6)}...</div>
                     </div>
                   </div>
                 ))}
                 {leaderboard.length === 0 && (
-                  <div className="text-center py-12 text-gray-400 italic text-lg">Bądź pierwszy! 🥇</div>
+                  <div className="text-center py-8 text-gray-400">Bądź pierwszy! 🥇</div>
                 )}
               </div>
             </motion.div>
           ))}
         </div>
-      </motion.div>
-    </div>
-  )
+        )
 }
