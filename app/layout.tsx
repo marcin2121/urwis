@@ -2,13 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/ui/Navbar";
-import { SupabaseAuthProvider } from "@/contexts/SupabaseAuthContext";
-import { SupabaseLoyaltyProvider } from "@/contexts/SupabaseLoyaltyContext";
-import { LeaderboardProvider } from "@/contexts/LeaderboardContext";
-import { AchievementsProvider } from "@/contexts/AchievementsContext";
-import { StreakProvider } from "@/contexts/StreakContext";
-import { EventsProvider } from "@/contexts/EventsContext";
-import { NotificationProvider } from "@/contexts/NotificationContext";
+import { AppProviders } from "@/components/providers/AppProviders"; // <--- Nowy import
 import HiddenUrwis from "@/components/HiddenUrwis";
 import MissionTracker from "@/components/MissionTracker";
 import UrwisNotifications from "@/components/ui/UrwisNotifications";
@@ -33,26 +27,19 @@ export default function RootLayout({
   return (
     <html lang="pl" suppressHydrationWarning>
       <body suppressHydrationWarning className={inter.className}>
-        <SupabaseAuthProvider>
-          <SupabaseLoyaltyProvider>
-            <LeaderboardProvider>
-              <AchievementsProvider>
-                <StreakProvider>
-                  <EventsProvider>
-                    <NotificationProvider>
-                      <MissionTracker />
-                      <GamificationListener />
-                      <UrwisNotifications />
-                      <Navbar />
-                      {children}
-                      <HiddenUrwis />
-                    </NotificationProvider>
-                  </EventsProvider>
-                </StreakProvider>
-              </AchievementsProvider>
-            </LeaderboardProvider>
-          </SupabaseLoyaltyProvider>
-        </SupabaseAuthProvider>
+        <AppProviders>
+          {/* Logika i UI Grywalizacji */}
+          <GamificationListener />
+          <MissionTracker />
+          <UrwisNotifications />
+
+          {/* UI Strony */}
+          <Navbar />
+          <main className="min-h-screen">
+            {children}
+          </main>
+          <HiddenUrwis />
+        </AppProviders>
       </body>
     </html>
   );
