@@ -1,19 +1,23 @@
 import QuizDashboard from '@/components/QuizDashboard'
-import { createClient } from '@/lib/supabase/server'
-
-async function getData() {
-  const supabase = await createClient()
-
-  const [{ data: leaderboard }, { count: categoriesCount }] = await Promise.all([
-    supabase.from('quiz_leaderboard').select('*').limit(20),
-    supabase.from('trivia_questions').select('id', { count: 'exact', head: true }).eq('is_active', true)
-  ])
-
-  return { initialLeaderboard: leaderboard || [], categoriesCount: categoriesCount || 0 }
-}
+import { getLeaderboard, getCategories } from '@/lib/quiz'  // ✅ Użyj shared lib!
 
 export default async function QuizPage() {
-  const data = await getData()
+  // 🔄 Parallel RSC fetch (optymalne!)
+  const [{ data: leaderboard }, { data: categories }] = await Promise.all([
+    getLeaderboard(20),     // top 20 z VIEW
+    getCategories()         // kategorie count
+  ])
 
-  return <QuizDashboard {...data} />
+  // Format dla Dashboard
+  const initialLeaderboard = leaderboard.map((p, i) => ({
+    ...p,
+    rank: i + 1
+  }))
+
+  return (
+    <QuizDashboard
+      initialLeaderboard={initialLeaderboard}
+      categoriesCount={categories.length}
+    />
+  )
 }
