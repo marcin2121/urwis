@@ -21,12 +21,12 @@ type Session = {
 };
 
 const navItems: NavItem[] = [
-  { name: "Strona główna", href: "/", icon: "🏠" },
-  { name: "Kontakt", href: "/kontakt", icon: "📞" },
-  { name: "Misje", href: "/misje", icon: "🎯" },
-  { name: "Nagrody", href: "/nagrody", icon: "🏆" },
-  { name: "Gry", href: "/gry", icon: "🎮" },
-  { name: "Quiz", href: "/quiz", icon: "🧠" },
+  { name: "🏠 Home", href: "/", icon: "🏠" },
+  { name: "📞 Kontakt", href: "/kontakt", icon: "📞" },
+  { name: "🎯 Misje", href: "/misje", icon: "🎯" },
+  { name: "🏆 Nagrody", href: "/nagrody", icon: "🏆" },
+  { name: "🎮 Gry", href: "/gry", icon: "🎮" },
+  { name: "🧠 Quiz", href: "/quiz", icon: "🧠" },
 ];
 
 const Navbar = memo(() => {
@@ -37,7 +37,7 @@ const Navbar = memo(() => {
   const { profile, session, signOut, isLoading } = useSupabaseAuth() as {
     profile: Profile | null;
     session: Session | null;
-    signOut: () => void;
+    signOut: () => Promise<void>;
     isLoading: boolean;
   };
 
@@ -48,6 +48,10 @@ const Navbar = memo(() => {
   const handleAuthClick = useCallback(() => {
     setShowAuthModal(true);
   }, []);
+
+  const handleSignOut = useCallback(async () => {
+    await signOut();
+  }, [signOut]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -63,17 +67,27 @@ const Navbar = memo(() => {
 
   return (
     <>
+      {/* Dynamiczna wyspa z backdrop-blur tylko pod navbar */}
       <motion.nav
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="fixed top-4 left-4 right-4 z-50 backdrop-blur-xl"
+        className="fixed top-6 left-1/2 -translate-x-1/2 z-50"
       >
-        <div className="bg-white/90 dark:bg-gray-900/90 shadow-2xl border border-white/20 dark:border-gray-800/50 rounded-3xl p-4 md:p-6 max-w-7xl mx-auto">
+        {/* Podkładka blur tylko pod navbar */}
+        <motion.div
+          className="absolute inset-0 -top-2 -bottom-2 backdrop-blur-xl bg-white/20 dark:bg-black/20 rounded-3xl -z-10"
+          style={{
+            maskImage: 'radial-gradient(circle at center, black 60%, transparent 70%)',
+            WebkitMaskImage: 'radial-gradient(circle at center, black 60%, transparent 70%)'
+          }}
+        />
+
+        <div className="relative bg-white/95 dark:bg-gray-900/95 backdrop-blur-3xl shadow-2xl border border-white/30 dark:border-gray-800/40 rounded-3xl p-4 md:p-6 max-w-5xl w-full mx-4 xl:mx-0">
           <div className="flex items-center justify-between gap-4">
             {/* Logo */}
             <Link
               href="/"
-              className="flex items-center gap-3 group p-3 -m-3 rounded-2xl hover:bg-gradient-to-r hover:from-red-500/10 hover:to-blue-500/10 transition-all duration-300 flex-shrink-0"
+              className="flex items-center gap-3 group p-3 -m-3 rounded-2xl hover:bg-gradient-to-r hover:from-red-500/10 hover:to-blue-500/10 transition-all duration-300 flex-shrink-0 flex-0"
               aria-label="Urwis - Strona główna"
             >
               <motion.div
@@ -89,22 +103,22 @@ const Navbar = memo(() => {
                 </div>
               </motion.div>
               <div className="hidden lg:block">
-                <h1 className="text-2xl font-black bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text">URWIS</h1>
+                <h1 className="text-2xl font-black bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text leading-tight">URWIS</h1>
                 <p className="text-xs font-bold uppercase tracking-widest text-[#E94444]">Białobrzegi</p>
               </div>
             </Link>
 
-            {/* Desktop Navigation */}
-            <div className="hidden xl:flex items-center gap-3 flex-1 justify-center max-w-4xl">
+            {/* Desktop Navigation - skraca się gdy mało miejsca */}
+            <div className="hidden xl:flex items-center gap-2 md:gap-3 flex-1 justify-center max-w-4xl min-w-0">
               {navItems.map((item, idx) => (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="group relative px-6 py-3 text-base font-bold text-gray-800 hover:text-[#E94444] rounded-2xl hover:bg-gradient-to-r hover:from-[#E94444]/5 hover:to-[#1473E6]/5 transition-all duration-300 flex items-center gap-3 shadow-sm hover:shadow-md"
+                  className="group relative px-3 md:px-4 lg:px-6 py-3 text-sm lg:text-base font-bold text-gray-800 hover:text-[#E94444] rounded-2xl hover:bg-gradient-to-r hover:from-[#E94444]/5 hover:to-[#1473E6]/5 transition-all duration-300 flex items-center gap-2 md:gap-3 shadow-sm hover:shadow-md whitespace-nowrap flex-shrink-0"
                   aria-label={item.name}
                 >
-                  <span aria-hidden className="text-2xl opacity-75 group-hover:opacity-100 transition-opacity">{item.icon}</span>
-                  <span>{item.name}</span>
+                  <span aria-hidden className="text-xl md:text-2xl opacity-75 group-hover:opacity-100 transition-opacity flex-shrink-0">{item.icon}</span>
+                  <span className="hidden xl:inline">{item.name}</span>
                   <motion.div
                     layoutId={`desktop-nav-${idx}`}
                     className="absolute inset-0 bg-gradient-to-r from-[#E94444]/10 to-[#1473E6]/10 rounded-2xl opacity-0 group-hover:opacity-100"
@@ -113,19 +127,19 @@ const Navbar = memo(() => {
               ))}
             </div>
 
-            {/* Right side: Notifications, Profile, Mobile menu */}
-            <div className="flex items-center gap-3">
+            {/* Right side - ograniczona szerokość */}
+            <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-shrink-0">
               {/* Notifications */}
               <motion.div
-                className="relative p-3 rounded-2xl bg-gradient-to-br from-[#FFBE0B] to-orange-500 text-white shadow-xl hover:shadow-2xl cursor-pointer transition-all duration-300"
+                className="relative p-2 md:p-3 rounded-2xl bg-gradient-to-br from-[#FFBE0B] to-orange-500 text-white shadow-xl hover:shadow-2xl cursor-pointer transition-all duration-300 flex-shrink-0"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={toggleNotifications}
                 aria-label="Powiadomienia"
               >
-                <span className="text-2xl relative z-10">🔔</span>
+                <span className="text-xl md:text-2xl relative z-10">🔔</span>
                 <motion.span
-                  className="absolute -top-1 -right-1 w-7 h-7 bg-red-500 rounded-full border-3 border-white shadow-lg text-xs font-black flex items-center justify-center"
+                  className="absolute -top-0.5 md:-top-1 -right-0.5 md:-right-1 w-5 md:w-7 h-5 md:h-7 bg-red-500 rounded-full border-2 md:border-3 border-white shadow-lg text-xs font-black flex items-center justify-center"
                   initial={{ scale: 0, y: -5 }}
                   animate={{ scale: 1, y: 0 }}
                   transition={{ type: "spring", stiffness: 500 }}
@@ -139,10 +153,10 @@ const Navbar = memo(() => {
                       initial={{ opacity: 0, scale: 0.95, y: 8 }}
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95, y: 8 }}
-                      className="absolute top-full right-0 mt-3 w-96 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 py-4 px-5 z-50"
+                      className="absolute top-full right-0 mt-2 md:mt-3 w-80 md:w-96 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 py-4 px-5 z-50"
                       style={{ boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}
                     >
-                      {/* Notifications content - bez zmian */}
+                      {/* Zawartość powiadomień bez zmian */}
                       <div className="flex items-center gap-3 mb-4 pb-3 border-b border-gray-200/50 dark:border-gray-700/50">
                         <span className="text-2xl">🔔</span>
                         <div>
@@ -153,7 +167,6 @@ const Navbar = memo(() => {
                         </div>
                       </div>
                       <div className="space-y-3 max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
-                        {/* 3 przykładowe powiadomienia - bez zmian */}
                         <div className="group p-4 rounded-xl hover:bg-blue-50/50 dark:hover:bg-blue-900/20 border-l-4 border-blue-400 transition-all cursor-pointer">
                           <div className="flex items-start gap-3">
                             <span className="text-2xl flex-shrink-0 mt-0.5">🎯</span>
@@ -193,39 +206,37 @@ const Navbar = memo(() => {
                 </AnimatePresence>
               </motion.div>
 
-              {/* Profile/Login button */}
-              {isLoading ? (
-                <div className="w-12 h-12 bg-gray-200/50 dark:bg-gray-700/50 rounded-2xl animate-pulse shadow-lg" />
-              ) : session && profile ? (
-                <Link
-                  href="/profil"
-                  className="group flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-r from-[#E94444] to-[#1473E6] text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]"
-                  aria-label={`Profil ${profile.username}`}
-                >
-                  <div className="w-12 h-12 bg-white/30 rounded-xl flex items-center justify-center shadow-lg backdrop-blur-sm">
-                    <span className="text-xl">👤</span>
-                  </div>
-                  <div className="hidden md:block min-w-0">
-                    <div className="font-bold text-sm truncate" title={profile.username}>
-                      {profile.username}
+              {/* Profile/Login button - responsywny */}
+              <div className="flex-shrink-0 min-w-0">
+                {isLoading ? (
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-200/50 dark:bg-gray-700/50 rounded-2xl animate-pulse shadow-lg flex-shrink-0" />
+                ) : session && profile ? (
+                  <div className="flex items-center gap-2 md:gap-3 p-2 md:p-4 rounded-2xl bg-gradient-to-r from-[#E94444] to-[#1473E6] text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] flex-shrink-0">
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-white/30 rounded-xl flex items-center justify-center shadow-lg backdrop-blur-sm flex-shrink-0">
+                      <span className="text-lg md:text-xl">👤</span>
                     </div>
-                    <div className="text-xs opacity-90">Lv. {profile.level ?? 1}</div>
+                    <div className="hidden md:block min-w-0 flex-1 max-w-32">
+                      <div className="font-bold text-xs md:text-sm truncate" title={profile.username}>
+                        {profile.username}
+                      </div>
+                      <div className="text-xs opacity-90">Lv. {profile.level ?? 1}</div>
+                    </div>
                   </div>
-                </Link>
-              ) : (
-                <motion.button
-                  onClick={handleAuthClick}
-                  className="px-8 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold text-sm shadow-xl hover:shadow-2xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-300 whitespace-nowrap"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  👤 Załóż konto
-                </motion.button>
-              )}
+                ) : (
+                  <motion.button
+                    onClick={handleAuthClick}
+                    className="px-4 py-2 md:px-6 md:py-3 md:px-8 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold text-xs md:text-sm shadow-xl hover:shadow-2xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-300 whitespace-nowrap flex-shrink-0 max-w-[140px] md:max-w-none"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    👤 Załóż konto
+                  </motion.button>
+                )}
+              </div>
 
               {/* Mobile menu button */}
               <motion.button
-                className="xl:hidden p-3 rounded-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur shadow-lg hover:shadow-xl transition-all duration-300"
+                className="xl:hidden p-2 md:p-3 rounded-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur shadow-lg hover:shadow-xl transition-all duration-300 flex-shrink-0"
                 onClick={toggleMobile}
                 whileTap={{ scale: 0.95 }}
                 whileHover={{ scale: 1.1 }}
@@ -233,12 +244,12 @@ const Navbar = memo(() => {
                 aria-expanded={mobileOpen}
               >
                 <motion.div
-                  className="w-6 h-6 flex flex-col justify-center gap-1.5"
+                  className="w-5 h-5 md:w-6 md:h-6 flex flex-col justify-center gap-1 md:gap-1.5"
                   animate={{ rotate: mobileOpen ? 90 : 0 }}
                 >
                   <motion.span
                     className="h-0.5 w-full bg-gray-800 rounded-full origin-center"
-                    animate={{ rotate: mobileOpen ? 45 : 0, y: mobileOpen ? 2 : 0 }}
+                    animate={{ rotate: mobileOpen ? 45 : 0, y: mobileOpen ? 1.5 : 0 }}
                     transition={{ duration: 0.2 }}
                   />
                   <motion.span
@@ -247,7 +258,7 @@ const Navbar = memo(() => {
                   />
                   <motion.span
                     className="h-0.5 w-full bg-gray-800 rounded-full origin-center"
-                    animate={{ rotate: mobileOpen ? -45 : 0, y: mobileOpen ? -2 : 0 }}
+                    animate={{ rotate: mobileOpen ? -45 : 0, y: mobileOpen ? -1.5 : 0 }}
                     transition={{ duration: 0.2 }}
                   />
                 </motion.div>
@@ -257,7 +268,7 @@ const Navbar = memo(() => {
         </div>
       </motion.nav>
 
-      {/* Mobile menu */}
+      {/* Mobile menu - bez zmian */}
       <AnimatePresence>
         {mobileOpen && (
           <>
@@ -276,7 +287,6 @@ const Navbar = memo(() => {
               className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 xl:hidden w-[calc(100%-2rem)] max-w-md max-h-[85vh]"
             >
               <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 dark:border-gray-800/50 overflow-hidden flex flex-col h-full">
-                {/* Mobile profile section */}
                 {session && profile && !isLoading && (
                   <Link
                     href="/profil"
@@ -297,7 +307,6 @@ const Navbar = memo(() => {
                   </Link>
                 )}
 
-                {/* Mobile navigation items */}
                 <div className="flex-1 overflow-y-auto py-8 px-6 space-y-4">
                   {navItems.map((item, idx) => (
                     <Link
@@ -318,7 +327,6 @@ const Navbar = memo(() => {
                   ))}
                 </div>
 
-                {/* Mobile bottom CTA */}
                 <div className="p-8 pt-0 border-t border-gray-200/50 dark:border-gray-700/50">
                   {isLoading ? (
                     <div className="flex items-center gap-3 p-6 rounded-2xl bg-gray-100/50 dark:bg-gray-800/50 animate-pulse">
