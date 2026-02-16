@@ -2,9 +2,9 @@ import { createClient } from '@/lib/supabase/server'
 import type { TriviaQuestion } from '@/lib/triviaApi'
 
 export async function getTriviaQuestions(amount = 20): Promise<TriviaQuestion[]> {  // + Promise
-  const supabase = await createClient()  // ✅ AWAIT!
+  const supabase = await createClient()
 
-  const { data, error } = await supabase  // ✅ + await tutaj
+  const { data, error } = await supabase
     .from('trivia_questions')
     .select('id,question,options,correct,exp,category')
     .eq('isactive', true)
