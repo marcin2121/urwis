@@ -11,7 +11,7 @@ interface LeaderboardPlayer {
 }
 
 export default function QuizDashboard({
-  initialCategoriesCount = 0  // fallback
+  initialCategoriesCount = 0
 }: {
   initialCategoriesCount?: number
 }) {
