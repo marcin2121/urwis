@@ -1,22 +1,24 @@
-import type { Database } from '@/types/supabase'; // generated types!
+import type { Database } from '../types/supabase'; // fix ścieżka!
 
 export type TriviaQuestion = Database['public']['Tables']['trivia_questions']['Row'] & {
-  options: string[]; // parsed
+  options: string[]; // parsed CSV
 };
 
-export async function getCategories(): Promise<string[]> {
-  let supabase;
-
-  // RSC path
+// UTILITY: helper do clienta (używa dynamic import)
+async function getSupabaseClient() {
   if (typeof window === 'undefined') {
+    // RSC
     const { createClient } = await import('@/lib/supabase/server');
-    supabase = await createClient();
+    return await createClient();
   } else {
-    // Client path
+    // Client
     const { createClient } = await import('@/lib/supabase/client');
-    supabase = createClient();
+    return createClient();
   }
+}
 
+export async function getCategories(): Promise<string[]> {
+  const supabase = await getSupabaseClient()!;
   const { data } = await supabase
     .from('trivia_questions')
     .select('category')
@@ -26,17 +28,8 @@ export async function getCategories(): Promise<string[]> {
   return [...new Set((data || []).map((q: any) => q.category))];
 }
 
-// Reszta funkcji IDENTYCZNE (tylko ten sam dual pattern)
 export async function getRandomQuestions(category?: string, count = 10): Promise<TriviaQuestion[]> {
-  let supabase;
-  if (typeof window === 'undefined') {
-    const { createClient } = await import('@/lib/supabase/server');
-    supabase = await createClient();
-  } else {
-    const { createClient } = await import('@/lib/supabase/client');
-    supabase = createClient();
-  }
-
+  const supabase = await getSupabaseClient()!;
   let query = supabase
     .from('trivia_questions')
     .select('id,question,options,correct,exp,category')
@@ -51,51 +44,26 @@ export async function getRandomQuestions(category?: string, count = 10): Promise
   const { data } = await query;
   return (data || []).map((q): TriviaQuestion => ({
     ...q,
-    options: typeof q.options === 'string' ? q.options.split(',').map((o: string) => o.trim()) : q.options,
+    options: typeof q.options === 'string' ?
+      q.options.split(',').map((o: string) => o.trim()) :
+      q.options || [],
   }));
 }
 
-
 export async function getDailyQuestion(userId: string): Promise<TriviaQuestion | null> {
-  const supabase = await createClient()
-  const today = new Date().toISOString().slice(0, 10)
+  const supabase = await getSupabaseClient()!;
+  const today = new Date().toISOString().slice(0, 10);
 
-  const { data } = await supabase
+  const { data: session } = await supabase
     .from('quiz_sessions')
     .select('id')
     .eq('user_id', userId)
     .eq('mode', 'daily')
     .gte('played_at', today)
-    .single()
+    .single();
 
-  if (data) return null // już zrobione dzisiaj
+  if (session) return null; // już zrobione dzisiaj
 
-  const questions = await getRandomQuestions('mixed', 1)  // ✅ AWAIT!
-  return questions[0] || null  // ✅ Type-safe!
+  const questions = await getRandomQuestions('mixed', 1);
+  return questions[0] || null;
 }
-
-export async function getRandomQuestions(category?: string, count = 10): Promise<TriviaQuestion[]> {
-  const supabase = await createClient()
-  let query = supabase
-    .from('trivia_questions')
-    .select('id,question,options,correct,exp,category')
-    .eq('is_active', true)
-    .order('random()')
-    .limit(count)
-
-  if (category && category !== 'mixed') {
-    query = query.eq('category', category)
-  }
-
-  const { data } = await query
-  return (data || []).map((q: any): TriviaQuestion => ({
-    id: q.id,
-    question: q.question,
-    options: q.options.split(',').map((o: string) => o.trim()),
-    correct: q.correct,
-    exp: q.exp,
-    category: q.category
-  }))
-}
-
-export type { TriviaQuestion }
