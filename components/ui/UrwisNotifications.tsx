@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Trophy, Star, Gift, PartyPopper } from 'lucide-react'
-
+import { useRouter } from 'next/navigation'
 // --- TYPY ---
 export type NotificationType = 'success' | 'level-up' | 'mission' | 'reward' | 'info'
 
@@ -27,39 +27,54 @@ export const urwisToast = {
     const id = Math.random().toString(36).substring(2, 9)
     listeners.forEach(l => l({ ...notification, id }))
   },
-  // Helpery
+
+  // AWANS POZIOMU -> Przekierowanie do /profil
   levelUp: (level: number) => {
     urwisToast.add({
       type: 'level-up',
       title: 'POZIOM W GÓRĘ! 🎉',
       message: `Gratulacje! Osiągnąłeś poziom ${level}!`,
-      duration: 8000
+      duration: 8000,
+      actionLabel: 'Zobacz profil',
+      onAction: () => { window.dispatchEvent(new CustomEvent('urwis-nav', { detail: '/profil' })) }
     })
   },
+
+  // MISJA / NAGRODA -> Przekierowanie do /misje lub /nagrody
   missionComplete: (missionName: string, xp: number) => {
     urwisToast.add({
       type: 'mission',
       title: 'Misja Wykonana!',
       message: `${missionName} (+${xp} XP)`,
-      duration: 5000
+      duration: 5000,
+      actionLabel: 'Moje Misje',
+      onAction: () => { window.dispatchEvent(new CustomEvent('urwis-nav', { detail: '/misje' })) }
     })
   },
+
   dailyReward: () => {
     urwisToast.add({
       type: 'reward',
       title: 'Nagroda Czeka!',
       message: 'Twój dzienny bonus jest gotowy do odebrania.',
-      actionLabel: 'Odbierz',
-      onAction: () => window.location.href = '/nagrody', // Lub otwarcie modala
-      duration: 10000
+      duration: 10000,
+      actionLabel: 'Odbierz nagrodę',
+      onAction: () => { window.dispatchEvent(new CustomEvent('urwis-nav', { detail: '/nagrody' })) }
     })
   }
 }
-
 // --- KOMPONENT UI ---
 export default function UrwisNotifications() {
+  const router = useRouter()
   const [notifications, setNotifications] = useState<UrwisNotification[]>([])
-
+  useEffect(() => {
+    const handleNav = (e: any) => {
+      router.push(e.detail)
+    }
+  
+    window.addEventListener('urwis-nav', handleNav)
+    return () => window.removeEventListener('urwis-nav', handleNav)
+  }, [router])
   useEffect(() => {
     const handler = (newNote: UrwisNotification) => {
       setNotifications(prev => [...prev, newNote])
@@ -101,19 +116,25 @@ export default function UrwisNotifications() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-[9999] flex flex-col gap-2 pointer-events-none">
+    <div className="fixed bottom-4 right-4 z-9999 flex flex-col gap-2 pointer-events-none">
       <AnimatePresence>
         {notifications.map(note => (
           <motion.div
-            key={note.id}
+          key={note.id}
+          onClick={() => {
+            if (note.onAction) {
+              note.onAction()
+              removeNotification(note.id)
+            }
+          }}
             initial={{ opacity: 0, x: 100, scale: 0.8 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
             layout
             className={`
-              pointer-events-auto w-80 p-4 rounded-2xl shadow-xl border-2 
-              flex items-start gap-4 backdrop-blur-md
-              ${getBgColor(note.type)}
+              cursor-pointer pointer-events-auto w-80 p-4 rounded-2xl shadow-xl border-2 
+    flex items-start gap-4 backdrop-blur-md hover:scale-105 transition-transform
+    ${getBgColor(note.type)}
             `}
           >
             <div className="shrink-0 pt-1 bg-white/50 p-2 rounded-full">
