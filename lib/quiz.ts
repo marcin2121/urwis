@@ -1,24 +1,60 @@
-import { createClient } from '@/lib/supabase/server'
+import type { Database } from '@/types/supabase'; // generated types!
 
-interface TriviaQuestion {
-  id: number
-  question: string
-  options: string[]
-  correct: number
-  exp: number
-  category: string
-}
+export type TriviaQuestion = Database['public']['Tables']['trivia_questions']['Row'] & {
+  options: string[]; // parsed
+};
 
 export async function getCategories(): Promise<string[]> {
-  const supabase = await createClient()
+  let supabase;
+
+  // RSC path
+  if (typeof window === 'undefined') {
+    const { createClient } = await import('@/lib/supabase/server');
+    supabase = await createClient();
+  } else {
+    // Client path
+    const { createClient } = await import('@/lib/supabase/client');
+    supabase = createClient();
+  }
+
   const { data } = await supabase
     .from('trivia_questions')
     .select('category')
     .eq('is_active', true)
-    .order('category')
+    .order('category');
 
-  return [...new Set((data || []).map((q: any) => q.category))]
+  return [...new Set((data || []).map((q: any) => q.category))];
 }
+
+// Reszta funkcji IDENTYCZNE (tylko ten sam dual pattern)
+export async function getRandomQuestions(category?: string, count = 10): Promise<TriviaQuestion[]> {
+  let supabase;
+  if (typeof window === 'undefined') {
+    const { createClient } = await import('@/lib/supabase/server');
+    supabase = await createClient();
+  } else {
+    const { createClient } = await import('@/lib/supabase/client');
+    supabase = createClient();
+  }
+
+  let query = supabase
+    .from('trivia_questions')
+    .select('id,question,options,correct,exp,category')
+    .eq('is_active', true)
+    .order('random()')
+    .limit(count);
+
+  if (category && category !== 'mixed') {
+    query = query.eq('category', category);
+  }
+
+  const { data } = await query;
+  return (data || []).map((q): TriviaQuestion => ({
+    ...q,
+    options: typeof q.options === 'string' ? q.options.split(',').map((o: string) => o.trim()) : q.options,
+  }));
+}
+
 
 export async function getDailyQuestion(userId: string): Promise<TriviaQuestion | null> {
   const supabase = await createClient()
