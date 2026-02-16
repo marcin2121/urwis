@@ -1,25 +1,31 @@
-interface SupabaseRow {
+interface SupabaseQuestion {
   id: number;
   question: string;
-  options: string;
+  options: string;  // CSV w DB
   correct: number;
   exp: number;
   category: string;
   is_active: boolean;
 }
 
-export type TriviaQuestion = SupabaseRow & { options: string[] };
+export type TriviaQuestion = Omit<SupabaseQuestion, 'options'> & {
+  options: string[];  // parsed array
+};
 
+// 🔧 UNIVERSAL CLIENT HELPER (RSC + Client safe)
 async function getSupabaseClient(): Promise<any> {
   if (typeof window === 'undefined') {
+    // Server Component
     const { createClient } = await import('@/lib/supabase/server');
     return await createClient();
   } else {
+    // Client Component  
     const { createClient } = await import('@/lib/supabase/client');
-    return createClient()!;
+    return createClient();
   }
 }
 
+// 🏆 KATEGORIE (Geografia, Matematyka...)
 export async function getCategories(): Promise<string[]> {
   const supabase = await getSupabaseClient();
   const { data } = await supabase
@@ -27,10 +33,14 @@ export async function getCategories(): Promise<string[]> {
     .select('category')
     .eq('is_active', true)
     .order('category');
-  return [...new Set((data as any[]).map((q: any) => q.category))];
+  return [...new Set((data || []).map((q: any) => q.category))];
 }
 
-export async function getRandomQuestions(category?: string, count = 10): Promise<TriviaQuestion[]> {
+// 🎲 LOSOWE PYTANIA (kategoria/mixed)
+export async function getRandomQuestions(
+  category?: string,
+  count = 10
+): Promise<TriviaQuestion[]> {
   const supabase = await getSupabaseClient();
   let query = supabase
     .from('trivia_questions')
@@ -39,15 +49,22 @@ export async function getRandomQuestions(category?: string, count = 10): Promise
     .order('random()')
     .limit(count);
 
-  if (category && category !== 'mixed') query = query.eq('category', category);
+  if (category && category !== 'mixed') {
+    query = query.eq('category', category);
+  }
 
   const { data } = await query;
-  return (data || []).map((q: SupabaseRow): TriviaQuestion => ({
-    ...q,
-    options: (q.options as string).split(',').map((o: string) => o.trim()),
+  return (data || []).map((q: SupabaseQuestion): TriviaQuestion => ({
+    id: q.id,
+    question: q.question,
+    options: q.options.split(',').map((o: string) => o.trim()),  // CSV → array
+    correct: q.correct,
+    exp: q.exp,
+    category: q.category,
   }));
 }
 
+// 📅 DAILY QUESTION (1/dzień/user)
 export async function getDailyQuestion(userId: string): Promise<TriviaQuestion | null> {
   const supabase = await getSupabaseClient();
   const today = new Date().toISOString().slice(0, 10);
@@ -60,11 +77,13 @@ export async function getDailyQuestion(userId: string): Promise<TriviaQuestion |
     .gte('played_at', today)
     .single();
 
-  if (session) return null;
+  if (session) return null;  // już odebrane
+
   const questions = await getRandomQuestions('mixed', 1);
   return questions[0] || null;
 }
 
+// 🥇 LEADERBOARD (bonus z SQL VIEW)
 export async function getLeaderboard(limit = 10): Promise<{ user_id: string; total_exp: number }[]> {
   const supabase = await getSupabaseClient();
   const { data } = await supabase
@@ -72,7 +91,5 @@ export async function getLeaderboard(limit = 10): Promise<{ user_id: string; tot
     .select('user_id, total_exp')
     .order('total_exp', { ascending: false })
     .limit(limit);
-  return data as { user_id: string; total_exp: number }[];
+  return data || [];
 }
-
-// NIE ma duplikat export type!
