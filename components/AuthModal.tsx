@@ -84,8 +84,8 @@ export default function AuthModal({ isOpen, onClose, defaultView = 'login' }: Au
               <button
                 onClick={() => setView('login')}
                 className={`flex-1 py-2 text-sm font-bold rounded-full transition-all ${view === 'login'
-                    ? 'bg-white dark:bg-zinc-700 shadow-sm text-black dark:text-white'
-                    : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+                  ? 'bg-white dark:bg-zinc-700 shadow-sm text-black dark:text-white'
+                  : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
                   }`}
               >
                 Logowanie
@@ -93,8 +93,8 @@ export default function AuthModal({ isOpen, onClose, defaultView = 'login' }: Au
               <button
                 onClick={() => setView('register')}
                 className={`flex-1 py-2 text-sm font-bold rounded-full transition-all ${view === 'register'
-                    ? 'bg-white dark:bg-zinc-700 shadow-sm text-black dark:text-white'
-                    : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+                  ? 'bg-white dark:bg-zinc-700 shadow-sm text-black dark:text-white'
+                  : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
                   }`}
               >
                 Rejestracja
@@ -112,7 +112,7 @@ export default function AuthModal({ isOpen, onClose, defaultView = 'login' }: Au
               <p className="text-sm text-zinc-500 mt-1 font-medium">
                 {view === 'login'
                   ? 'Gotowy na kolejne wyzwania?'
-                  : 'Załóż konto i zgarnij bonus na start.'}
+                  : 'Załóż konto i ruszaj do zabawy.'}
               </p>
             </div>
 
