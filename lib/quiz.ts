@@ -1,6 +1,15 @@
-import { createClient } from '@/lib/supabase/server'  // ✅ Twoja ścieżka!
+import { createClient } from '@/lib/supabase/server'
 
-export async function getCategories() {
+interface TriviaQuestion {
+  id: number
+  question: string
+  options: string[]
+  correct: number
+  exp: number
+  category: string
+}
+
+export async function getCategories(): Promise<string[]> {
   const supabase = await createClient()
   const { data } = await supabase
     .from('trivia_questions')
@@ -8,10 +17,28 @@ export async function getCategories() {
     .eq('is_active', true)
     .order('category')
 
-  return [...new Set(data?.map((q: any) => q.category) || [])]
+  return [...new Set((data || []).map((q: any) => q.category))]
 }
 
-export async function getRandomQuestions(category?: string, count = 10) {
+export async function getDailyQuestion(userId: string): Promise<TriviaQuestion | null> {
+  const supabase = await createClient()
+  const today = new Date().toISOString().slice(0, 10)
+
+  const { data } = await supabase
+    .from('quiz_sessions')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('mode', 'daily')
+    .gte('played_at', today)
+    .single()
+
+  if (data) return null // już zrobione dzisiaj
+
+  const questions = await getRandomQuestions('mixed', 1)  // ✅ AWAIT!
+  return questions[0] || null  // ✅ Type-safe!
+}
+
+export async function getRandomQuestions(category?: string, count = 10): Promise<TriviaQuestion[]> {
   const supabase = await createClient()
   let query = supabase
     .from('trivia_questions')
@@ -25,12 +52,12 @@ export async function getRandomQuestions(category?: string, count = 10) {
   }
 
   const { data } = await query
-  return data?.map((q: any) => ({
+  return (data || []).map((q: any): TriviaQuestion => ({
     id: q.id,
     question: q.question,
     options: q.options.split(',').map((o: string) => o.trim()),
     correct: q.correct,
     exp: q.exp,
     category: q.category
-  })) || []
+  }))
 }
