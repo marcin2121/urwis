@@ -1,23 +1,22 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+// 1. Importujemy nowe fonty
+import { Fredoka, Outfit } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/ui/Navbar";
-import { AppProviders } from "@/components/providers/AppProviders"; // <--- Nowy import
-import HiddenUrwis from "@/components/HiddenUrwis";
-import MissionTracker from "@/components/MissionTracker";
-import UrwisNotifications from "@/components/ui/UrwisNotifications";
-import GamificationListener from "@/components/systems/GamificationListener";
+// ... reszta importów
 
-const inter = Inter({ subsets: ["latin"] });
+// 2. Konfigurujemy fonty
+const fredoka = Fredoka({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-heading",
+});
 
-export const metadata: Metadata = {
-  title: "Sklep Urwis 🧸",
-  description: "Twój lokalny sklep w Białobrzegach",
-};
+const outfit = Outfit({
+  subsets: ["latin"],
+  variable: "--font-body",
+});
 
-export const viewport = {
-  colorScheme: 'light',
-};
+// ... metadata ...
 
 export default function RootLayout({
   children,
@@ -26,20 +25,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pl" suppressHydrationWarning>
-      <body suppressHydrationWarning className={inter.className}>
-        <AppProviders>
-          {/* Logika i UI Grywalizacji */}
-          <GamificationListener />
-          <MissionTracker />
-          <UrwisNotifications />
-
-          {/* UI Strony */}
-          <Navbar />
-          <main className="min-h-screen">
-            {children}
-          </main>
-          <HiddenUrwis />
-        </AppProviders>
+      <body
+        suppressHydrationWarning
+        // 3. Dodajemy zmienne CSS do body
+        className={`${fredoka.variable} ${outfit.variable} font-body antialiased bg-slate-50 text-slate-900 overflow-x-hidden`}
+      >
+        {/* ... reszta providerów ... */}
       </body>
     </html>
   );
