@@ -125,3 +125,5 @@ const decodeHTMLEntities = (str: string): string => {
   textarea.innerHTML = str
   return textarea.value
 }
+// DODAJ NA KOŃCU pliku triviaApi.ts:
+export { FALLBACK_QUESTIONS, TriviaQuestion } // ✅ TYLKO TO!
