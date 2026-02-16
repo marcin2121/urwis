@@ -1,215 +1,228 @@
 'use client'
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
+import { X, Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  defaultMode?: 'login' | 'register';
+  defaultView?: 'login' | 'register'; // Zmieniłem na defaultView by pasowało do Navbara
 }
 
-export default function AuthModal({ isOpen, onClose, defaultMode = 'login' }: AuthModalProps) {
+export default function AuthModal({ isOpen, onClose, defaultView = 'login' }: AuthModalProps) {
   const { login, register } = useSupabaseAuth();
-  const [mode, setMode] = useState<'login' | 'register'>(defaultMode);
+
+  // Stan widoku (logowanie vs rejestracja)
+  const [view, setView] = useState<'login' | 'register'>(defaultView);
+
+  // Pola formularza
   const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState(''); // Tylko dla rejestracji
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+
+  // Stany UI
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Synchronizacja: Jak Navbar każe otworzyć "Rejestrację", to ustawiamy rejestrację
+  useEffect(() => {
+    if (isOpen) {
+      setView(defaultView);
+      setError(null);
+      // Opcjonalnie: czyść formularz przy otwarciu
+      // setEmail(''); setPassword(''); setUsername('');
+    }
+  }, [isOpen, defaultView]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
 
-    if (mode === 'register') {
-      if (password !== confirmPassword) {
-        alert('Hasła nie pasują do siebie!');
-        setIsLoading(false);
-        return;
+    try {
+      if (view === 'register') {
+        if (password.length < 6) {
+          throw new Error('Hasło musi mieć minimum 6 znaków.');
+        }
+        // Zakładam, że register zwraca { error } lub rzuca błąd, 
+        // jeśli Twoja funkcja zwraca boolean, dostosuj ten warunek.
+        await register(email, username, password);
+        onClose(); // Zamknij po sukcesie
+      } else {
+        await login(email, password);
+        onClose(); // Zamknij po sukcesie
       }
-
-      if (password.length < 6) {
-        alert('Hasło musi mieć minimum 6 znaków!');
-        setIsLoading(false);
-        return;
-      }
-
-      const success = await register(email, username, password);
-      if (success) {
-        onClose();
-      }
-    } else {
-      const success = await login(email, password);
-      if (success) {
-        onClose();
-      }
+    } catch (err: any) {
+      // Tutaj obsługa błędu z Supabase
+      setError(err.message || 'Wystąpił błąd. Spróbuj ponownie.');
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
-  };
-
-  const resetForm = () => {
-    setEmail('');
-    setUsername('');
-    setPassword('');
-    setConfirmPassword('');
-  };
-
-  const switchMode = () => {
-    setMode(mode === 'login' ? 'register' : 'login');
-    resetForm();
   };
 
   if (!isOpen) return null;
 
   return (
     <AnimatePresence>
+      {/* Backdrop */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
-        className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4"
       >
+        {/* Modal Card */}
         <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
+          initial={{ scale: 0.95, opacity: 0, y: 20 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.95, opacity: 0, y: 20 }}
           onClick={(e) => e.stopPropagation()}
-          className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl"
+          className="bg-white dark:bg-zinc-900 w-full max-w-[420px] rounded-3xl shadow-2xl overflow-hidden relative"
         >
-          {/* Header */}
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-3xl font-black">
-              {mode === 'login' ? 'Zaloguj się' : 'Zarejestruj się'}
-            </h2>
-            <motion.button
-              whileHover={{ scale: 1.1, rotate: 90 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={onClose}
-              className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-2xl font-bold"
-            >
-              ×
-            </motion.button>
-          </div>
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500 transition-colors z-10"
+          >
+            <X size={20} />
+          </button>
 
-          {/* Icon */}
-          <div className="text-center mb-6">
-            <div className="text-6xl mb-2">
-              {mode === 'login' ? '👋' : '🎉'}
+          <div className="p-8 pt-10">
+            {/* Header / Tabs */}
+            <div className="flex items-center justify-center gap-1 bg-zinc-100 dark:bg-zinc-800 p-1 rounded-full mb-8">
+              <button
+                onClick={() => setView('login')}
+                className={`flex-1 py-2 text-sm font-bold rounded-full transition-all ${view === 'login'
+                    ? 'bg-white dark:bg-zinc-700 shadow-sm text-black dark:text-white'
+                    : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+                  }`}
+              >
+                Zaloguj się
+              </button>
+              <button
+                onClick={() => setView('register')}
+                className={`flex-1 py-2 text-sm font-bold rounded-full transition-all ${view === 'register'
+                    ? 'bg-white dark:bg-zinc-700 shadow-sm text-black dark:text-white'
+                    : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+                  }`}
+              >
+                Załóż konto
+              </button>
             </div>
-            <p className="text-gray-600">
-              {mode === 'login'
-                ? 'Witaj z powrotem w Klubie Urwisa!'
-                : 'Dołącz do Klubu Urwisa i zdobywaj nagrody!'}
-            </p>
-          </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {mode === 'register' && (
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Nazwa użytkownika
-                </label>
+            {/* Title & Emoji */}
+            <div className="text-center mb-6">
+              <div className="text-4xl mb-3">
+                {view === 'login' ? '👋' : '🚀'}
+              </div>
+              <h2 className="text-2xl font-bold text-black dark:text-white">
+                {view === 'login' ? 'Witaj ponownie!' : 'Dołącz do nas'}
+              </h2>
+              <p className="text-sm text-zinc-500 mt-1">
+                {view === 'login'
+                  ? 'Zaloguj się, aby kontynuować misje.'
+                  : 'Stwórz konto i odbierz nagrody na start.'}
+              </p>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Error Message */}
+              {error && (
+                <div className="p-3 bg-red-50 text-red-600 text-sm rounded-xl border border-red-100 flex items-center gap-2">
+                  <span>⚠️</span> {error}
+                </div>
+              )}
+
+              {view === 'register' && (
+                <div className="relative group">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-black dark:group-focus-within:text-white transition-colors" size={18} />
+                  <input
+                    type="text"
+                    placeholder="Nazwa użytkownika"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl py-3 pl-11 pr-4 outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-sm font-medium"
+                  />
+                </div>
+              )}
+
+              <div className="relative group">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-black dark:group-focus-within:text-white transition-colors" size={18} />
                 <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Podaj swoją nazwę"
+                  type="email"
+                  placeholder="Adres e-mail"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-colors"
+                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl py-3 pl-11 pr-4 outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-sm font-medium"
                 />
               </div>
-            )}
 
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
-                Email
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="twoj@email.com"
-                required
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-colors"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
-                Hasło
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                minLength={6}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-colors"
-              />
-            </div>
-
-            {mode === 'register' && (
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Potwierdź hasło
-                </label>
+              <div className="relative group">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-black dark:group-focus-within:text-white transition-colors" size={18} />
                 <input
                   type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder="Hasło"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   required
-                  minLength={6}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-colors"
+                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl py-3 pl-11 pr-4 outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all text-sm font-medium"
                 />
               </div>
-            )}
 
-            {/* Submit Button */}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              type="submit"
-              disabled={isLoading}
-              className="w-full py-4 bg-gradient-to-r from-blue-500 to-red-500 text-white rounded-xl font-bold text-lg shadow-lg disabled:opacity-50"
-            >
-              {isLoading
-                ? '⏳ Przetwarzanie...'
-                : mode === 'login' ? '🔓 Zaloguj się' : '🎉 Zarejestruj się'}
-            </motion.button>
-          </form>
-
-          {/* Switch Mode */}
-          <div className="mt-6 text-center">
-            <p className="text-gray-600">
-              {mode === 'login' ? 'Nie masz konta?' : 'Masz już konto?'}
-              {' '}
               <button
-                onClick={switchMode}
-                className="text-blue-600 font-bold hover:underline"
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-black dark:bg-white text-white dark:text-black py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed mt-2"
               >
-                {mode === 'login' ? 'Zarejestruj się' : 'Zaloguj się'}
+                {isLoading ? (
+                  <Loader2 className="animate-spin" size={18} />
+                ) : (
+                  <>
+                    {view === 'login' ? 'Zaloguj się' : 'Stwórz konto'}
+                    <ArrowRight size={16} />
+                  </>
+                )}
               </button>
-            </p>
-          </div>
+            </form>
 
-          {/* Benefits */}
-          {mode === 'register' && (
-            <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-red-50 rounded-xl">
-              <h4 className="font-bold text-sm mb-2 text-center">Co zyskujesz?</h4>
-              <ul className="text-sm space-y-1 text-gray-700">
-                <li>✅ Codzienne nagrody i bonusy</li>
-                <li>✅ System levelowania</li>
-                <li>✅ Ekskluzywne kupony rabatowe</li>
-                <li>✅ Odznaki i osiągnięcia</li>
-              </ul>
-            </div>
-          )}
+            {/* Benefits (Register Mode Only) */}
+            <AnimatePresence>
+              {view === 'register' && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="mt-6 pt-6 border-t border-zinc-100 dark:border-zinc-800">
+                    <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-3 text-center">
+                      Co na Ciebie czeka?
+                    </p>
+                    <div className="grid grid-cols-2 gap-2 text-xs text-zinc-600 dark:text-zinc-400">
+                      <div className="flex items-center gap-1.5 bg-zinc-50 dark:bg-zinc-800/50 p-2 rounded-lg">
+                        <span className="text-orange-500">🏆</span> Rankingi
+                      </div>
+                      <div className="flex items-center gap-1.5 bg-zinc-50 dark:bg-zinc-800/50 p-2 rounded-lg">
+                        <span className="text-blue-500">🎮</span> Gry
+                      </div>
+                      <div className="flex items-center gap-1.5 bg-zinc-50 dark:bg-zinc-800/50 p-2 rounded-lg">
+                        <span className="text-green-500">🎁</span> Nagrody
+                      </div>
+                      <div className="flex items-center gap-1.5 bg-zinc-50 dark:bg-zinc-800/50 p-2 rounded-lg">
+                        <span className="text-purple-500">⚡</span> Wyzwania
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+          </div>
         </motion.div>
       </motion.div>
     </AnimatePresence>
