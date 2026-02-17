@@ -1,168 +1,138 @@
 'use client'
 
-import { useSupabaseAuth } from "@/contexts/SupabaseAuthContext" // Używamy naszego Contextu
-import { motion } from "framer-motion"
-import { User, Shield, Star, Edit, LogOut, Settings, Award } from "lucide-react"
-import Link from "next/link"
-import { useState } from "react"
+import { useEffect, useState } from 'react'
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext'
+import { useRouter } from 'next/navigation'
+import { motion } from 'framer-motion'
+import { Star, Trophy, Zap, ShieldCheck, Settings, ArrowRight } from 'lucide-react'
+import Link from 'next/link'
 
 export default function ProfilPage() {
-  // Pobieramy wszystko z Contextu - to rozwiązuje Twój problem z importem createClientComponentClient
-  const { profile, signOut, loading, updateProfile } = useSupabaseAuth()
-  
-  const [isEditing, setIsEditing] = useState(false)
-  const [newName, setNewName] = useState("")
+  const { profile, session, loading } = useSupabaseAuth()
+  const router = useRouter()
+  const [mounted, setMounted] = useState(false)
 
-  // Funkcja zapisu
-  const handleSaveName = async () => {
-    if (!newName) return
-    try {
-      await updateProfile({ full_name: newName }) // Używamy funkcji z Contextu
-      setIsEditing(false)
-    } catch (error) {
-      alert("Błąd podczas zapisu profilu")
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (mounted && !loading && !session) {
+      router.push('/login')
     }
-  }
+  }, [mounted, loading, session, router])
 
-  // Jeśli się ładuje, pokaż spinner
-  if (loading) {
+  if (!mounted || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#BF2024]"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 text-zinc-400 font-bold animate-pulse uppercase tracking-widest text-xs">
+        Weryfikacja agenta...
       </div>
     )
   }
 
-  // Jeśli brak profilu (niezalogowany), przekieruj lub pokaż komunikat
-  if (!profile) {
-    return (
-      <div className="min-h-screen pt-32 text-center">
-        <h1 className="text-2xl font-bold mb-4">Musisz się zalogować!</h1>
-        <Link href="/" className="text-blue-600 underline">Wróć na stronę główną</Link>
-      </div>
-    )
-  }
+  if (!profile) return null
+
+  const isAdmin = profile.role === 'admin'
 
   return (
-    <main className="min-h-screen bg-gray-50 pt-24 pb-12">
-      <div className="container mx-auto px-6 max-w-4xl">
+    <div className="min-h-screen bg-[#F8F9FC] pt-24 pb-12 px-4">
+      <div className="max-w-4xl mx-auto space-y-6">
         
-        {/* Karta Główna Profilu */}
+        {/* KARTA PROFILU */}
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-[2.5rem] p-8 shadow-xl border border-gray-100 overflow-hidden relative"
+          initial={{ opacity: 0, y: 20 }} 
+          animate={{ opacity: 1, y: 0 }} 
+          className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-zinc-100 relative overflow-hidden"
         >
-          {/* Tło dekoracyjne */}
-          <div className="absolute top-0 left-0 w-full h-32 bg-linear-to-r from-[#BF2024] to-[#0055ff] opacity-10" />
-          
-          <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 mt-4">
-            {/* Avatar */}
-            <div className="w-32 h-32 rounded-full bg-gray-100 border-4 border-white shadow-lg flex items-center justify-center text-4xl font-black text-gray-300">
-               {profile.avatar_url ? (
-                 // Tu mógłby być <Image>
-                 <span className="text-sm">IMG</span> 
-               ) : (
-                 <User size={64} />
-               )}
-            </div>
+          {/* Przycisk Ustawień */}
+          <div className="absolute top-0 right-0 p-6">
+            <button className="p-3 bg-zinc-50 rounded-2xl text-zinc-400 hover:text-black transition-colors">
+              <Settings size={20} />
+            </button>
+          </div>
 
-            {/* Dane */}
-            <div className="flex-1 text-center md:text-left space-y-2">
+          <div className="flex flex-col md:flex-row items-center gap-8">
+            <div className="w-32 h-32 bg-blue-100 rounded-[2rem] flex items-center justify-center text-5xl shadow-inner">
+              {profile.avatar_url || '🐱'}
+            </div>
+            
+            <div className="text-center md:text-left space-y-2">
               <div className="flex items-center justify-center md:justify-start gap-3">
-                <span className="px-3 py-1 bg-blue-100 text-blue-600 text-xs font-black uppercase tracking-widest rounded-full">
-                  Poziom {profile.level}
-                </span>
-                {profile.role === 'admin' && (
-                  <span className="px-3 py-1 bg-red-100 text-red-600 text-xs font-black uppercase tracking-widest rounded-full flex items-center gap-1">
-                    <Shield size={12} /> Admin
+                <h1 className="text-4xl font-black text-zinc-900">{profile.username}</h1>
+                {isAdmin && (
+                  <span className="px-3 py-1 bg-red-100 text-red-600 text-[10px] font-black uppercase tracking-widest rounded-full flex items-center gap-1">
+                    <ShieldCheck size={12} /> Admin
                   </span>
                 )}
               </div>
-
-              {isEditing ? (
-                <div className="flex items-center gap-2">
-                    <input 
-                        className="text-3xl font-black font-heading text-gray-900 border-b-2 border-blue-500 outline-none"
-                        defaultValue={profile.full_name || profile.username}
-                        onChange={(e) => setNewName(e.target.value)}
-                        autoFocus
-                    />
-                    <button onClick={handleSaveName} className="text-sm bg-black text-white px-3 py-1 rounded-full">Zapisz</button>
-                    <button onClick={() => setIsEditing(false)} className="text-sm text-gray-500">Anuluj</button>
-                </div>
-              ) : (
-                <h1 className="text-3xl md:text-5xl font-black font-heading text-gray-900 flex items-center justify-center md:justify-start gap-4">
-                    {profile.full_name || profile.username}
-                    <button onClick={() => setIsEditing(true)} className="text-gray-400 hover:text-blue-500 transition-colors">
-                        <Edit size={24} />
-                    </button>
-                </h1>
-              )}
-              
-              <p className="text-gray-500 font-bold">@{profile.username}</p>
-
-              {/* Pasek XP */}
-              <div className="max-w-md mt-4">
-                <div className="flex justify-between text-xs font-bold text-gray-400 mb-1">
-                  <span>XP: {profile.xp}</span>
-                  <span>Następny poziom: {profile.level * 1000}</span>
-                </div>
-                <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
-                  <motion.div 
-                    initial={{ width: 0 }}
-                    animate={{ width: `${(profile.xp / (profile.level * 1000)) * 100}%` }}
-                    className="h-full bg-linear-to-r from-[#BF2024] to-[#0055ff]"
-                  />
-                </div>
-              </div>
+              <p className="text-zinc-400 font-bold uppercase tracking-widest text-sm">Agent Poziomu {profile.level}</p>
             </div>
           </div>
+
+          {/* STATYSTYKI */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-10">
+            <div className="bg-blue-50/50 p-6 rounded-[2rem] border border-blue-100/50">
+              <div className="flex items-center gap-2 text-blue-500 mb-1">
+                <Star size={14} fill="currentColor" />
+                <span className="text-[10px] font-black uppercase tracking-wider">Twoje Punkty</span>
+              </div>
+              <div className="text-4xl font-black text-blue-600">{profile.points}</div>
+            </div>
+
+            <div className="bg-orange-50/50 p-6 rounded-[2rem] border border-orange-100/50">
+              <div className="flex items-center gap-2 text-orange-500 mb-1">
+                <Zap size={14} fill="currentColor" />
+                <span className="text-[10px] font-black uppercase tracking-wider">Doświadczenie</span>
+              </div>
+              <div className="text-4xl font-black text-orange-600">{profile.xp} <span className="text-sm">XP</span></div>
+            </div>
+
+            <div className="bg-zinc-900 p-6 rounded-[2rem] text-white">
+              <div className="flex items-center gap-2 text-zinc-400 mb-1">
+                <Trophy size={14} fill="currentColor" />
+                <span className="text-[10px] font-black uppercase tracking-wider">Ranking</span>
+              </div>
+              <div className="text-4xl font-black">#1</div>
+            </div>
+          </div>
+
+          {/* SEKRETY ADMINA - POJAWIA SIĘ TYLKO DLA ADMINA */}
+          {isAdmin && (
+            <motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              className="mt-8 pt-8 border-t border-zinc-100"
+            >
+              <Link 
+                href="/admin"
+                className="group flex items-center justify-between p-6 bg-zinc-900 rounded-[2rem] text-white hover:bg-black transition-all shadow-lg shadow-zinc-200"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-blue-400">
+                    <ShieldCheck size={28} />
+                  </div>
+                  <div>
+                    <div className="font-black text-lg">Panel Zarządzania</div>
+                    <div className="text-zinc-400 text-xs font-bold uppercase tracking-widest">Edytuj punkty i misje urwisów</div>
+                  </div>
+                </div>
+                <ArrowRight className="text-zinc-500 group-hover:text-white group-hover:translate-x-2 transition-all" />
+              </Link>
+            </motion.div>
+          )}
         </motion.div>
 
-        {/* Grid Opcji */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-           {/* Osiągnięcia */}
-           <div className="bg-white p-6 rounded-[2rem] shadow-lg border border-gray-100">
-              <h3 className="font-black text-xl mb-4 flex items-center gap-2">
-                 <Award className="text-[#f59e0b]" /> Twoje Osiągnięcia
-              </h3>
-              <div className="grid grid-cols-4 gap-2">
-                 {[1,2,3,4].map(i => (
-                    <div key={i} className="aspect-square bg-gray-50 rounded-xl flex items-center justify-center text-gray-300">
-                        <Star size={20} />
-                    </div>
-                 ))}
-              </div>
-              <p className="text-xs text-gray-400 mt-4 text-center">Wykonywanie misji odblokowuje odznaki!</p>
-           </div>
-
-           {/* Ustawienia */}
-           <div className="bg-white p-6 rounded-[2rem] shadow-lg border border-gray-100 flex flex-col justify-between">
-              <div>
-                <h3 className="font-black text-xl mb-4 flex items-center gap-2">
-                    <Settings className="text-gray-400" /> Konto
-                </h3>
-                <p className="text-sm text-gray-500">Zarządzaj swoim kontem Urwisa.</p>
-              </div>
-              
-              <div className="space-y-3 mt-6">
-                {profile.role === 'admin' && (
-                    <Link href="/admin" className="block w-full py-3 bg-zinc-900 text-white text-center rounded-xl font-bold uppercase tracking-widest hover:bg-[#BF2024] transition-colors">
-                        Panel Admina
-                    </Link>
-                )}
-                <button 
-                    onClick={signOut}
-                    className="w-full py-3 border-2 border-red-100 text-red-500 text-center rounded-xl font-bold uppercase tracking-widest hover:bg-red-50 transition-colors flex items-center justify-center gap-2"
-                >
-                    <LogOut size={18} /> Wyloguj się
-                </button>
-              </div>
-           </div>
+        {/* DODATKOWE WIDŻETY */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-zinc-300 font-bold italic">
+            <div className="bg-white p-12 rounded-[2.5rem] border border-zinc-100 text-center">
+               Twoje aktywne misje...
+            </div>
+            <div className="bg-white p-12 rounded-[2.5rem] border border-zinc-100 text-center">
+               Twoje nagrody...
+            </div>
         </div>
 
       </div>
-    </main>
+    </div>
   )
 }
